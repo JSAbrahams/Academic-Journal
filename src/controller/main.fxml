@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.layout.BorderPane?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+            xmlns="http://javafx.com/javafx/11.0.1" fx:controller="Main">
+    <top>
+        <fx:include source="menu.fxml"/>
+    </top>
+    <left>
+        <fx:include source="history.fxml"/>
+    </left>
+    <center>
+        <fx:include source="editor.fxml"/>
+    </center>
+    <right>
+        <fx:include source="note.fxml"/>
+    </right>
+</BorderPane>
