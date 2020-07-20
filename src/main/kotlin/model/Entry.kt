@@ -1,6 +1,6 @@
-package model
+package main.kotlin.model
 
-import model.reference.Reference
+import main.kotlin.model.reference.Reference
 import java.util.*
 
 abstract class Notable(val start: Int, val end: Int, val note: String?)

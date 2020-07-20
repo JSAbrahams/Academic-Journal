@@ -1,4 +1,4 @@
-package controller
+package main.kotlin.controller
 
 import tornadofx.Controller
 

@@ -1,4 +1,4 @@
-package model.reference
+package main.kotlin.model.reference
 
 class Bibtex
 
