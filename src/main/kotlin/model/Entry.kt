@@ -1,6 +1,6 @@
-package service
+package model
 
-import service.reference.Reference
+import model.reference.Reference
 import java.util.*
 
 abstract class Notable(val start: Int, val end: Int, val note: String?)

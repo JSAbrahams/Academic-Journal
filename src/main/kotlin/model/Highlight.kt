@@ -1,4 +1,4 @@
-package service
+package model
 
 import javafx.scene.paint.Color
 

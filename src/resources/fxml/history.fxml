@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.VBox?>
+<ScrollPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="1.7976931348623157E308" prefWidth="300.0"
+            xmlns="http://javafx.com/javafx/11.0.1" fx:controller="controller.HistoryController">
+    <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"/>
+</ScrollPane>
