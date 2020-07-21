@@ -6,7 +6,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
-<GridPane xmlns:fx="http://javafx.com/fxml/1" hgap="5.0" prefWidth="400.0" vgap="5.0"
+<GridPane xmlns:fx="http://javafx.com/fxml/1" hgap="5.0" maxHeight="-Infinity" vgap="5.0"
           xmlns="http://javafx.com/javafx/11.0.1" fx:controller="main.kotlin.controller.NoteController">
     <columnConstraints>
         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
@@ -18,7 +18,7 @@
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
     </rowConstraints>
     <ColorPicker GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-    <TextArea prefHeight="500.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+    <TextArea prefHeight="300.0" prefWidth="400.0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
     <TextField GridPane.columnIndex="1"/>
     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Title"/>
     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Note" GridPane.rowIndex="1"/>

@@ -21,7 +21,8 @@
         </Separator>
         <Text id="editDate" strokeType="OUTSIDE" strokeWidth="0.0" text="Edit Date"/>
     </HBox>
-    <TextArea id="editorArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"/>
+    <TextArea id="editorArea" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="300.0"
+              promptText="What were today's findings?" wrapText="true"/>
     <ButtonBar prefHeight="40.0" prefWidth="200.0">
         <buttons>
             <Button id="saveButton" mnemonicParsing="false" text="Save"/>
