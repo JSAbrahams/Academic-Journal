@@ -4,7 +4,7 @@ import tornadofx.View
 import tornadofx.borderpane
 
 class Main : View() {
-    override val root = borderpane {  }
+    override val root = borderpane { }
 
     val history: History by inject()
     val editor: Editor by inject()

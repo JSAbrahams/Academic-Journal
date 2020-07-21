@@ -1,6 +1,6 @@
 package main.kotlin.model
 
-import java.util.*
+import java.util.Date
 
 data class Entry(
     val date: Date,
