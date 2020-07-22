@@ -2,31 +2,23 @@ package main.kotlin.view
 
 import javafx.geometry.Orientation
 import main.kotlin.controller.EditorController
-import tornadofx.View
-import tornadofx.hbox
-import tornadofx.separator
-import tornadofx.text
-import tornadofx.textarea
-import tornadofx.textfield
-import tornadofx.vbox
+import main.kotlin.controller.StoreController
+import tornadofx.*
 
 class Editor : View() {
     val editorController: EditorController by inject()
-
-    val titleField = textfield { }
-    val creationDate = text { }
-    val lastEditDate = text { }
-    val editArea = textarea { }
+    val storeController: StoreController by inject()
 
     override val root = vbox {
-        title
+        textfield { }
         hbox {
             text("Creation Date:")
-            creationDate
+            text { }
             separator(Orientation.VERTICAL)
             text("Last Edit Date:")
-            lastEditDate
+            text { }
         }
-        editArea
+        textarea { }
+        button("Save") { }
     }
 }

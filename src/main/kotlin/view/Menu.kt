@@ -1,30 +1,70 @@
 package main.kotlin.view
 
-import main.kotlin.controller.menu.FileController
-import main.kotlin.controller.menu.HelpController
-import tornadofx.View
-import tornadofx.item
-import tornadofx.menu
-import tornadofx.menubar
-import tornadofx.radiomenuitem
-import tornadofx.separator
+import javafx.application.Platform
+import javafx.scene.control.ButtonType
+import javafx.scene.control.ButtonType.*
+import javafx.stage.FileChooser
+import main.kotlin.controller.StoreController
+import tornadofx.*
+import java.util.*
 
 class Menu : View() {
-    val fileController: FileController by inject()
-    val helpController: HelpController by inject()
+    val storeController: StoreController by inject()
+
+    private fun save(manual: Boolean = false) {
+        if (manual || storeController.location.isNotNull.get()) {
+            val file = chooseFile(
+                "Open",
+                filters = arrayOf(FileChooser.ExtensionFilter("Journal Entry", "*.journal"))
+            )
+            if (file.isNotEmpty()) storeController.saveJournal(file[0])
+        } else {
+            storeController.saveJournal()
+        }
+    }
 
     override val root = menubar {
         menu("File") {
-            item("Open")
-            radiomenuitem("Open Recent")
+            item("Open").action {
+                val file = chooseFile(
+                    "Open",
+                    filters = arrayOf(FileChooser.ExtensionFilter("Journal Entry", "*.journal"))
+                )
+                if (file.isNotEmpty()) storeController.loadJournal(file[0])
+            }
+            radiomenuitem("Open Recent") {
+                isVisible = false
+            }
             separator()
-            item("Save")
-            item("Save As")
-            separator()
-            item("Close")
-        }
-        menu("Help") {
-            item("About")
+            item("Save") {
+                disableWhen { storeController.journal.isNull }
+                action { save() }
+            }
+            item("Save As") {
+                disableWhen { storeController.journal.isNull }
+                action { save(true) }
+                separator()
+                item("Close").action {
+                    if (storeController.edited.value) {
+                        when (warning(
+                            "Journal still open, do you wish to save first?",
+                            buttons = *arrayOf<ButtonType>(OK, CANCEL, CLOSE)
+                        ).showAndWait()) {
+                            Optional.of(OK) -> {
+                                save()
+                                Platform.exit()
+                            }
+                            Optional.of(CLOSE) -> Platform.exit()
+                        }
+                    } else {
+                        Platform.exit()
+                    }
+                }
+            }
+            menu("Help") {
+                item("About")
+                isVisible = false
+            }
         }
     }
 }

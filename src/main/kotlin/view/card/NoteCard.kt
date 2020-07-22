@@ -1,12 +1,10 @@
 package main.kotlin.view.card
 
-import main.kotlin.controller.card.NoteController
-import tornadofx.Fragment
+import main.kotlin.model.Reference
+import tornadofx.ListCellFragment
 import tornadofx.gridpane
 
-class NoteCard : Fragment() {
-    val noteController: NoteController by inject()
-
+class NoteCard : ListCellFragment<Reference>() {
     override val root = gridpane {
 
     }
