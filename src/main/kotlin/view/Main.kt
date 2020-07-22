@@ -7,6 +7,7 @@ class Main : View() {
     override val root = borderpane {
         top(Menu::class)
         center(Editor::class)
-        left(History::class)
+        left(Entries::class)
+        right(Notes::class)
     }
 }

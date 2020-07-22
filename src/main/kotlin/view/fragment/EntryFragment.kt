@@ -1,4 +1,4 @@
-package main.kotlin.view.card
+package main.kotlin.view.fragment
 
 import javafx.geometry.Orientation
 import main.kotlin.controller.EditorController
@@ -6,7 +6,7 @@ import main.kotlin.model.JournalEntry
 import main.kotlin.model.JournalEntryModel
 import tornadofx.*
 
-class EntryCard : ListCellFragment<JournalEntry>() {
+class EntryFragment : ListCellFragment<JournalEntry>() {
     val editorController: EditorController by inject()
     val entry = JournalEntryModel(itemProperty)
 
@@ -17,8 +17,6 @@ class EntryCard : ListCellFragment<JournalEntry>() {
             separator(Orientation.VERTICAL)
             text(entry.lastEdit.toString())
         }
-        hbox {
-            for (keyword in entry.keywords.value) text(keyword)
-        }
+        listview(entry.keywords) { }
     }
 }

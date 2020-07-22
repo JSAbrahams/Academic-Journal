@@ -18,11 +18,13 @@ sourceSets.main.kotlin.srcDirs = ['src']
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     compile "no.tornado:tornadofx:$tornadoVersion"
+    implementation "com.beust:klaxon:$klaxonVersion"
 }
 
 compileKotlin {

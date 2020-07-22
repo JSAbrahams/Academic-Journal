@@ -15,6 +15,11 @@ class StoreController : Controller() {
         journal.set(Journal.load(file))
     }
 
-    fun saveJournal(): Nothing = journal.value.save(location.value)
-    fun saveJournal(file: File): Nothing = journal.value.save(file)
+    fun saveJournal() {
+        if (journal.isBound) journal.value.save(location.value)
+    }
+
+    fun saveJournal(file: File) {
+        if (journal.isBound) journal.value.save(file)
+    }
 }

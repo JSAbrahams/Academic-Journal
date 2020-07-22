@@ -17,7 +17,10 @@ class Menu : View() {
                 "Open",
                 filters = arrayOf(FileChooser.ExtensionFilter("Journal Entry", "*.journal"))
             )
-            if (file.isNotEmpty()) storeController.saveJournal(file[0])
+            if (file.isNotEmpty()) {
+                storeController.saveJournal(file[0])
+                storeController.location.set(file[0])
+            }
         } else {
             storeController.saveJournal()
         }
@@ -32,9 +35,6 @@ class Menu : View() {
                 )
                 if (file.isNotEmpty()) storeController.loadJournal(file[0])
             }
-            radiomenuitem("Open Recent") {
-                isVisible = false
-            }
             separator()
             item("Save") {
                 disableWhen { storeController.journal.isNull }
@@ -43,22 +43,22 @@ class Menu : View() {
             item("Save As") {
                 disableWhen { storeController.journal.isNull }
                 action { save(true) }
-                separator()
-                item("Close").action {
-                    if (storeController.edited.value) {
-                        when (warning(
-                            "Journal still open, do you wish to save first?",
-                            buttons = *arrayOf<ButtonType>(OK, CANCEL, CLOSE)
-                        ).showAndWait()) {
-                            Optional.of(OK) -> {
-                                save()
-                                Platform.exit()
-                            }
-                            Optional.of(CLOSE) -> Platform.exit()
+            }
+            separator()
+            item("Close").action {
+                if (storeController.edited.value) {
+                    when (warning(
+                        "Journal still open, do you wish to save first?",
+                        buttons = *arrayOf<ButtonType>(OK, CANCEL, CLOSE)
+                    ).showAndWait()) {
+                        Optional.of(OK) -> {
+                            save()
+                            Platform.exit()
                         }
-                    } else {
-                        Platform.exit()
+                        Optional.of(CLOSE) -> Platform.exit()
                     }
+                } else {
+                    Platform.exit()
                 }
             }
             menu("Help") {
