@@ -14,5 +14,6 @@ class Notes : View() {
                 cellFragment(NoteFragment::class)
             }
         }
+        button("+")
     }
 }

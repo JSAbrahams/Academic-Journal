@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleStringProperty
 import tornadofx.ItemViewModel
 import tornadofx.asObservable
+import tornadofx.select
 
 class Author(first: String, surname: String, names: List<String>) {
     val firstProperty = SimpleStringProperty(first)
@@ -13,7 +14,7 @@ class Author(first: String, surname: String, names: List<String>) {
 }
 
 class AuthorModel(property: ObjectProperty<Author>) : ItemViewModel<Author>(itemProperty = property) {
-    val start = bind(autocommit = true) { property.get().firstProperty }
-    val surname = bind(autocommit = true) { property.get().surnameProperty }
-    val names = bind(autocommit = true) { property.get().namesProperty }
+    val start = bind(autocommit = true) { property.select { it.firstProperty } }
+    val surname = bind(autocommit = true) { property.select { it.surnameProperty } }
+    val names = bind(autocommit = true) { property.select { it.namesProperty } }
 }

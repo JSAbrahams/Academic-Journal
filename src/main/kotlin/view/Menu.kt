@@ -12,10 +12,11 @@ class Menu : View() {
     val storeController: StoreController by inject()
 
     private fun save(manual: Boolean = false) {
-        if (manual || storeController.location.isNotNull.get()) {
+        if (manual || storeController.location.isNull.get()) {
             val file = chooseFile(
                 "Open",
-                filters = arrayOf(FileChooser.ExtensionFilter("Journal Entry", "*.journal"))
+                filters = arrayOf(FileChooser.ExtensionFilter("Journal Entry", "*.journal")),
+                mode = FileChooserMode.Save
             )
             if (file.isNotEmpty()) {
                 storeController.saveJournal(file[0])

@@ -10,16 +10,15 @@ class Entries : View() {
     val storeController: StoreController by inject()
 
     override val root = vbox {
+        text().bind(storeController.journal.select { it.titleProperty })
         text("Entries")
         scrollpane {
-            listview(storeController.journal.select { it.items }) {
+            listview(storeController.journal.select { it.itemsProperty }) {
                 cellFragment(EntryFragment::class)
             }
         }
-        hbox {
-            button("+") {
-                isVisible = false
-            }
+        button("+").action {
+            storeController.newEntry()
         }
     }
 }

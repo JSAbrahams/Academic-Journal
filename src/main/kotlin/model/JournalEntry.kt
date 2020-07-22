@@ -6,15 +6,16 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import tornadofx.ItemViewModel
 import tornadofx.asObservable
+import tornadofx.select
 import java.util.*
 
 class JournalEntry(
-    creation: Date,
-    lastEdit: Date,
-    title: String,
-    text: String,
-    notes: List<Note>,
-    keywords: List<String>
+    creation: Date = Date(),
+    lastEdit: Date = Date(),
+    title: String = "",
+    text: String = "",
+    notes: List<Note> = listOf(),
+    keywords: List<String> = listOf()
 ) {
     val id = UUID.randomUUID()
 
@@ -27,15 +28,15 @@ class JournalEntry(
     val notesProperty = SimpleListProperty<Note>(notes.asObservable())
     val keywordsProperty = SimpleListProperty<String>(keywords.asObservable())
 
-    override fun equals(other: Any?): Boolean = id == (other as JournalEntry).id
+    override fun equals(other: Any?): Boolean = other is JournalEntry && id == other.id
     override fun hashCode(): Int = id.hashCode()
 }
 
 class JournalEntryModel(property: ObjectProperty<JournalEntry>) : ItemViewModel<JournalEntry>(itemProperty = property) {
-    val title = bind(autocommit = true) { property.get().titleProperty }
-    val text = bind(autocommit = true) { property.get().textProperty }
-    val lastEdit = bind(autocommit = true) { property.get().lastEditProperty }
-    val creation = bind(autocommit = true) { property.get().creationProperty }
-    val notes = bind(autocommit = true) { property.get().notesProperty }
-    val keywords = bind(autocommit = true) { property.get().keywordsProperty }
+    val title = bind(autocommit = true) { property.select { it.titleProperty } }
+    val text = bind(autocommit = true) { property.select { it.textProperty } }
+    val lastEdit = bind(autocommit = true) { property.select { it.lastEditProperty } }
+    val creation = bind(autocommit = true) { property.select { it.creationProperty } }
+    val notes = bind(autocommit = true) { property.select { it.notesProperty } }
+    val keywords = bind(autocommit = true) { property.select { it.keywordsProperty } }
 }
