@@ -6,10 +6,7 @@ import javafx.beans.property.SimpleStringProperty
 import tornadofx.asObservable
 import java.io.File
 
-class Journal(
-    title: String = "My Journal",
-    items: MutableList<JournalEntry> = mutableListOf(JournalEntry())
-) {
+class Journal(title: String = "My Journal", items: MutableList<JournalEntry> = mutableListOf()) {
     val titleProperty = SimpleStringProperty(title)
     val itemsProperty = SimpleListProperty<JournalEntry>(items.asObservable())
 

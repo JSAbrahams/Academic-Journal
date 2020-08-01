@@ -3,7 +3,11 @@ package main.kotlin.view.fragment
 import main.kotlin.controller.EditorController
 import main.kotlin.model.JournalEntry
 import main.kotlin.model.JournalEntryModel
-import tornadofx.*
+import tornadofx.ListCellFragment
+import tornadofx.bind
+import tornadofx.hbox
+import tornadofx.text
+import tornadofx.vbox
 
 class EntryFragment : ListCellFragment<JournalEntry>() {
     val editorController: EditorController by inject()
@@ -12,8 +16,11 @@ class EntryFragment : ListCellFragment<JournalEntry>() {
     override val root = vbox {
         hbox {
             text().bind(entry.creation)
+            text("•")
             text(entry.title)
         }
-//        listview(entry.keywords) { }
+        setOnMouseClicked {
+            editorController.current.value = entry.item
+        }
     }
 }

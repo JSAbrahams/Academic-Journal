@@ -24,7 +24,9 @@ class StoreController : Controller() {
         if (journal.isNotNull.get()) journal.value.save(file)
     }
 
-    fun newEntry() {
-        journal.get().itemsProperty.add(JournalEntry())
+    fun newEntry(): JournalEntry {
+        val journalEntry = JournalEntry()
+        journal.get().itemsProperty.add(journalEntry)
+        return journalEntry
     }
 }

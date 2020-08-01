@@ -1,12 +1,14 @@
 import javafx.application.Application
 import javafx.beans.binding.Bindings
 import javafx.stage.Stage
+import main.kotlin.controller.EditorController
 import main.kotlin.controller.StoreController
 import main.kotlin.view.Main
 import tornadofx.App
 
 class JournalApp : App(Main::class) {
     val storeController: StoreController by inject()
+    val editorController: EditorController by inject()
 
     override fun start(stage: Stage) {
         stage.titleProperty().bind(
@@ -15,6 +17,7 @@ class JournalApp : App(Main::class) {
                 .otherwise(storeController.location.asString())
         )
 
+        editorController.current.value = storeController.newEntry()
         super.start(stage)
     }
 }

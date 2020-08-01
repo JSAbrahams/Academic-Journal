@@ -3,7 +3,15 @@ package main.kotlin.view
 import main.kotlin.controller.EditorController
 import main.kotlin.controller.StoreController
 import main.kotlin.view.fragment.EntryFragment
-import tornadofx.*
+import tornadofx.View
+import tornadofx.action
+import tornadofx.bind
+import tornadofx.button
+import tornadofx.listview
+import tornadofx.scrollpane
+import tornadofx.select
+import tornadofx.text
+import tornadofx.vbox
 
 class Entries : View() {
     val editorController: EditorController by inject()
@@ -18,7 +26,8 @@ class Entries : View() {
             }
         }
         button("+").action {
-            storeController.newEntry()
+            val journalEntry = storeController.newEntry()
+            editorController.current.value = journalEntry
         }
     }
 }
