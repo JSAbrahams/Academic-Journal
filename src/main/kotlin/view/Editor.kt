@@ -48,18 +48,18 @@ class Editor : View() {
     override val root = vbox {
         hbox {
             circle(radius = 3).visibleWhen(editorController.current.select { it.editedProperty })
-            textfield(editorController.current.select { it.titleProperty }).disableWhen(
-                editorController.editMode.not()
-            )
+            textfield(editorController.current.select { it.titleProperty }) {
+                disableWhen(editorController.editMode.not())
+            }
         }
         hbox {
             text("Creation")
             text(editorController.current.select { it.creationProperty.asString() })
             separator(Orientation.VERTICAL)
         }
-        textarea(editorController.current.select { it.textProperty }).disableWhen(
-            editorController.editMode.not()
-        )
+        textarea(editorController.current.select { it.textProperty }) {
+            disableWhen(editorController.editMode.not())
+        }
         togglebutton("Edit Mode") {
             editorController.editMode.bind(this.selectedProperty())
         }

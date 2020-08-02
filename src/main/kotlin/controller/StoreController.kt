@@ -4,7 +4,6 @@ import javafx.beans.property.SimpleObjectProperty
 import main.kotlin.model.Journal
 import main.kotlin.model.JournalEntry
 import tornadofx.Controller
-import tornadofx.select
 import java.io.File
 
 class StoreController : Controller() {
@@ -16,16 +15,22 @@ class StoreController : Controller() {
     }
 
     fun saveJournal() {
-        journal.select { it.save() }
+        if (journal.isNotNull.get()) {
+            journal.value.save()
+        }
     }
 
     fun saveJournal(file: File) {
-        journal.select { it.save() }
+        if (journal.isNotNull.get()) {
+            journal.value.save()
+        }
     }
 
     fun newEntry(): JournalEntry {
         val journalEntry = JournalEntry()
-        journal.select { it.addJournalEntry(journalEntry) }
+        if (journal.isNotNull.get()) {
+            journal.value.addJournalEntry(journalEntry)
+        }
         return journalEntry
     }
 }

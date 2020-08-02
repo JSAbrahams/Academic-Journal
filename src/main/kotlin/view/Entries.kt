@@ -37,9 +37,7 @@ class Entries : View() {
                 disableWhen(storeController.journal.select { it.editedProperty.not() })
                 action { storeController.saveJournal() }
             }
-            button("+").action {
-                editorController.current.value = storeController.newEntry()
-            }
+            button("+").action { editorController.current.value = storeController.newEntry() }
         }
     }
 }
