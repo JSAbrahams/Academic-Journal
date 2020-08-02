@@ -8,6 +8,6 @@ class Main : View() {
         top(Menu::class)
         left(Entries::class)
         center(Editor::class)
-        right(Notes::class)
+        right(References::class)
     }
 }

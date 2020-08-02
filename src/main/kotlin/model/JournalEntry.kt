@@ -1,13 +1,16 @@
 package main.kotlin.model
 
+import javafx.beans.property.BooleanProperty
 import javafx.beans.property.ObjectProperty
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import tornadofx.ItemViewModel
 import tornadofx.asObservable
 import tornadofx.select
-import java.util.*
+import java.util.Date
+import java.util.UUID
 
 class JournalEntry(
     creation: Date = Date(),
@@ -22,6 +25,7 @@ class JournalEntry(
     val lastEditProperty = SimpleObjectProperty(lastEdit)
     val creationProperty = SimpleObjectProperty(creation)
 
+    val editedProperty: BooleanProperty = SimpleBooleanProperty(true)
     val titleProperty = SimpleStringProperty(title)
     val textProperty = SimpleStringProperty(text)
 
@@ -32,9 +36,11 @@ class JournalEntry(
     override fun hashCode(): Int = id.hashCode()
 }
 
-class JournalEntryModel(property: ObjectProperty<JournalEntry>) : ItemViewModel<JournalEntry>(itemProperty = property) {
+class JournalEntryModel(property: ObjectProperty<JournalEntry>) :
+    ItemViewModel<JournalEntry>(itemProperty = property) {
     val title = bind(autocommit = true) { property.select { it.titleProperty } }
     val text = bind(autocommit = true) { property.select { it.textProperty } }
+    val edited = bind(autocommit = true) { property.select { it.editedProperty } }
     val lastEdit = bind(autocommit = true) { property.select { it.lastEditProperty } }
     val creation = bind(autocommit = true) { property.select { it.creationProperty } }
     val notes = bind(autocommit = true) { property.select { it.notesProperty } }

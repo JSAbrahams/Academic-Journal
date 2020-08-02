@@ -17,6 +17,9 @@ plugins {
 sourceSets.main.kotlin.srcDirs = ['src']
 
 repositories {
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
     mavenCentral()
     jcenter()
 }
@@ -24,6 +27,7 @@ repositories {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     compile "no.tornado:tornadofx:$tornadoVersion"
+    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: "$richTextFxVersion"
     implementation "com.beust:klaxon:$klaxonVersion"
 }
 

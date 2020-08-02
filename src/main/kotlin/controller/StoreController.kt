@@ -1,6 +1,5 @@
 package main.kotlin.controller
 
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import main.kotlin.model.Journal
 import main.kotlin.model.JournalEntry
@@ -9,7 +8,6 @@ import java.io.File
 
 class StoreController : Controller() {
     val location = SimpleObjectProperty<File>()
-    val edited = SimpleBooleanProperty()
     val journal = SimpleObjectProperty<Journal>(Journal())
 
     fun loadJournal(file: File) {
