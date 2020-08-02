@@ -8,6 +8,7 @@ import tornadofx.action
 import tornadofx.bind
 import tornadofx.button
 import tornadofx.circle
+import tornadofx.disableWhen
 import tornadofx.hbox
 import tornadofx.listview
 import tornadofx.scrollpane
@@ -31,9 +32,14 @@ class Entries : View() {
                 cellFragment(EntryFragment::class)
             }
         }
-        button("+").action {
-            val journalEntry = storeController.newEntry()
-            editorController.current.value = journalEntry
+        hbox {
+            button("save") {
+                disableWhen(storeController.journal.select { it.editedProperty.not() })
+                action { storeController.saveJournal() }
+            }
+            button("+").action {
+                editorController.current.value = storeController.newEntry()
+            }
         }
     }
 }

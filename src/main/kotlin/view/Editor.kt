@@ -7,6 +7,7 @@ import main.kotlin.controller.EditorController
 import org.fxmisc.richtext.StyleClassedTextArea
 import org.fxmisc.richtext.event.MouseOverTextEvent
 import tornadofx.View
+import tornadofx.circle
 import tornadofx.disableWhen
 import tornadofx.hbox
 import tornadofx.select
@@ -16,6 +17,7 @@ import tornadofx.textarea
 import tornadofx.textfield
 import tornadofx.togglebutton
 import tornadofx.vbox
+import tornadofx.visibleWhen
 import java.time.Duration
 
 class Editor : View() {
@@ -45,6 +47,7 @@ class Editor : View() {
 
     override val root = vbox {
         hbox {
+            circle(radius = 3).visibleWhen(editorController.current.select { it.editedProperty })
             textfield(editorController.current.select { it.titleProperty }).disableWhen(
                 editorController.editMode.not()
             )
