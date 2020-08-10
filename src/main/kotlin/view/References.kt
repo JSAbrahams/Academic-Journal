@@ -1,25 +1,23 @@
 package main.kotlin.view
 
+import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.view.fragment.NoteFragment
-import tornadofx.View
-import tornadofx.button
-import tornadofx.listview
-import tornadofx.scrollpane
-import tornadofx.select
-import tornadofx.text
-import tornadofx.vbox
+import tornadofx.*
 
 class References : View() {
     val editorController: EditorController by inject()
 
     override val root = vbox {
-        text("References")
+        addClass(Styles.container)
+        text("References") { setId(Styles.title) }
+
         scrollpane {
             listview(editorController.current.select { it.notesProperty }) {
                 cellFragment(NoteFragment::class)
             }
         }
+
         button("+")
     }
 }

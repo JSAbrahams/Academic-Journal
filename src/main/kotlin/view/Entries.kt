@@ -1,32 +1,22 @@
 package main.kotlin.view
 
+import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.controller.StoreController
 import main.kotlin.view.fragment.EntryFragment
-import tornadofx.View
-import tornadofx.action
-import tornadofx.bind
-import tornadofx.button
-import tornadofx.circle
-import tornadofx.disableWhen
-import tornadofx.hbox
-import tornadofx.listview
-import tornadofx.scrollpane
-import tornadofx.select
-import tornadofx.text
-import tornadofx.vbox
-import tornadofx.visibleWhen
+import tornadofx.*
 
 class Entries : View() {
     val editorController: EditorController by inject()
     val storeController: StoreController by inject()
 
     override val root = vbox {
+        addClass(Styles.container)
         hbox {
             circle(radius = 3).visibleWhen(storeController.journal.select { it.editedProperty })
             text().bind(storeController.journal.select { it.titleProperty })
         }
-        text("Entries")
+        text("Entries") { setId(Styles.title) }
         scrollpane {
             listview(storeController.journal.select { it.itemsProperty }) {
                 cellFragment(EntryFragment::class)
