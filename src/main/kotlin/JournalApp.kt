@@ -3,9 +3,7 @@ package main.kotlin
 import javafx.application.Application
 import javafx.beans.binding.Bindings
 import javafx.scene.control.ButtonType
-import javafx.scene.control.ButtonType.CANCEL
-import javafx.scene.control.ButtonType.CLOSE
-import javafx.scene.control.ButtonType.OK
+import javafx.scene.control.ButtonType.*
 import javafx.stage.Stage
 import main.kotlin.controller.EditorController
 import main.kotlin.controller.StoreController
@@ -19,9 +17,9 @@ class JournalApp : App(Main::class) {
     val storeController: StoreController by inject()
     val editorController: EditorController by inject()
 
-    override fun start(primaryStage: Stage) {
-        super.start(primaryStage)
-        primaryStage.titleProperty().bind(
+    override fun start(stage: Stage) {
+        super.start(stage)
+        stage.titleProperty().bind(
             Bindings.concat(
                 Bindings.`when`(storeController.journal.selectBoolean { it.editedProperty })
                     .then("[Unsaved] ").otherwise(""),
@@ -31,12 +29,12 @@ class JournalApp : App(Main::class) {
             )
         )
 
-        primaryStage.setOnCloseRequest {
+        stage.setOnCloseRequest {
             if (storeController.journal.isNotNull.get() && storeController.journal.selectBoolean { it.editedProperty }.value) {
                 warning(
                     header = "Journal still open, do you wish to save first?",
-                    buttons = *arrayOf<ButtonType>(OK, CANCEL, CLOSE),
-                    owner = primaryStage.owner,
+                    buttons = arrayOf<ButtonType>(OK, CANCEL, CLOSE),
+                    owner = stage.owner,
                     actionFn = { buttonType ->
                         when (buttonType) {
                             CANCEL -> it.consume()

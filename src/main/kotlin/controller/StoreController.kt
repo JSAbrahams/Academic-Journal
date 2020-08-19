@@ -8,7 +8,7 @@ import java.io.File
 
 class StoreController : Controller() {
     val location = SimpleObjectProperty<File>()
-    val journal = SimpleObjectProperty<Journal>(Journal())
+    val journal = SimpleObjectProperty(Journal())
 
     fun loadJournal(file: File) {
         journal.set(Journal.load(file))
@@ -16,13 +16,13 @@ class StoreController : Controller() {
 
     fun saveJournal() {
         if (journal.isNotNull.get()) {
-            journal.value.save()
+            journal.value.reset()
         }
     }
 
     fun saveJournal(file: File) {
         if (journal.isNotNull.get()) {
-            journal.value.save()
+            journal.value.reset()
         }
     }
 

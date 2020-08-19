@@ -2,14 +2,7 @@ package main.kotlin.view
 
 import javafx.stage.FileChooser
 import main.kotlin.controller.StoreController
-import tornadofx.View
-import tornadofx.action
-import tornadofx.chooseFile
-import tornadofx.disableWhen
-import tornadofx.item
-import tornadofx.menu
-import tornadofx.menubar
-import tornadofx.separator
+import tornadofx.*
 
 class Menu : View() {
     val storeController: StoreController by inject()
@@ -25,12 +18,13 @@ class Menu : View() {
             }
             separator()
             item("Save").disableWhen { storeController.journal.isNull }
-            item("Save As").disableWhen { storeController.journal.isNull }
-            separator { isVisible = false }
-            menu("Help") {
-                item("About")
-                isVisible = false
-            }
+            item("Export").disableWhen { storeController.journal.isNull }
+            separator()
+            item("Settings")
+        }
+        menu("Help") {
+            item("About")
+            isVisible = false
         }
     }
 }

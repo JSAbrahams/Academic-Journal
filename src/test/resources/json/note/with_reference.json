@@ -1,0 +1,18 @@
+{
+  "start": 10,
+  "end": 20,
+  "note": "Test",
+  "references": [
+    {
+      "title": "testTitle",
+      "authors": [
+        {
+          "names": [
+            "first",
+            "last"
+          ]
+        }
+      ]
+    }
+  ]
+}

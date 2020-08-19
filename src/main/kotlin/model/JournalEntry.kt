@@ -1,28 +1,23 @@
 package main.kotlin.model
 
-import javafx.beans.property.BooleanProperty
-import javafx.beans.property.ObjectProperty
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleListProperty
-import javafx.beans.property.SimpleObjectProperty
-import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.*
 import javafx.collections.ObservableList
 import tornadofx.ItemViewModel
 import tornadofx.asObservable
 import tornadofx.onChange
 import tornadofx.select
-import java.util.Date
-import java.util.UUID
+import java.util.*
 
 class JournalEntry(
+    id: UUID? = null,
     creation: Date = Date(),
     lastEdit: Date = Date(),
     title: String = "",
     text: String = "",
-    notes: List<Note> = listOf(),
-    keywords: List<String> = listOf()
+    keywords: List<String> = listOf(),
+    notes: List<Note> = listOf()
 ) {
-    val id = UUID.randomUUID()
+    val id = id ?: UUID.randomUUID()
 
     val lastEditProperty = SimpleObjectProperty(lastEdit)
     val creationProperty = SimpleObjectProperty(creation)

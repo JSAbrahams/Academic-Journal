@@ -7,9 +7,9 @@ import tornadofx.ItemViewModel
 import tornadofx.asObservable
 import tornadofx.select
 
-class Author(first: String, surname: String, names: List<String>) {
-    val firstProperty = SimpleStringProperty(first)
-    val surnameProperty = SimpleStringProperty(surname)
+class Author(names: List<String>) {
+    val firstProperty = SimpleStringProperty(if (names.isNotEmpty()) names[0] else "")
+    val surnameProperty = SimpleStringProperty(if (names.size > 1) names.last() else "")
     val namesProperty = SimpleListProperty(names.asObservable())
 }
 
