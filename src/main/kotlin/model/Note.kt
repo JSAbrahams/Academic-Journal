@@ -36,7 +36,7 @@ class Note(start: Int, end: Int, note: String = "", reference: List<Reference> =
 }
 
 /**
- * Custom NoteSerializer to handle the ObjectProperty.
+ * Custom NoteSerializer to handle the ObjectProperty's.
  */
 object NoteSerializer : KSerializer<Note> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Note") {
