@@ -21,13 +21,18 @@ class Author(names: List<String>) {
     val firstProperty = SimpleStringProperty(if (names.isNotEmpty()) names[0] else "")
     val surnameProperty = SimpleStringProperty(if (names.size > 1) names.last() else "")
     val namesProperty = SimpleListProperty(names.asObservable())
+
+    override fun equals(other: Any?): Boolean =
+        other is Author && namesProperty.toList() == other.namesProperty.toList()
+
+    override fun hashCode(): Int = namesProperty.hashCode()
 }
 
 /**
  * Custom AuthorSerializer to handle the ObjectProperty's.
  */
 object AuthorSerializer : KSerializer<Author> {
-    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Note") {
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Author") {
         element<Array<String>>("names")
     }
 

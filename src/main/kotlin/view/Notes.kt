@@ -5,7 +5,7 @@ import main.kotlin.controller.EditorController
 import main.kotlin.view.fragment.NoteFragment
 import tornadofx.*
 
-class References : View() {
+class Notes : View() {
     val editorController: EditorController by inject()
 
     override val root = vbox {
