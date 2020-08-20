@@ -56,7 +56,6 @@ class JournalEntry(
     override fun hashCode(): Int {
         var result = lastEditProperty.get().toInstant().epochSecond.hashCode()
         result = 31 * result + creationProperty.get().toInstant().epochSecond.hashCode()
-        result = 31 * result + editedProperty.hashCode()
         result = 31 * result + titleProperty.hashCode()
         result = 31 * result + textProperty.hashCode()
         result = 31 * result + notesProperty.hashCode()
@@ -89,8 +88,8 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
     }
 
     override fun deserialize(decoder: Decoder): JournalEntry = decoder.decodeStructure(descriptor) {
-        var lastEdit = Date()
         var creation = Date()
+        var lastEdit = Date()
         var title = ""
         var text = ""
         val notes = mutableListOf<Note>()

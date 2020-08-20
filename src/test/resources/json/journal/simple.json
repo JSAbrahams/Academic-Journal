@@ -1,5 +1,11 @@
 {
-  "title": "testTitle",
-  "items": [
+  "title": "title",
+  "entries": [
+    {
+      "creation": 10,
+      "last_edited": 20,
+      "title": "otherTitle",
+      "text": "text"
+    }
   ]
 }
