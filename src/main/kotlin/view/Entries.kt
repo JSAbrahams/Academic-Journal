@@ -24,10 +24,10 @@ class Entries : View() {
         }
         hbox {
             button("save") {
-                disableWhen(storeController.journal.select { it.editedProperty.not() })
+                disableWhen { storeController.location.isNull.or(storeController.journal.selectBoolean { it.editedProperty }) }
                 action { storeController.saveJournal() }
             }
-            button("+").action { editorController.current.value = storeController.newEntry() }
         }
+        button("+").action { editorController.current.value = storeController.newEntry() }
     }
 }

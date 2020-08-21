@@ -1,6 +1,8 @@
 package main.kotlin.controller
 
 import javafx.beans.property.SimpleObjectProperty
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import main.kotlin.model.Journal
 import main.kotlin.model.JournalEntry
 import tornadofx.Controller
@@ -10,18 +12,21 @@ class StoreController : Controller() {
     val location = SimpleObjectProperty<File>()
     val journal = SimpleObjectProperty(Journal())
 
-    fun loadJournal(file: File) {
-        journal.set(Journal.load(file))
+    fun loadJournal(file: File) = journal.set(Journal.load(file))
+
+    fun saveJournal() = when {
+        location.isNull.get() -> throw IllegalStateException("Location must be set.")
+        else -> saveJournal(location.get())
     }
 
-    fun saveJournal() {
-        if (journal.isNotNull.get()) {
-            journal.value.reset()
-        }
-    }
-
-    fun saveJournal(file: File) {
-        if (journal.isNotNull.get()) {
+    /**
+     * Save Journal to given location and set location.
+     */
+    fun saveJournal(file: File) = when {
+        journal.isNull.get() -> throw IllegalStateException("Journal must be be loaded.")
+        else -> {
+            location.set(file)
+            file.writeText(Json.encodeToString(journal.get()))
             journal.value.reset()
         }
     }

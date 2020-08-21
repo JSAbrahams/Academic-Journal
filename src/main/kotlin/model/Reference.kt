@@ -2,6 +2,7 @@ package main.kotlin.model
 
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleListProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -13,11 +14,13 @@ import kotlinx.serialization.encoding.*
 import tornadofx.ItemViewModel
 import tornadofx.asObservable
 import tornadofx.select
+import java.io.File
 
 @Serializable(with = ReferenceSerializer::class)
 class Reference(title: String, authors: List<Author>) {
     val titleProperty = SimpleStringProperty(title)
     val authorsProperty = SimpleListProperty(authors.asObservable())
+    val pdfLocation = SimpleObjectProperty<File>()
 
     override fun equals(other: Any?): Boolean = other is Reference && titleProperty.get() == other.titleProperty.get()
             && authorsProperty.toList() == other.authorsProperty.toList()
@@ -45,8 +48,7 @@ object ReferenceSerializer : KSerializer<Reference> {
     }
 
     override fun deserialize(decoder: Decoder): Reference = decoder.decodeStructure(descriptor) {
-        var title = ""
-        val authors = mutableListOf<Author>()
+        var (title, authors) = Pair("", mutableListOf<Author>())
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
                 0 -> title = decodeStringElement(descriptor, index)

@@ -21,8 +21,7 @@ class JournalEntryTest : FreeSpec({
         }
         "can be written to json" {
             val entry = JournalEntry(Date(100), Date(200), "title", "text")
-            val entryString = Json.encodeToString(entry)
-            val newEntry = Json.decodeFromString<JournalEntry>(entryString)
+            val newEntry = Json.decodeFromString<JournalEntry>(Json.encodeToString(entry))
 
             newEntry shouldBe entry
         }

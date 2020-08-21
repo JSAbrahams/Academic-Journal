@@ -29,7 +29,7 @@ class JournalEntry(
     val lastEditProperty = SimpleObjectProperty(lastEdit)
     val creationProperty = SimpleObjectProperty(creation)
 
-    val editedProperty: BooleanProperty = SimpleBooleanProperty(true)
+    val editedProperty: BooleanProperty = SimpleBooleanProperty(false)
 
     val titleProperty = SimpleStringProperty(title)
     val textProperty = SimpleStringProperty(text)
@@ -71,7 +71,7 @@ class JournalEntry(
 object JournalEntrySerializer : KSerializer<JournalEntry> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("JournalEntry") {
         element<Long>("creation")
-        element<Long>("last_edited")
+        element<Long>("last_edit")
         element<String>("title")
         element<String>("text")
         element<List<Note>>("notes")
@@ -88,12 +88,10 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
     }
 
     override fun deserialize(decoder: Decoder): JournalEntry = decoder.decodeStructure(descriptor) {
-        var creation = Date()
-        var lastEdit = Date()
-        var title = ""
-        var text = ""
-        val notes = mutableListOf<Note>()
-        val keywords = mutableListOf<String>()
+        var (creation, lastEdit) = Pair(Date(), Date())
+        var (title, text) = Pair("", "")
+        val (notes, keywords) = Pair(mutableListOf<Note>(), mutableListOf<String>())
+
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
                 0 -> creation = Date(decodeLongElement(descriptor, index) * 1000)

@@ -1,6 +1,5 @@
 package model
 
-import io.kotest.core.annotation.Ignored
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.serialization.decodeFromString
@@ -10,7 +9,6 @@ import main.kotlin.model.Journal
 import main.kotlin.model.JournalEntry
 import java.util.*
 
-@Ignored // Writing to JSON does not work for JournalEntries
 class JournalTest : FreeSpec({
     "a journal" - {
         "can be retrieved from a json" {
@@ -28,8 +26,7 @@ class JournalTest : FreeSpec({
         }
         "can be written to json" {
             val journal = Journal("title", listOf(JournalEntry(Date(300), Date(400), "title", "text")))
-            val journalString = Json.encodeToString(journal)
-            val newJournal = Json.decodeFromString<JournalEntry>(journalString)
+            val newJournal = Json.decodeFromString<Journal>(Json.encodeToString(journal))
 
             newJournal shouldBe journal
         }

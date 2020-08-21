@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleStringProperty
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
@@ -43,28 +44,33 @@ object NoteSerializer : KSerializer<Note> {
         element<Int>("start")
         element<Int>("end")
         element<String>("note")
+        element<List<Reference>>("references")
     }
 
     override fun serialize(encoder: Encoder, value: Note) = encoder.encodeStructure(descriptor) {
         encodeIntElement(descriptor, 0, value.startProperty.get())
         encodeIntElement(descriptor, 1, value.endProperty.get())
         encodeStringElement(descriptor, 2, value.noteProperty.get())
+        encodeSerializableElement(descriptor, 3, ListSerializer(ReferenceSerializer), value.referencesProperty.toList())
     }
 
     override fun deserialize(decoder: Decoder): Note = decoder.decodeStructure(descriptor) {
-        var start = -1
-        var end = -1
+        var (start, end) = Pair(0, 0)
         var note = ""
+        val references = mutableListOf<Reference>()
+
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
                 0 -> start = decodeIntElement(descriptor, 0)
                 1 -> end = decodeIntElement(descriptor, 1)
                 2 -> note = decodeStringElement(descriptor, 2)
+                3 -> references.addAll(decodeSerializableElement(descriptor, 3, ListSerializer(ReferenceSerializer)))
                 CompositeDecoder.DECODE_DONE -> break
                 else -> error("Unexpected index: $index")
             }
         }
-        Note(start, end, note)
+
+        Note(start, end, note, references)
     }
 }
 
