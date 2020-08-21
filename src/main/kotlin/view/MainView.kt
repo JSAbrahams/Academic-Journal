@@ -8,6 +8,6 @@ class MainView : View() {
         top(MenuView::class)
         left(EntriesView::class)
         center(EditorView::class)
-        right(NotesView::class)
+        right(ReferencesView::class)
     }
 }

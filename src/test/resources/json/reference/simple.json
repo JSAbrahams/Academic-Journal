@@ -1,11 +1,4 @@
 {
-  "title": "title",
-  "authors": [
-    {
-      "names": [
-        "first",
-        "last"
-      ]
-    }
-  ]
+  "start": 10,
+  "end": 20
 }

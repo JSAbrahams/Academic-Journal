@@ -4,6 +4,8 @@ import javafx.geometry.Orientation
 import javafx.scene.control.Label
 import javafx.stage.Popup
 import main.kotlin.controller.EditorController
+import main.kotlin.model.Keyword
+import main.kotlin.view.fragment.KeywordFragment
 import org.fxmisc.richtext.StyleClassedTextArea
 import org.fxmisc.richtext.event.MouseOverTextEvent
 import tornadofx.*
@@ -46,11 +48,20 @@ class EditorView : View() {
             text(editorController.current.select { it.creationProperty.asString() })
             separator(Orientation.VERTICAL)
         }
+
         textarea(editorController.current.select { it.textProperty }) {
             disableWhen(editorController.editMode.not())
         }
-        togglebutton("Edit Mode") {
-            editorController.editMode.bind(this.selectedProperty())
+
+        text("Keywords")
+        hbox {
+            button("+") {
+                disableWhen(editorController.current.isNull.or(editorController.editMode.not()))
+                action { editorController.current.get().keywordsProperty.add(Keyword()) }
+            }
+            listview(editorController.current.select { it.keywordsProperty }) {
+                cellFragment(KeywordFragment::class)
+            }
         }
     }
 }

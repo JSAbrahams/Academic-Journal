@@ -21,10 +21,10 @@ class JournalApp : App(MainView::class) {
         super.start(stage)
         stage.titleProperty().bind(
             Bindings.concat(
-                Bindings.`when`(storeController.savedProperty).then("[Unsaved] ").otherwise(""),
-                storeController.journal.select { it.titleProperty },
                 Bindings.`when`(storeController.location.isNotNull)
-                    .then(Bindings.concat(" [", storeController.location.get(), "]")).otherwise("")
+                    .then(Bindings.concat(" [", storeController.location.asString(), "] ")).otherwise(""),
+                storeController.journal.select { it.titleProperty },
+                Bindings.`when`(storeController.savedProperty).then("").otherwise(" [Unsaved]")
             )
         )
 

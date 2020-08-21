@@ -6,7 +6,6 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
@@ -23,8 +22,8 @@ class JournalEntry(
     lastEdit: Date = Date(),
     title: String = "",
     text: String = "",
-    notes: List<Note> = listOf(),
-    keywords: List<String> = listOf()
+    references: List<Reference> = listOf(),
+    keywords: List<Keyword> = listOf()
 ) {
     val lastEditProperty = SimpleObjectProperty(lastEdit)
     val creationProperty = SimpleObjectProperty(creation)
@@ -34,14 +33,23 @@ class JournalEntry(
     val titleProperty = SimpleStringProperty(title)
     val textProperty = SimpleStringProperty(text)
 
-    val notesProperty = SimpleListProperty(notes.asObservable())
-    val keywordsProperty = SimpleListProperty(keywords.asObservable())
+    val referencesProperty = SimpleListProperty(references.toMutableList().asObservable())
+    val keywordsProperty = SimpleListProperty(keywords.toMutableList().asObservable())
 
     init {
         titleProperty.onChange { editedProperty.set(true) }
         textProperty.onChange { editedProperty.set(true) }
-        notesProperty.onChange<ObservableList<Note>> { editedProperty.set(true) }
-        keywordsProperty.onChange<ObservableList<String>> { editedProperty.set(true) }
+        keywordsProperty.onChange<ObservableList<Keyword>> {
+            it?.forEach { keyword -> keyword.editedProperty.onChange { editedProperty.set(editedProperty.get() || it) } }
+            editedProperty.set(true)
+        }
+
+        keywordsProperty.forEach { keyword -> keyword.editedProperty.onChange { editedProperty.set(editedProperty.get() || it) } }
+    }
+
+    fun reset() {
+        keywordsProperty.forEach { it.editedProperty.set(false) }
+        editedProperty.set(false)
     }
 
     override fun equals(other: Any?): Boolean = other is JournalEntry
@@ -50,7 +58,7 @@ class JournalEntry(
             && editedProperty.get() == other.editedProperty.get()
             && titleProperty.get() == other.titleProperty.get()
             && textProperty.get() == other.textProperty.get()
-            && notesProperty.get().toList() == other.notesProperty.get().toList()
+            && referencesProperty.get().toList() == other.referencesProperty.get().toList()
             && keywordsProperty.get().toList() == other.keywordsProperty.get().toList()
 
     override fun hashCode(): Int {
@@ -58,7 +66,7 @@ class JournalEntry(
         result = 31 * result + creationProperty.get().toInstant().epochSecond.hashCode()
         result = 31 * result + titleProperty.hashCode()
         result = 31 * result + textProperty.hashCode()
-        result = 31 * result + notesProperty.hashCode()
+        result = 31 * result + referencesProperty.hashCode()
         result = 31 * result + keywordsProperty.hashCode()
         return result
     }
@@ -74,8 +82,8 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
         element<Long>("last_edit")
         element<String>("title")
         element<String>("text")
-        element<List<Note>>("notes")
         element<List<String>>("keywords")
+        element<List<Reference>>("references")
     }
 
     override fun serialize(encoder: Encoder, value: JournalEntry) = encoder.encodeStructure(descriptor) {
@@ -83,14 +91,14 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
         encodeLongElement(descriptor, 1, value.lastEditProperty.get().toInstant().epochSecond)
         encodeStringElement(descriptor, 2, value.titleProperty.get())
         encodeStringElement(descriptor, 3, value.textProperty.get())
-        encodeSerializableElement(descriptor, 4, ListSerializer(NoteSerializer), value.notesProperty.toList())
-        encodeSerializableElement(descriptor, 5, ListSerializer(String.serializer()), value.keywordsProperty.toList())
+        encodeSerializableElement(descriptor, 4, ListSerializer(KeywordSerializer), value.keywordsProperty.toList())
+        encodeSerializableElement(descriptor, 5, ListSerializer(ReferenceSerializer), value.referencesProperty.toList())
     }
 
     override fun deserialize(decoder: Decoder): JournalEntry = decoder.decodeStructure(descriptor) {
         var (creation, lastEdit) = Pair(Date(), Date())
         var (title, text) = Pair("", "")
-        val (notes, keywords) = Pair(mutableListOf<Note>(), mutableListOf<String>())
+        val (references, keywords) = Pair(mutableListOf<Reference>(), mutableListOf<Keyword>())
 
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
@@ -98,14 +106,20 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
                 1 -> lastEdit = Date(decodeLongElement(descriptor, index) * 1000)
                 2 -> title = decodeStringElement(descriptor, index)
                 3 -> text = decodeStringElement(descriptor, index)
-                4 -> notes.addAll(decodeSerializableElement(descriptor, index, ListSerializer(NoteSerializer)))
-                5 -> keywords.addAll(decodeSerializableElement(descriptor, index, ListSerializer(String.serializer())))
+                4 -> keywords.addAll(decodeSerializableElement(descriptor, index, ListSerializer(KeywordSerializer)))
+                5 -> references.addAll(
+                    decodeSerializableElement(
+                        descriptor,
+                        index,
+                        ListSerializer(ReferenceSerializer)
+                    )
+                )
                 CompositeDecoder.DECODE_DONE -> break
                 else -> throw SerializationException("Unknown index $index")
             }
         }
 
-        JournalEntry(creation, lastEdit, title, text, notes, keywords)
+        JournalEntry(creation, lastEdit, title, text, references, keywords)
     }
 }
 
@@ -116,6 +130,5 @@ class JournalEntryModel(property: ObjectProperty<JournalEntry>) :
     val edited = bind(autocommit = true) { property.select { it.editedProperty } }
     val lastEdit = bind(autocommit = true) { property.select { it.lastEditProperty } }
     val creation = bind(autocommit = true) { property.select { it.creationProperty } }
-    val notes = bind(autocommit = true) { property.select { it.notesProperty } }
     val keywords = bind(autocommit = true) { property.select { it.keywordsProperty } }
 }

@@ -14,11 +14,9 @@ class EntriesView : View() {
 
     override val root = vbox {
         addClass(Styles.container)
-        hbox {
-            circle(radius = 3).visibleWhen(storeController.journal.select { it.editedProperty })
-            text().bind(storeController.journal.select { it.titleProperty })
-        }
+        text().bind(storeController.journal.select { it.titleProperty })
         text("Entries") { setId(Styles.title) }
+
         listview(storeController.journal.select { it.itemsProperty }) {
             cellFragment(EntryFragment::class)
             bindSelected(editorController.current)
@@ -30,12 +28,17 @@ class EntriesView : View() {
                 }
             }
         }
+
         hbox {
+            togglebutton("Edit Mode") {
+                disableWhen(storeController.journal.isNull)
+                editorController.editMode.bind(this.selectedProperty())
+            }
             button("save") {
                 disableWhen(storeController.savedProperty)
                 action { menuViewView.save() }
             }
+            button("+").action { editorController.current.set(storeController.newEntry()) }
         }
-        button("+").action { editorController.current.set(storeController.newEntry()) }
     }
 }

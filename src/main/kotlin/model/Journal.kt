@@ -32,7 +32,15 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf()) {
         fun load(file: File): Journal = Json.decodeFromString(file.readText())
     }
 
-    fun reset() = itemsProperty.forEach { it.editedProperty.set(false) }
+    init {
+        val or = myItems.fold(
+            SimpleBooleanProperty(false),
+            fun(acc, b): BooleanBinding { return Bindings.or(acc, b.editedProperty) })
+
+        editedProperty.cleanBind(or)
+    }
+
+    fun reset() = itemsProperty.forEach { it.reset() }
 
     fun addJournalEntry(journalEntry: JournalEntry) {
         myItems.add(journalEntry)

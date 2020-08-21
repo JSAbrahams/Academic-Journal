@@ -1,20 +1,12 @@
 package main.kotlin.view.fragment
 
-import main.kotlin.model.Note
 import main.kotlin.model.NoteModel
+import main.kotlin.model.Reference
 import tornadofx.ListCellFragment
-import tornadofx.listview
-import tornadofx.text
 import tornadofx.vbox
 
-class NoteFragment : ListCellFragment<Note>() {
+class NoteFragment : ListCellFragment<Reference>() {
     val entry = NoteModel(itemProperty)
 
-    override val root = vbox {
-        text(entry.note)
-        text("References")
-        listview(entry.references) {
-            cellFragment(ReferenceFragment::class)
-        }
-    }
+    override val root = vbox {}
 }

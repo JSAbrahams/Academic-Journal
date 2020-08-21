@@ -30,9 +30,14 @@ class MenuView : View() {
                 disableWhen { storeController.journal.isNull }
                 action { save(true) }
             }
-            item("Export").disableWhen { storeController.journal.isNull }
-            separator()
-            item("Settings")
+            item("Export") {
+                disableWhen { storeController.journal.isNull }
+                isVisible = false
+            }
+            separator { isVisible = false }
+            item("Settings") {
+                isVisible = false
+            }
         }
         menu("Help") {
             item("About")

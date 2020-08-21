@@ -34,6 +34,7 @@ class StoreController : Controller() {
         journal.isNull.get() -> throw IllegalStateException("Journal must be be loaded.")
         else -> {
             location.set(file)
+            if (journal.get().titleProperty.isEmpty.get()) journal.get().titleProperty.set(file.nameWithoutExtension)
             file.writeText(Json.encodeToString(journal.get()))
             journal.value.reset()
         }
