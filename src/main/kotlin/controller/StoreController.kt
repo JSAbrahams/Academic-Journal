@@ -1,18 +1,26 @@
 package main.kotlin.controller
 
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import main.kotlin.model.Journal
 import main.kotlin.model.JournalEntry
 import tornadofx.Controller
+import tornadofx.cleanBind
+import tornadofx.select
 import java.io.File
 
 class StoreController : Controller() {
     val location = SimpleObjectProperty<File>()
     val journal = SimpleObjectProperty(Journal())
+    val savedProperty = SimpleBooleanProperty(false)
 
-    fun loadJournal(file: File) = journal.set(Journal.load(file))
+    fun loadJournal(file: File) {
+        journal.set(Journal.load(file))
+        location.set(file)
+        savedProperty.cleanBind(journal.select { it.editedProperty.not() })
+    }
 
     fun saveJournal() = when {
         location.isNull.get() -> throw IllegalStateException("Location must be set.")

@@ -7,13 +7,13 @@ import javafx.scene.control.ButtonType.*
 import javafx.stage.Stage
 import main.kotlin.controller.EditorController
 import main.kotlin.controller.StoreController
-import main.kotlin.view.Main
+import main.kotlin.view.MainView
 import tornadofx.App
 import tornadofx.select
 import tornadofx.selectBoolean
 import tornadofx.warning
 
-class JournalApp : App(Main::class) {
+class JournalApp : App(MainView::class) {
     val storeController: StoreController by inject()
     val editorController: EditorController by inject()
 
@@ -21,8 +21,7 @@ class JournalApp : App(Main::class) {
         super.start(stage)
         stage.titleProperty().bind(
             Bindings.concat(
-                Bindings.`when`(storeController.journal.selectBoolean { it.editedProperty })
-                    .then("[Unsaved] ").otherwise(""),
+                Bindings.`when`(storeController.savedProperty).then("[Unsaved] ").otherwise(""),
                 storeController.journal.select { it.titleProperty },
                 Bindings.`when`(storeController.location.isNotNull)
                     .then(Bindings.concat(" [", storeController.location.get(), "]")).otherwise("")
