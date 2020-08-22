@@ -3,6 +3,7 @@ package main.kotlin.view
 import javafx.geometry.Orientation
 import javafx.scene.control.Label
 import javafx.stage.Popup
+import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.model.Keyword
 import main.kotlin.view.fragment.KeywordFragment
@@ -37,6 +38,8 @@ class EditorView : View() {
     }
 
     override val root = vbox {
+        addClass(Styles.container)
+
         hbox {
             circle(radius = 3).visibleWhen(editorController.current.select { it.editedProperty })
             textfield(editorController.current.select { it.titleProperty }) {

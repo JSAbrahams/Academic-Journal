@@ -9,9 +9,9 @@ class Styles : Stylesheet() {
     }
 
     init {
+        title { fontSize = 2.em }
+
         container {
-            padding = box(100.px)
-            title { fontSize = 10.em }
             textField { backgroundRadius = multi(box(0.em)) }
             textArea { backgroundRadius = multi(box(0.em)) }
         }

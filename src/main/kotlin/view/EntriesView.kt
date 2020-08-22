@@ -17,8 +17,9 @@ class EntriesView : View() {
 
     override val root = vbox {
         addClass(Styles.container)
-        text().bind(storeController.journal.select { it.titleProperty })
+
         text("Entries") { setId(Styles.title) }
+        text().bind(storeController.journal.select { it.titleProperty })
 
         listview(storeController.journal.select { it.itemsProperty }) {
             cellFragment(EntryFragment::class)

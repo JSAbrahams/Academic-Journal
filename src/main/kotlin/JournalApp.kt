@@ -16,7 +16,7 @@ import tornadofx.selectBoolean
 import tornadofx.warning
 import java.io.File
 
-class JournalApp : App(MainView::class) {
+class JournalApp : App(MainView::class, Styles::class) {
     val storeController: StoreController by inject()
     val appdirController: AppdirController by inject()
 
