@@ -14,12 +14,13 @@ import tornadofx.ItemViewModel
 import tornadofx.asObservable
 import tornadofx.onChange
 import tornadofx.select
-import java.util.*
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 @Serializable(with = JournalEntrySerializer::class)
 class JournalEntry(
-    creation: Date = Date(),
-    lastEdit: Date = Date(),
+    creation: LocalDateTime = LocalDateTime.now(),
+    lastEdit: LocalDateTime = LocalDateTime.now(),
     title: String = "",
     text: String = "",
     references: List<Reference> = listOf(),
@@ -53,8 +54,10 @@ class JournalEntry(
     }
 
     override fun equals(other: Any?): Boolean = other is JournalEntry
-            && lastEditProperty.get().toInstant().epochSecond == other.lastEditProperty.get().toInstant().epochSecond
-            && creationProperty.get().toInstant().epochSecond == other.creationProperty.get().toInstant().epochSecond
+            && lastEditProperty.get().toEpochSecond(ZoneOffset.UTC) == other.lastEditProperty.get()
+        .toEpochSecond(ZoneOffset.UTC)
+            && creationProperty.get().toEpochSecond(ZoneOffset.UTC) == other.creationProperty.get()
+        .toEpochSecond(ZoneOffset.UTC)
             && editedProperty.get() == other.editedProperty.get()
             && titleProperty.get() == other.titleProperty.get()
             && textProperty.get() == other.textProperty.get()
@@ -62,8 +65,8 @@ class JournalEntry(
             && keywordsProperty.get().toList() == other.keywordsProperty.get().toList()
 
     override fun hashCode(): Int {
-        var result = lastEditProperty.get().toInstant().epochSecond.hashCode()
-        result = 31 * result + creationProperty.get().toInstant().epochSecond.hashCode()
+        var result = lastEditProperty.get().toEpochSecond(ZoneOffset.UTC).hashCode()
+        result = 31 * result + creationProperty.get().toEpochSecond(ZoneOffset.UTC).hashCode()
         result = 31 * result + titleProperty.hashCode()
         result = 31 * result + textProperty.hashCode()
         result = 31 * result + referencesProperty.hashCode()
@@ -87,8 +90,8 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
     }
 
     override fun serialize(encoder: Encoder, value: JournalEntry) = encoder.encodeStructure(descriptor) {
-        encodeLongElement(descriptor, 0, value.creationProperty.get().toInstant().epochSecond)
-        encodeLongElement(descriptor, 1, value.lastEditProperty.get().toInstant().epochSecond)
+        encodeLongElement(descriptor, 0, value.creationProperty.get().toEpochSecond(ZoneOffset.UTC))
+        encodeLongElement(descriptor, 1, value.lastEditProperty.get().toEpochSecond(ZoneOffset.UTC))
         encodeStringElement(descriptor, 2, value.titleProperty.get())
         encodeStringElement(descriptor, 3, value.textProperty.get())
         encodeSerializableElement(descriptor, 4, ListSerializer(KeywordSerializer), value.keywordsProperty.toList())
@@ -96,14 +99,16 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
     }
 
     override fun deserialize(decoder: Decoder): JournalEntry = decoder.decodeStructure(descriptor) {
-        var (creation, lastEdit) = Pair(Date(), Date())
+        var (creation, lastEdit) = Pair(LocalDateTime.now(), LocalDateTime.now())
         var (title, text) = Pair("", "")
         val (references, keywords) = Pair(mutableListOf<Reference>(), mutableListOf<Keyword>())
 
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
-                0 -> creation = Date(decodeLongElement(descriptor, index) * 1000)
-                1 -> lastEdit = Date(decodeLongElement(descriptor, index) * 1000)
+                0 -> creation =
+                    LocalDateTime.ofEpochSecond(decodeLongElement(descriptor, index) * 1000, 0, ZoneOffset.UTC)
+                1 -> lastEdit =
+                    LocalDateTime.ofEpochSecond(decodeLongElement(descriptor, index) * 1000, 0, ZoneOffset.UTC)
                 2 -> title = decodeStringElement(descriptor, index)
                 3 -> text = decodeStringElement(descriptor, index)
                 4 -> keywords.addAll(decodeSerializableElement(descriptor, index, ListSerializer(KeywordSerializer)))
