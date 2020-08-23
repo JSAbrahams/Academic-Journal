@@ -1,4 +1,4 @@
-package main.kotlin.view
+package main.kotlin.view.main
 
 import javafx.scene.control.MenuItem
 import javafx.stage.FileChooser
@@ -64,6 +64,9 @@ class MenuView : View() {
             item("Settings") {
                 isVisible = false
             }
+        }
+        menu("References") {
+            item("Zotero")
         }
         menu("Help") {
             item("About")

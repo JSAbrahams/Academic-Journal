@@ -1,7 +1,7 @@
 package main.kotlin.view.fragment
 
-import main.kotlin.model.Author
-import main.kotlin.model.AuthorModel
+import main.kotlin.model.reference.Author
+import main.kotlin.model.reference.AuthorModel
 import tornadofx.ListCellFragment
 import tornadofx.text
 import tornadofx.vbox

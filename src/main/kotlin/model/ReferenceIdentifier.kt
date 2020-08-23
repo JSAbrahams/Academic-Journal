@@ -2,6 +2,8 @@ package main.kotlin.model
 
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleIntegerProperty
+import javafx.beans.property.SimpleMapProperty
+import javafx.beans.property.SimpleObjectProperty
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -12,22 +14,23 @@ import tornadofx.ItemViewModel
 import tornadofx.select
 
 @Serializable(with = ReferenceSerializer::class)
-class Reference(start: Int, end: Int, val reference: Int) {
+class Reference(start: Int, end: Int, val referenceNo: Int) {
     val startProperty = SimpleIntegerProperty(start)
     val endProperty = SimpleIntegerProperty(end)
+    val reference = SimpleObjectProperty<Reference>()
 
     /**
      * Load reference based on mapping from identifier to actual reference
      */
-    fun loadReference(): Nothing = TODO()
+    fun loadReference(referenceMapping: SimpleMapProperty<Int, Reference>): Nothing = TODO()
 
     override fun equals(other: Any?): Boolean = other is Reference && startProperty.get() == other.startProperty.get()
-            && endProperty.get() == other.endProperty.get() && reference == other.reference
+            && endProperty.get() == other.endProperty.get() && referenceNo == other.referenceNo
 
     override fun hashCode(): Int {
         var result = startProperty.hashCode()
         result = 31 * result + endProperty.hashCode()
-        return 31 * result + reference
+        return 31 * result + referenceNo
     }
 }
 
@@ -44,24 +47,24 @@ object ReferenceSerializer : KSerializer<Reference> {
     override fun serialize(encoder: Encoder, value: Reference) = encoder.encodeStructure(descriptor) {
         encodeIntElement(descriptor, 0, value.startProperty.get())
         encodeIntElement(descriptor, 1, value.endProperty.get())
-        encodeIntElement(descriptor, 2, value.reference)
+        encodeIntElement(descriptor, 2, value.referenceNo)
     }
 
     override fun deserialize(decoder: Decoder): Reference = decoder.decodeStructure(descriptor) {
         var (start, end) = Pair(0, 0)
-        var reference = -1
+        var referenceNo = -1
 
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
                 0 -> start = decodeIntElement(descriptor, 0)
                 1 -> end = decodeIntElement(descriptor, 1)
-                2 -> reference = decodeIntElement(descriptor, 2)
+                2 -> referenceNo = decodeIntElement(descriptor, 2)
                 CompositeDecoder.DECODE_DONE -> break
                 else -> error("Unexpected index: $index")
             }
         }
 
-        Reference(start, end, reference)
+        Reference(start, end, referenceNo)
     }
 }
 

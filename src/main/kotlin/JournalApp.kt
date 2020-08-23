@@ -8,7 +8,7 @@ import javafx.stage.Stage
 import javafx.stage.Window
 import main.kotlin.controller.AppdirController
 import main.kotlin.controller.StoreController
-import main.kotlin.view.MainView
+import main.kotlin.view.main.MainView
 import net.harawata.appdirs.AppDirsFactory
 import tornadofx.App
 import tornadofx.select
