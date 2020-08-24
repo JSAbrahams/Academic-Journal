@@ -36,6 +36,12 @@ dependencies {
     compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: richTextFxVersion
     compile group: 'net.harawata', name: 'appdirs', version: appdirsVersion
     compile group: 'com.moandjiezana.toml', name: 'toml4j', version: toml4jVersion
+
+    // Database
+    compile group: 'org.jetbrains.exposed', name: 'exposed-core', version: exposedVersion
+    compile group: 'org.jetbrains.exposed', name: 'exposed-jdbc', version: exposedVersion
+    compile group: 'org.xerial', name: 'sqlite-jdbc', version: sqliteJDBCVersion
+
     implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-serialization-core', version: kotlinxVersion
 
     testImplementation "io.kotest:kotest-runner-junit5-jvm:$kotestVersion" // for kotest framework

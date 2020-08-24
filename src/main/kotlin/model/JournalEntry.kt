@@ -10,6 +10,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.*
+import main.kotlin.model.reference.Reference
 import tornadofx.ItemViewModel
 import tornadofx.asObservable
 import tornadofx.onChange
@@ -26,7 +27,7 @@ class JournalEntry(
     lastEdit: LocalDateTime = LocalDateTime.now(),
     title: String = "",
     text: String = "",
-    references: List<Reference> = listOf(),
+    references: List<ReferencePosition> = listOf(),
     keywords: List<Keyword> = listOf()
 ) {
     val lastEditProperty = SimpleObjectProperty(lastEdit)
@@ -39,6 +40,13 @@ class JournalEntry(
 
     val referencesProperty = SimpleListProperty(references.toMutableList().asObservable())
     val keywordsProperty = SimpleListProperty(keywords.toMutableList().asObservable())
+
+    /**
+     * Load reference based on mapping from identifier to actual reference.
+     */
+    fun loadReference(referenceMapping: Map<Int, Reference>) {
+        referencesProperty.forEach { it.loadReference(referenceMapping) }
+    }
 
     init {
         titleProperty.onChange { editedProperty.set(true) }
@@ -66,8 +74,8 @@ class JournalEntry(
             && keywordsProperty.get().toList() == other.keywordsProperty.get().toList()
 
     override fun hashCode(): Int {
-        var result = lastEditProperty.get().toEpochSecond(ZoneOffset.UTC).hashCode()
-        result = 31 * result + creationProperty.get().toEpochSecond(ZoneOffset.UTC).hashCode()
+        var result = lastEditProperty.get().epochSeconds.hashCode()
+        result = 31 * result + creationProperty.get().epochSeconds.hashCode()
         result = 31 * result + titleProperty.hashCode()
         result = 31 * result + textProperty.hashCode()
         result = 31 * result + referencesProperty.hashCode()
@@ -87,7 +95,7 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
         element<String>("title")
         element<String>("text")
         element<List<String>>("keywords")
-        element<List<Reference>>("references")
+        element<List<ReferencePosition>>("references")
     }
 
     override fun serialize(encoder: Encoder, value: JournalEntry) = encoder.encodeStructure(descriptor) {
@@ -96,13 +104,18 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
         encodeStringElement(descriptor, 2, value.titleProperty.get())
         encodeStringElement(descriptor, 3, value.textProperty.get())
         encodeSerializableElement(descriptor, 4, ListSerializer(KeywordSerializer), value.keywordsProperty.toList())
-        encodeSerializableElement(descriptor, 5, ListSerializer(ReferenceSerializer), value.referencesProperty.toList())
+        encodeSerializableElement(
+            descriptor,
+            5,
+            ListSerializer(ReferencePositionSerializer),
+            value.referencesProperty.toList()
+        )
     }
 
     override fun deserialize(decoder: Decoder): JournalEntry = decoder.decodeStructure(descriptor) {
         var (creation, lastEdit) = Pair(LocalDateTime.now(), LocalDateTime.now())
         var (title, text) = Pair("", "")
-        val (references, keywords) = Pair(mutableListOf<Reference>(), mutableListOf<Keyword>())
+        val (references, keywords) = Pair(mutableListOf<ReferencePosition>(), mutableListOf<Keyword>())
 
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
@@ -111,7 +124,13 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
                 2 -> title = decodeStringElement(descriptor, 2)
                 3 -> text = decodeStringElement(descriptor, 3)
                 4 -> keywords.addAll(decodeSerializableElement(descriptor, 4, ListSerializer(KeywordSerializer)))
-                5 -> references.addAll(decodeSerializableElement(descriptor, 5, ListSerializer(ReferenceSerializer)))
+                5 -> references.addAll(
+                    decodeSerializableElement(
+                        descriptor,
+                        5,
+                        ListSerializer(ReferencePositionSerializer)
+                    )
+                )
                 CompositeDecoder.DECODE_DONE -> break
                 else -> throw SerializationException("Unknown index $index")
             }

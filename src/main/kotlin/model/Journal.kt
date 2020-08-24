@@ -16,6 +16,7 @@ import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.*
 import kotlinx.serialization.json.Json
+import main.kotlin.model.reference.Reference
 import tornadofx.asObservable
 import tornadofx.cleanBind
 import java.io.File
@@ -41,6 +42,13 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf()) {
     }
 
     fun reset() = itemsProperty.forEach { it.reset() }
+
+    /**
+     * Load reference based on mapping from identifier to actual reference.
+     */
+    fun loadReference(referenceMapping: Map<Int, Reference>) {
+        itemsProperty.forEach { it.loadReference(referenceMapping) }
+    }
 
     fun addJournalEntry(journalEntry: JournalEntry) {
         myItems.add(journalEntry)
