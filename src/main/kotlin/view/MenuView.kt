@@ -1,6 +1,7 @@
 package main.kotlin.view
 
 import javafx.stage.FileChooser
+import main.kotlin.controller.AppdirController
 import main.kotlin.controller.StoreController
 import tornadofx.*
 

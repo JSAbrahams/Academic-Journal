@@ -14,6 +14,7 @@ import java.io.File
 class StoreController : Controller() {
     val location = SimpleObjectProperty<File>()
     val journal = SimpleObjectProperty(Journal())
+
     val savedProperty = SimpleBooleanProperty(false)
 
     fun loadJournal(file: File) {
