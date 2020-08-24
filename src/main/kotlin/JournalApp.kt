@@ -5,6 +5,7 @@ import javafx.beans.binding.Bindings
 import javafx.scene.control.ButtonType
 import javafx.scene.control.ButtonType.*
 import javafx.stage.Stage
+import javafx.stage.Window
 import main.kotlin.controller.AppdirController
 import javafx.stage.Window
 import main.kotlin.controller.AppdirController
@@ -70,7 +71,6 @@ class JournalApp : App(MainView::class, Styles::class) {
             if (storeController.journal.isNotNull.get() && storeController.journal.selectBoolean { it.editedProperty }.value) {
                 savePrompt(storeController, stage.owner)
             }
-
             appdirController.writeToFile()
         }
     }
