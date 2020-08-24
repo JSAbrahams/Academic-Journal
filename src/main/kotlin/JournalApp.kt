@@ -5,9 +5,11 @@ import javafx.beans.binding.Bindings
 import javafx.scene.control.ButtonType
 import javafx.scene.control.ButtonType.*
 import javafx.stage.Stage
+import main.kotlin.controller.AppdirController
 import javafx.stage.Window
 import main.kotlin.controller.AppdirController
 import main.kotlin.controller.StoreController
+import net.harawata.appdirs.AppDirsFactory
 import main.kotlin.view.main.MainView
 import net.harawata.appdirs.AppDirsFactory
 import tornadofx.App
@@ -68,9 +70,9 @@ class JournalApp : App(MainView::class, Styles::class) {
             if (storeController.journal.isNotNull.get() && storeController.journal.selectBoolean { it.editedProperty }.value) {
                 savePrompt(storeController, stage.owner)
             }
+
             appdirController.writeToFile()
         }
-
     }
 }
 

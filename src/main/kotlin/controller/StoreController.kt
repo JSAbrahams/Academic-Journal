@@ -8,7 +8,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import main.kotlin.model.Journal
 import main.kotlin.model.JournalEntry
-import main.kotlin.model.Reference
+import main.kotlin.model.reference.Reference
 import tornadofx.Controller
 import tornadofx.cleanBind
 import tornadofx.select
