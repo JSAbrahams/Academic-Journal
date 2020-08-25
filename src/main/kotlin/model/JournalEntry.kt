@@ -128,5 +128,5 @@ class JournalEntryModel(property: ObjectProperty<JournalEntry>) :
     val edited = bind(autocommit = true) { property.select { it.editedProperty } }
     val lastEdit = bind(autocommit = true) { property.select { it.lastEditProperty } }
     val creation = bind(autocommit = true) { property.select { it.creationProperty } }
-    val keywords = bind(autocommit = true) { property.select { it.keywordsProperty } }
+    val keywords: ObservableList<Keyword> = bind(autocommit = true) { property.select { it.keywordsProperty } }
 }

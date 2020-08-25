@@ -16,6 +16,9 @@ class EntryFragment : ListCellFragment<JournalEntry>() {
             text(entry.title)
         }
         hbox {
+            visibleWhen(entry.keywords.sizeProperty.greaterThan(0))
+            managedWhen(entry.keywords.sizeProperty.greaterThan(0))
+
             text("keywords:")
             listview(entry.keywords) {
                 addClass(Styles.keywords)

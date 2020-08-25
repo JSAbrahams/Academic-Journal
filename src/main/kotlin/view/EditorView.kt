@@ -2,7 +2,6 @@ package main.kotlin.view
 
 import javafx.geometry.Orientation
 import javafx.scene.control.Label
-import javafx.scene.layout.Priority
 import javafx.stage.Popup
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
@@ -65,9 +64,6 @@ class EditorView : View() {
             }
             listview(editorController.current.select { it.keywordsProperty }) {
                 addClass(Styles.keywords)
-                hgrow = Priority.ALWAYS
-                vgrow = Priority.NEVER
-
                 cellFragment(KeywordFragment::class)
             }
         }
