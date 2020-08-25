@@ -33,14 +33,15 @@ class MenuView : View() {
                 items.bind(appdirController.files.select { it.recentFiles }.value) { path ->
                     val menuItem = MenuItem(path.toString())
                     menuItem.action {
-                        if (storeController.location.isNull.get() ||
-                            storeController.location.isNotNull.get() && path != storeController.location.get().toPath()
+                        if (!path.toFile().exists()) {
+                            warning("Unknown file", "File no longer exists, and will be removed")
+                            appdirController.files.value.recentFiles.remove(path)
+                        } else if (storeController.location.isNull.get()
+                            || storeController.location.isNotNull.get() && path != storeController.location.get()
+                                .toPath()
+                            && savePrompt(storeController, currentStage?.owner)
                         ) {
-                            if (savePrompt(
-                                    storeController,
-                                    currentStage?.owner
-                                )
-                            ) storeController.loadJournal(path.toFile())
+                            storeController.loadJournal(path.toFile())
                         }
                     }
                     menuItem
