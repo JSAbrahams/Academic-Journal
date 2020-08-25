@@ -40,7 +40,7 @@ class EditorView : View() {
         hbox {
             circle(radius = 3).visibleWhen(editorController.current.select { it.editedProperty })
             textfield(editorController.current.select { it.titleProperty }) {
-                disableWhen(editorController.editMode.not())
+                disableWhen(editorController.editMode.not().or(editorController.current.isNull))
             }
         }
         hbox {
@@ -50,7 +50,7 @@ class EditorView : View() {
         }
 
         textarea(editorController.current.select { it.textProperty }) {
-            disableWhen(editorController.editMode.not())
+            disableWhen(editorController.editMode.not().or(editorController.current.isNull))
         }
 
         text("Keywords")
