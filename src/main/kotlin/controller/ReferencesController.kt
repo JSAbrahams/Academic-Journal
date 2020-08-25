@@ -9,6 +9,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import tornadofx.Controller
 import tornadofx.toObservable
 import java.io.File
+import java.time.LocalDateTime
 
 class ReferencesController : Controller() {
     val storeController: StoreController by inject()
@@ -17,6 +18,8 @@ class ReferencesController : Controller() {
     val zoteroDirectory = File(System.getProperty("user.home"), "Zotero")
     val location = SimpleObjectProperty(File(zoteroDirectory, "zotero.sqlite"))
     var connected = false
+
+    val lastSync = SimpleObjectProperty(LocalDateTime.now())
 
     fun connect() {
         Database.connect(url = File("jdbc:sqlite:", location.get().absolutePath).path, driver = "org.sqlite.JDBC")
@@ -49,5 +52,6 @@ class ReferencesController : Controller() {
 
         storeController.authorMapping.set(authorMapping.toObservable())
         storeController.referenceMapping.set(referenceMapping.toObservable())
+        lastSync.set(LocalDateTime.now())
     }
 }

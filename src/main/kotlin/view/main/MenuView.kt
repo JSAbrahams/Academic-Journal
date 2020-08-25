@@ -5,6 +5,7 @@ import javafx.stage.FileChooser
 import main.kotlin.JournalApp.Companion.savePrompt
 import main.kotlin.controller.AppdirController
 import main.kotlin.controller.StoreController
+import main.kotlin.view.reference.ZoteroView
 import tornadofx.*
 
 class MenuView : View() {
@@ -66,7 +67,9 @@ class MenuView : View() {
             }
         }
         menu("References") {
-            item("Zotero")
+            item("Zotero").action {
+                ZoteroView().openWindow(owner = currentStage, block = true)
+            }
         }
         menu("Help") {
             item("About")

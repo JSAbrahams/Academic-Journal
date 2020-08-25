@@ -1,5 +1,7 @@
 package main.kotlin.model.reference
 
+import javafx.beans.property.ObjectProperty
+import tornadofx.ItemViewModel
 import java.time.LocalDate
 
 data class Reference(
@@ -21,3 +23,6 @@ data class Reference(
     val journalAbbr: String = "",
     val language: String = "",
 )
+
+class ReferenceModel(property: ObjectProperty<Reference>) : ItemViewModel<Reference>(itemProperty = property)
+
