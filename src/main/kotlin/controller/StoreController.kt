@@ -1,17 +1,13 @@
 package main.kotlin.controller
 
 import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleMapProperty
 import javafx.beans.property.SimpleObjectProperty
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import main.kotlin.model.Journal
 import main.kotlin.model.JournalEntry
-import main.kotlin.model.reference.Author
-import main.kotlin.model.reference.Reference
 import tornadofx.Controller
 import tornadofx.cleanBind
-import tornadofx.onChange
 import tornadofx.select
 import java.io.File
 
@@ -20,16 +16,6 @@ class StoreController : Controller() {
     val savedProperty = SimpleBooleanProperty(false)
 
     val journal = SimpleObjectProperty(Journal())
-    val authorMapping = SimpleMapProperty<Int, Author>()
-    val referenceMapping = SimpleMapProperty<Int, Reference>()
-
-    init {
-        referenceMapping.onChange {
-            if (journal.isNotNull.get()) {
-                journal.get().loadReference(referenceMapping.toMap())
-            }
-        }
-    }
 
     fun loadJournal(file: File) {
         journal.set(Journal.load(file))

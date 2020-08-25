@@ -2,6 +2,8 @@ package main.kotlin.model.reference
 
 import org.jetbrains.exposed.sql.Table
 
+val ZOTERO_VERSION = "5.0.89"
+
 // Authors
 object Creators : Table() {
     val id = integer("creatorID")
@@ -18,6 +20,13 @@ object Items : Table() {
     override val primaryKey = PrimaryKey(id, name = "itemID")
 }
 
+// Mapping from Item Type ID to Item type
+object ItemTypes : Table() {
+    val id = integer("itemTypeID")
+    val typeName = text("typeName")
+    override val primaryKey = PrimaryKey(id, name = "itemTypeID")
+}
+
 // Locations of PDFs
 object ItemAttachments : Table() {
     val id = integer("itemID")
@@ -30,6 +39,13 @@ object Fields : Table() {
     val id = integer("fieldID")
     val name = text("fieldName")
     override val primaryKey = PrimaryKey(id, name = "fieldID")
+}
+
+// Types of fields, i.e. webpage, image, pdf, etc.
+object FieldTypes : Table() {
+    val id = integer("fieldTypeID")
+    val name = text("fieldType")
+    override val primaryKey = PrimaryKey(id, name = "fieldTypeID")
 }
 
 // Mapping from item and field pair to value identifier

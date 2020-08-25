@@ -1,5 +1,6 @@
 package main.kotlin.controller
 
+import javafx.beans.property.SimpleMapProperty
 import javafx.beans.property.SimpleObjectProperty
 import main.kotlin.model.reference.*
 import org.jetbrains.exposed.sql.Database
@@ -7,6 +8,7 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import tornadofx.Controller
+import tornadofx.onChange
 import tornadofx.toObservable
 import java.io.File
 import java.time.LocalDateTime
@@ -18,8 +20,18 @@ class ReferencesController : Controller() {
     val zoteroDirectory = File(System.getProperty("user.home"), "Zotero")
     val location = SimpleObjectProperty(File(zoteroDirectory, "zotero.sqlite"))
     var connected = false
-
     val lastSync = SimpleObjectProperty(LocalDateTime.now())
+
+    val authorMapping = SimpleMapProperty<Int, Author>()
+    val referenceMapping = SimpleMapProperty<Int, Reference>()
+
+    init {
+        referenceMapping.onChange {
+            if (storeController.journal.isNotNull.get()) {
+                storeController.journal.get().loadReference(referenceMapping.toMap())
+            }
+        }
+    }
 
     fun connect() {
         Database.connect(url = File("jdbc:sqlite:", location.get().absolutePath).path, driver = "org.sqlite.JDBC")
@@ -50,8 +62,8 @@ class ReferencesController : Controller() {
             }
         }
 
-        storeController.authorMapping.set(authorMapping.toObservable())
-        storeController.referenceMapping.set(referenceMapping.toObservable())
+        this.authorMapping.set(authorMapping.toObservable())
+        this.referenceMapping.set(referenceMapping.toObservable())
         lastSync.set(LocalDateTime.now())
     }
 }

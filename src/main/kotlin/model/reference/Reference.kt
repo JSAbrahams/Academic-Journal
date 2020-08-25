@@ -1,13 +1,17 @@
 package main.kotlin.model.reference
 
 import javafx.beans.property.ObjectProperty
+import javafx.beans.property.SimpleListProperty
+import javafx.beans.property.SimpleStringProperty
 import tornadofx.ItemViewModel
+import tornadofx.asObservable
+import tornadofx.select
 import java.time.LocalDate
 
 data class Reference(
     val itemType: String = "",
     val title: String = "",
-    val author: List<Author> = listOf(),
+    val authors: List<Author> = listOf(),
     val abstract: String = "",
 
     val publication: Int? = null,
@@ -22,7 +26,17 @@ data class Reference(
 
     val journalAbbr: String = "",
     val language: String = "",
-)
+) {
+    val itemTypeProperty = SimpleStringProperty(itemType)
+    val titleProperty = SimpleStringProperty(title)
+    val authorProperty = SimpleListProperty(authors.asObservable())
+    val abstractProperty = SimpleStringProperty(abstract)
+}
 
-class ReferenceModel(property: ObjectProperty<Reference>) : ItemViewModel<Reference>(itemProperty = property)
+class ReferenceModel(property: ObjectProperty<Reference>) : ItemViewModel<Reference>(itemProperty = property) {
+    val itemType = bind(autocommit = true) { property.select { it.itemTypeProperty } }
+    val title = bind(autocommit = true) { property.select { it.titleProperty } }
+    val authors = bind(autocommit = true) { property.select { it.authorProperty } }
+    val abstract = bind(autocommit = true) { property.select { it.abstractProperty } }
+}
 
