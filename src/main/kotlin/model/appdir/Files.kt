@@ -17,9 +17,20 @@ class Files(opened: List<Path> = listOf()) : Tomable<Files> {
     val recentFiles = SimpleListProperty(opened.toMutableList().toObservable())
 
     companion object {
-        fun fromToml(toml: Toml): Files {
+        /**
+         * Read `*.toml` file and extract items.
+         *
+         * If exception, then log this exception and return false if this is not a NullPointerException,
+         * which is allowed on first boot.
+         */
+        fun fromToml(file: File): Pair<Boolean, Files> = try {
+            val toml = Toml().read(file)
             val opened = toml.getList<String>("opened").map { pathString -> File(pathString).toPath() }
-            return Files(opened)
+            Pair(true, Files(opened))
+        } catch (e: Exception) {
+            // TODO log exception
+            // NullpointerException is allowed on first boot for now
+            Pair(e !is NullPointerException, Files(emptyList()))
         }
     }
 

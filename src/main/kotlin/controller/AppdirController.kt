@@ -1,6 +1,5 @@
 package main.kotlin.controller
 
-import com.moandjiezana.toml.Toml
 import com.moandjiezana.toml.TomlWriter
 import javafx.beans.property.SimpleObjectProperty
 import main.kotlin.model.appdir.Files
@@ -34,16 +33,12 @@ class AppdirController : Controller() {
         if (!filesFile!!.exists()) filesFile!!.createNewFile()
 
         if (filesFile != null && filesFile!!.exists()) {
-            try {
-                files.set(Files.fromToml(Toml().read(filesFile)))
-                if (files.get().lastOpened.isNotNull.get() && storeController.location.isNull.get()) {
-                    storeController.loadJournal(files.get().lastOpened.get().toFile())
-                }
-            } catch (e: RuntimeException) {
-                // TODO use logger
-                e.printStackTrace()
-                // NullPointerException is expected on empty toml file with no opened key
-                if (e !is NullPointerException) writeFilesOnClose = false
+            val fromToml = Files.fromToml(filesFile!!)
+            writeFilesOnClose = fromToml.first
+            files.set(fromToml.second)
+
+            if (files.get().lastOpened.isNotNull.get() && storeController.location.isNull.get()) {
+                storeController.loadJournal(files.get().lastOpened.get().toFile())
             }
         }
     }
