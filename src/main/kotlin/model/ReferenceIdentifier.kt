@@ -1,5 +1,6 @@
 package main.kotlin.model
 
+import javafx.beans.property.IntegerProperty
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -73,6 +74,6 @@ object ReferencePositionSerializer : KSerializer<ReferencePosition> {
 
 class NoteModel(property: ObjectProperty<ReferencePosition>) :
     ItemViewModel<ReferencePosition>(itemProperty = property) {
-    val start = bind(autocommit = true) { property.select { it.startProperty } }
-    val end = bind(autocommit = true) { property.select { it.endProperty } }
+    val start: IntegerProperty = bind(autocommit = true) { property.select { it.startProperty } }
+    val end: IntegerProperty = bind(autocommit = true) { property.select { it.endProperty } }
 }

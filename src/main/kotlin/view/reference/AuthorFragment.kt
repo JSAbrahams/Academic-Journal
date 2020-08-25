@@ -7,6 +7,11 @@ import tornadofx.hbox
 import tornadofx.text
 
 class AuthorFragment : ListCellFragment<Author>() {
+    companion object {
+        // According to Javafx documentation of cell height
+        val height = 24
+    }
+
     val entry = AuthorModel(itemProperty)
 
     override val root = hbox {

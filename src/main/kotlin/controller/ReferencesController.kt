@@ -3,9 +3,7 @@ package main.kotlin.controller
 import javafx.beans.property.SimpleMapProperty
 import javafx.beans.property.SimpleObjectProperty
 import main.kotlin.model.reference.*
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import tornadofx.Controller
 import tornadofx.onChange
@@ -22,6 +20,7 @@ class ReferencesController : Controller() {
     var connected = false
     val lastSync = SimpleObjectProperty(LocalDateTime.now())
 
+    private val fieldTypes = mutableMapOf<String, Int>()
     val authorMapping = SimpleMapProperty<Int, Author>()
     val referenceMapping = SimpleMapProperty<Int, Reference>()
 
@@ -36,7 +35,23 @@ class ReferencesController : Controller() {
     fun connect() {
         Database.connect(url = File("jdbc:sqlite:", location.get().absolutePath).path, driver = "org.sqlite.JDBC")
         transaction {
-            SchemaUtils.create(Creators, Items, ItemAttachments, Fields, ItemData, ItemDataValues, Libraries)
+            SchemaUtils.create(
+                Creators,
+                ItemCreators,
+                Items,
+                ItemAttachments,
+                Fields,
+                ItemData,
+                ItemDataValues,
+                Libraries
+            )
+
+            fieldTypes[FIELD_TITLE] = Fields
+                .select { Fields.fieldName eq FIELD_TITLE }
+                .firstOrNull()?.get(Fields.fieldId) ?: -1
+            fieldTypes[ABSTRACT_NOTE] = Fields
+                .select { Fields.fieldName eq ABSTRACT_NOTE }
+                .firstOrNull()?.get(Fields.fieldId) ?: -1
         }
 
         connected = true
@@ -53,12 +68,34 @@ class ReferencesController : Controller() {
         val referenceMapping = mutableMapOf<Int, Reference>()
 
         transaction {
-            Items.selectAll().forEach {
-                referenceMapping[it[Items.id]] = Reference()
+
+            Items.selectAll().forEach { result ->
+                val field = { fieldType: String ->
+                    val abstractValueId = ItemData
+                        .select { ItemData.itemId eq result[Items.itemId] and (ItemData.fieldId eq fieldTypes[fieldType]!!) }
+                        .firstOrNull()?.get(ItemData.valueId) ?: -1
+                    ItemDataValues
+                        .select { ItemDataValues.valueId eq abstractValueId }
+                        .firstOrNull()?.get(ItemDataValues.value) ?: ""
+                }
+
+                referenceMapping[result[Items.itemId]] = Reference(
+                    id = result[Items.itemId],
+                    itemType = ItemTypes
+                        .select { ItemTypes.itemTypeId eq result[Items.itemTypeId] }
+                        .firstOrNull()?.get(ItemTypes.typeName) ?: "",
+                    title = field(FIELD_TITLE),
+                    authors = ItemCreators.select { ItemCreators.itemId eq result[Items.itemId] }.flatMap {
+                        Creators.select { Creators.creatorId eq it[ItemCreators.creatorId] }.map { creator ->
+                            Author(creator[Creators.firstName], creator[Creators.lastName])
+                        }
+                    },
+                    abstract = field(ABSTRACT_NOTE)
+                )
             }
 
             Creators.selectAll().forEach {
-                authorMapping[it[Creators.id]] = Author(it[Creators.firstName], it[Creators.lastName])
+                authorMapping[it[Creators.creatorId]] = Author(it[Creators.firstName], it[Creators.lastName])
             }
         }
 
