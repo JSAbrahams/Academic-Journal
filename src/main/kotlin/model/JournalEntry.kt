@@ -17,6 +17,9 @@ import tornadofx.select
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
+private val LocalDateTime.epochSeconds: Long
+    get() = this.toEpochSecond(ZoneOffset.UTC)
+
 @Serializable(with = JournalEntrySerializer::class)
 class JournalEntry(
     creation: LocalDateTime = LocalDateTime.now(),
@@ -54,10 +57,8 @@ class JournalEntry(
     }
 
     override fun equals(other: Any?): Boolean = other is JournalEntry
-            && lastEditProperty.get().toEpochSecond(ZoneOffset.UTC) == other.lastEditProperty.get()
-        .toEpochSecond(ZoneOffset.UTC)
-            && creationProperty.get().toEpochSecond(ZoneOffset.UTC) == other.creationProperty.get()
-        .toEpochSecond(ZoneOffset.UTC)
+            && lastEditProperty.get().epochSeconds == other.lastEditProperty.get().epochSeconds
+            && creationProperty.get().epochSeconds == other.creationProperty.get().epochSeconds
             && editedProperty.get() == other.editedProperty.get()
             && titleProperty.get() == other.titleProperty.get()
             && textProperty.get() == other.textProperty.get()
@@ -105,20 +106,12 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
 
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
-                0 -> creation =
-                    LocalDateTime.ofEpochSecond(decodeLongElement(descriptor, index) * 1000, 0, ZoneOffset.UTC)
-                1 -> lastEdit =
-                    LocalDateTime.ofEpochSecond(decodeLongElement(descriptor, index) * 1000, 0, ZoneOffset.UTC)
-                2 -> title = decodeStringElement(descriptor, index)
-                3 -> text = decodeStringElement(descriptor, index)
-                4 -> keywords.addAll(decodeSerializableElement(descriptor, index, ListSerializer(KeywordSerializer)))
-                5 -> references.addAll(
-                    decodeSerializableElement(
-                        descriptor,
-                        index,
-                        ListSerializer(ReferenceSerializer)
-                    )
-                )
+                0 -> creation = LocalDateTime.ofEpochSecond(decodeLongElement(descriptor, 0) * 1000, 0, ZoneOffset.UTC)
+                1 -> lastEdit = LocalDateTime.ofEpochSecond(decodeLongElement(descriptor, 1) * 1000, 0, ZoneOffset.UTC)
+                2 -> title = decodeStringElement(descriptor, 2)
+                3 -> text = decodeStringElement(descriptor, 3)
+                4 -> keywords.addAll(decodeSerializableElement(descriptor, 4, ListSerializer(KeywordSerializer)))
+                5 -> references.addAll(decodeSerializableElement(descriptor, 5, ListSerializer(ReferenceSerializer)))
                 CompositeDecoder.DECODE_DONE -> break
                 else -> throw SerializationException("Unknown index $index")
             }
