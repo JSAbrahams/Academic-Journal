@@ -59,7 +59,7 @@ class EditorView : View() {
         }
         textarea(editorController.current.select { it.textProperty }) {
             promptText = "Today I..."
-            disableWhen(editorController.editMode.not().or(editorController.current.isNull)))
+            disableWhen(editorController.editMode.not().or(editorController.current.isNull))
         }
 
         hbox {
