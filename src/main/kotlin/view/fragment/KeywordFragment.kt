@@ -1,5 +1,6 @@
 package main.kotlin.view.fragment
 
+import javafx.scene.layout.Priority
 import main.kotlin.controller.EditorController
 import main.kotlin.model.Keyword
 import main.kotlin.model.KeywordModel
@@ -11,7 +12,16 @@ class KeywordFragment : ListCellFragment<Keyword>() {
     val entry = KeywordModel(itemProperty)
 
     override val root = hbox {
-        circle(radius = 3).visibleWhen(entry.edited)
+        region {
+            vgrow = Priority.ALWAYS
+            val height = heightProperty()
+            circle(radius = 3) {
+                centerYProperty().bind(height.divide(2.0))
+                visibleWhen(entry.edited)
+                managedWhen(entry.edited)
+            }
+        }
+
         textfield(entry.value) {
             disableWhen(editorController.editMode.not())
         }
