@@ -1,35 +1,48 @@
 package main.kotlin.view.reference
 
+import main.kotlin.Styles
 import main.kotlin.controller.ReferencesController
 import tornadofx.*
 
 class ZoteroView : View() {
     val referencesController: ReferencesController by inject()
 
-    override val root = vbox {
-        hbox {
-            text("Database: ")
-            text(referencesController.location.asString())
-        }
+    override val root = gridpane {
+        addClass(Styles.customContainer)
 
-        hbox {
-            button("Resync").action {
-                referencesController.refreshReferences()
+        row {
+            gridpane {
+                gridpaneConstraints { columnSpan = 2 }
+                addClass(Styles.nestedContainer)
+
+                row {
+                    text("Data ")
+                    text(referencesController.location.asString())
+                }
+                row {
+                    button("Resync").action {
+                        referencesController.refreshReferences()
+                    }
+                    hbox {
+                        text("Last Sync ")
+                        text(referencesController.lastSync.asString())
+                    }
+                }
             }
-            text("Last sync: ")
-            text(referencesController.lastSync.asString())
+
         }
 
-        hbox {
+
+        row {
             vbox {
-                text("Authors")
+                text("Authors") { setId(Styles.title) }
                 listview(observableListOf(referencesController.authorMapping.values)) {
                     cellFragment(AuthorFragment::class)
                 }
             }
 
             vbox {
-                text("Items")
+                text("Items") { setId(Styles.title) }
                 listview(observableListOf(referencesController.referenceMapping.values)) {
                     cellFragment(ReferenceFragment::class)
                 }

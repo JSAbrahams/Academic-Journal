@@ -7,6 +7,8 @@ val ZOTERO_VERSION = "5.0.89"
 val FIELD_TITLE = "title"
 val ABSTRACT_NOTE = "abstractNote"
 
+val IGNORED_TYPES = setOf("attachment", "note")
+
 // Authors
 object Creators : Table() {
     val creatorId = integer("creatorID")

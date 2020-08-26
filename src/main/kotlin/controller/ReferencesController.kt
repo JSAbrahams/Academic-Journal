@@ -70,6 +70,10 @@ class ReferencesController : Controller() {
         transaction {
 
             Items.selectAll().forEach { result ->
+                val itemType = ItemTypes
+                    .select { ItemTypes.itemTypeId eq result[Items.itemTypeId] }
+                    .firstOrNull()?.get(ItemTypes.typeName) ?: ""
+
                 val field = { fieldType: String ->
                     val abstractValueId = ItemData
                         .select { ItemData.itemId eq result[Items.itemId] and (ItemData.fieldId eq fieldTypes[fieldType]!!) }
@@ -79,11 +83,9 @@ class ReferencesController : Controller() {
                         .firstOrNull()?.get(ItemDataValues.value) ?: ""
                 }
 
-                referenceMapping[result[Items.itemId]] = Reference(
+                if (!IGNORED_TYPES.contains(itemType)) referenceMapping[result[Items.itemId]] = Reference(
                     id = result[Items.itemId],
-                    itemType = ItemTypes
-                        .select { ItemTypes.itemTypeId eq result[Items.itemTypeId] }
-                        .firstOrNull()?.get(ItemTypes.typeName) ?: "",
+                    itemType = itemType,
                     title = field(FIELD_TITLE),
                     authors = ItemCreators.select { ItemCreators.itemId eq result[Items.itemId] }.flatMap {
                         Creators.select { Creators.creatorId eq it[ItemCreators.creatorId] }.map { creator ->
