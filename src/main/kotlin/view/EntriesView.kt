@@ -16,8 +16,8 @@ class EntriesView : View() {
     val menuViewView: MenuView by inject()
 
     override val root = vbox {
-        addClass(Styles.container)
-        text().bind(storeController.journal.select { it.titleProperty })
+        addClass(Styles.customContainer)
+
         text("Entries") { setId(Styles.title) }
 
         listview(storeController.journal.select { it.itemsProperty }) {
@@ -33,6 +33,7 @@ class EntriesView : View() {
         }
 
         hbox {
+            addClass(Styles.buttons)
             togglebutton("Edit Mode") {
                 disableWhen(storeController.journal.isNull)
                 editorController.editMode.bind(this.selectedProperty())
