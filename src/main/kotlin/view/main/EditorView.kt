@@ -56,7 +56,7 @@ class EditorView : View() {
                     }
                 }
             }
-            editorController.caretPosition.bind(area.caretPositionProperty())
+            editorController.selectionBounds.bind(area.selectionProperty())
 
             area.addEventHandler(MouseOverTextEvent.MOUSE_OVER_TEXT_END) { popup.hide() }
             // binding does not work, so manually update each time instead

@@ -76,7 +76,7 @@ object ReferencePositionSerializer : KSerializer<ReferencePosition> {
 
 class NoteModel(property: ObjectProperty<ReferencePosition>) :
     ItemViewModel<ReferencePosition>(itemProperty = property) {
-    val start = bind(autocommit = true) { property.select { it.startProperty } }
-    val end = bind(autocommit = true) { property.select { it.endProperty } }
+    val start = bind(autocommit = true) { property.select { it.startProperty.asString() } }
+    val end = bind(autocommit = true) { property.select { it.endProperty.asString() } }
     val reference: ObjectProperty<Reference> = bind(autocommit = true) { property.select { it.referenceProperty } }
 }

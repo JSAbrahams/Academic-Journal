@@ -22,7 +22,7 @@ class ReferencesView : View() {
         hbox {
             addClass(Styles.buttons)
             button("+") {
-                disableWhen(editorController.current.isNull)
+                disableWhen(editorController.current.isNull.or(editorController.selectionBounds.isNull))
                 action { zoteroView.openWindow(owner = currentStage, block = true) }
             }
         }
