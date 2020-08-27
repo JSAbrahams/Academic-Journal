@@ -1,4 +1,4 @@
-package main.kotlin.view
+package main.kotlin.view.main
 
 import javafx.scene.control.ButtonType
 import main.kotlin.Styles

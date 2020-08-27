@@ -1,10 +1,11 @@
-package main.kotlin.view
+package main.kotlin.view.main
 
 import javafx.scene.control.MenuItem
 import javafx.stage.FileChooser
 import main.kotlin.JournalApp.Companion.savePrompt
 import main.kotlin.controller.AppdirController
 import main.kotlin.controller.StoreController
+import main.kotlin.view.reference.ZoteroView
 import tornadofx.*
 
 class MenuView : View() {
@@ -63,6 +64,11 @@ class MenuView : View() {
             separator { isVisible = false }
             item("Settings") {
                 isVisible = false
+            }
+        }
+        menu("References") {
+            item("Zotero").action {
+                ZoteroView().openWindow(owner = currentStage, block = true)
             }
         }
         menu("Help") {

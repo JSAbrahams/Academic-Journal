@@ -13,6 +13,7 @@ class Styles : Stylesheet() {
         val entryItem by cssclass()
 
         val customContainer by cssclass()
+        val nestedContainer by cssclass()
         val buttons by cssclass()
     }
 
@@ -27,6 +28,13 @@ class Styles : Stylesheet() {
             textArea { backgroundRadius = multi(box(0.em)) }
             padding = box(5.px)
             spacing = 5.px
+            vgap = 10.px
+            hgap = 10.px
+        }
+        nestedContainer {
+            spacing = 5.px
+            vgap = 10.px
+            hgap = 10.px
         }
 
         buttons {

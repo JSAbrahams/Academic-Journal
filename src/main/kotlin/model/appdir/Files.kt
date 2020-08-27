@@ -36,13 +36,13 @@ class Files(opened: List<Path> = listOf()) : Tomable<Files> {
 
     fun addLocation(location: File) {
         val newLocations = recentFiles.toMutableList()
+
         // Remove all current locations to prevent duplication
         newLocations.removeAll { it == location.toPath() }
-
-        if (newLocations.isNotEmpty()) {
-            newLocations.add(0, location.toPath())
-        } else if (newLocations.isEmpty()) {
+        if (newLocations.isEmpty()) {
             newLocations.add(location.toPath())
+        } else {
+            newLocations.add(0, location.toPath())
         }
 
         newLocations.dropLastWhile { newLocations.size > MAX_RECENT }

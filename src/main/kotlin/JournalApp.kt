@@ -7,8 +7,9 @@ import javafx.scene.control.ButtonType.*
 import javafx.stage.Stage
 import javafx.stage.Window
 import main.kotlin.controller.AppdirController
+import main.kotlin.controller.ReferencesController
 import main.kotlin.controller.StoreController
-import main.kotlin.view.MainView
+import main.kotlin.view.main.MainView
 import net.harawata.appdirs.AppDirsFactory
 import tornadofx.App
 import tornadofx.select
@@ -19,6 +20,7 @@ import java.io.File
 class JournalApp : App(MainView::class, Styles::class) {
     val storeController: StoreController by inject()
     val appdirController: AppdirController by inject()
+    val referencesController: ReferencesController by inject()
 
     private val CREDENTIALS_APP_NAME = "AcademicJournal"
     private val CREDENTIALS_VERSION = "0.0.1"
@@ -54,6 +56,14 @@ class JournalApp : App(MainView::class, Styles::class) {
         val userConfigDir = appDirs.getUserConfigDir(CREDENTIALS_APP_NAME, CREDENTIALS_VERSION, CREDENTIALS_AUTHOR)
         appdirController.appdir.set(File(userConfigDir))
 
+        try {
+            referencesController.connect()
+            referencesController.refreshReferences()
+        } catch (e: Exception) {
+            // TODO use logger
+            e.printStackTrace()
+        }
+
         super.start(stage)
         stage.titleProperty().bind(
             Bindings.concat(
@@ -70,7 +80,6 @@ class JournalApp : App(MainView::class, Styles::class) {
             }
             appdirController.writeToFile()
         }
-
     }
 }
 
