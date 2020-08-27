@@ -43,17 +43,29 @@ class EditorView : View() {
             area.addEventHandler(MouseOverTextEvent.MOUSE_OVER_TEXT_BEGIN) {
                 if (editorController.current.isNotNull.get()) {
                     val chIdx = it.characterIndex
+                    val pos = it.screenPosition
+                    val items = mutableListOf<Pair<Pair<Int, Int>, String>>()
+
                     for (referencePosition in editorController.current.get().referencesProperty) {
                         if (referencePosition.startProperty <= chIdx && referencePosition.endProperty >= chIdx
                             && referencePosition.referenceProperty.isNotNull.get()
                         ) {
-                            popupMsg.text = referencePosition.referenceProperty.get().title
-
-                            val pos = it.screenPosition
-                            popup.show(area, pos.x, pos.y + 10)
-                            break
+                            items += Pair(
+                                Pair(referencePosition.startProperty.get(), referencePosition.endProperty.get()),
+                                referencePosition.referenceProperty.get().title
+                            )
                         }
                     }
+
+                    if (items.isEmpty()) return@addEventHandler
+                    if (items.size > 1) {
+                        val stringBuilder = StringBuilder()
+                        items.forEach { i -> stringBuilder.append("${i.first.first} - ${i.first.second}: ${i.second}\n") }
+                        popupMsg.text = stringBuilder.toString()
+                    } else {
+                        popupMsg.text = "${items[0].first.first} - ${items[0].first.second}: ${items[0].second}\n"
+                    }
+                    popup.show(area, pos.x, pos.y + 10)
                 }
             }
             editorController.selectionBounds.bind(area.selectionProperty())

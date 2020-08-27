@@ -54,7 +54,13 @@ class ZoteroView : View() {
 
         row {
             button("+") {
-                disableWhen(editorController.selectionBounds.isNull.or(referencesController.selectedReference.isNull))
+                disableWhen(
+                    editorController.current.isNull.or(
+                        editorController.selectionBounds.isNull.or(
+                            referencesController.selectedReference.isNull
+                        )
+                    )
+                )
                 action {
                     editorController.current.get().referencesProperty.add(
                         ReferencePosition(
