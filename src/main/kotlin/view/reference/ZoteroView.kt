@@ -1,11 +1,14 @@
 package main.kotlin.view.reference
 
 import main.kotlin.Styles
+import main.kotlin.controller.EditorController
 import main.kotlin.controller.ReferencesController
+import main.kotlin.model.ReferencePosition
 import tornadofx.*
 
 class ZoteroView : View() {
     val referencesController: ReferencesController by inject()
+    val editorController: EditorController by inject()
 
     override val root = gridpane {
         addClass(Styles.customContainer)
@@ -45,6 +48,22 @@ class ZoteroView : View() {
                 text("Items") { setId(Styles.title) }
                 listview(observableListOf(referencesController.referenceMapping.values)) {
                     cellFragment(ReferenceFragment::class)
+                }
+            }
+        }
+
+        row {
+            button("+") {
+                disableWhen(editorController.current.isNull.or(referencesController.selectedReference.isNull))
+                action {
+                    editorController.current.get().referencesProperty.add(
+                        ReferencePosition(
+                            start = editorController.caretPosition.get(),
+                            end = editorController.caretPosition.get(),
+                            reference = referencesController.selectedReference.get()
+                        )
+                    )
+                    currentStage?.close()
                 }
             }
         }

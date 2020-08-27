@@ -3,10 +3,13 @@ package main.kotlin.view.main
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.view.reference.ReferencePositionFragment
+import main.kotlin.view.reference.ZoteroView
 import tornadofx.*
 
 class ReferencesView : View() {
     val editorController: EditorController by inject()
+
+    val zoteroView: ZoteroView by inject()
 
     override val root = vbox {
         addClass(Styles.customContainer)
@@ -19,7 +22,8 @@ class ReferencesView : View() {
         hbox {
             addClass(Styles.buttons)
             button("+") {
-                isVisible = false
+                disableWhen(editorController.current.isNull)
+                action { zoteroView.openWindow(owner = currentStage, block = true) }
             }
         }
     }

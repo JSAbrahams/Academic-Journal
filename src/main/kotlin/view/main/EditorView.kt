@@ -41,10 +41,20 @@ class EditorView : View() {
 
             area.mouseOverTextDelay = Duration.ofMillis(100)
             area.addEventHandler(MouseOverTextEvent.MOUSE_OVER_TEXT_BEGIN) {
-                val chIdx = it.characterIndex
-                val pos = it.screenPosition
-                popupMsg.text = "Character '" + area.getText(chIdx, chIdx + 1) + "' at " + pos
-                popup.show(area, pos.x, pos.y + 10)
+                if (editorController.current.isNotNull.get()) {
+                    val chIdx = it.characterIndex
+                    for (referencePosition in editorController.current.get().referencesProperty) {
+                        if (referencePosition.startProperty <= chIdx && referencePosition.endProperty >= chIdx
+                            && referencePosition.referenceProperty.isNotNull.get()
+                        ) {
+                            popupMsg.text = referencePosition.referenceProperty.get().title
+
+                            val pos = it.screenPosition
+                            popup.show(area, pos.x, pos.y + 10)
+                            break
+                        }
+                    }
+                }
             }
             editorController.caretPosition.bind(area.caretPositionProperty())
 

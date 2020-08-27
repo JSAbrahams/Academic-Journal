@@ -2,18 +2,17 @@ package main.kotlin.view.reference
 
 import main.kotlin.model.NoteModel
 import main.kotlin.model.ReferencePosition
-import tornadofx.*
+import tornadofx.ListCellFragment
+import tornadofx.select
+import tornadofx.text
+import tornadofx.vbox
 
 class ReferencePositionFragment : ListCellFragment<ReferencePosition>() {
     val entry = NoteModel(itemProperty)
 
-    override val root = vbox {
-        hbox {
-            text(entry.start.asString())
-            text("-")
-            text(entry.end.asString())
-        }
+    val referenceFragment: ReferenceFragment by inject()
 
-        ReferenceFragment(itemProperty.select { it.reference }).root
+    override val root = vbox {
+        text(entry.reference.select { it.titleProperty })
     }
 }

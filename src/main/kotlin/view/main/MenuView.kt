@@ -9,8 +9,10 @@ import main.kotlin.view.reference.ZoteroView
 import tornadofx.*
 
 class MenuView : View() {
-    val appdirController: AppdirController by inject()
-    val storeController: StoreController by inject()
+    private val appdirController: AppdirController by inject()
+    private val storeController: StoreController by inject()
+
+    val zoteroView: ZoteroView by inject()
 
     val filters = arrayOf(FileChooser.ExtensionFilter("Journal Entry", "*.journal"))
 
@@ -68,7 +70,7 @@ class MenuView : View() {
         }
         menu("References") {
             item("Zotero").action {
-                ZoteroView().openWindow(owner = currentStage, block = true)
+                zoteroView.openWindow(owner = currentStage, block = true)
             }
         }
         menu("Help") {

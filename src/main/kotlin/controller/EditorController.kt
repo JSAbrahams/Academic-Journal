@@ -8,6 +8,7 @@ import tornadofx.Controller
 
 class EditorController : Controller() {
     val current = SimpleObjectProperty<JournalEntry>()
+
     val caretPosition = SimpleIntegerProperty()
 
     val editMode = SimpleBooleanProperty()
