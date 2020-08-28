@@ -17,6 +17,9 @@ class Styles : Stylesheet() {
         val buttons by cssclass()
 
         val highlightColor = Color.YELLOW
+        val hoverBackground = "black"
+        val hoverTextColor = "white"
+        val hoverPaddingPx = 3
     }
 
     init {

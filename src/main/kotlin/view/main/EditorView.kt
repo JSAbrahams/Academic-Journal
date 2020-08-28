@@ -46,6 +46,9 @@ class EditorView : View() {
             val area = InlineCssTextArea()
             val popup = javafx.stage.Popup()
             val popupMsg = javafx.scene.control.Label()
+            popupMsg.style = "-fx-background-color: ${Styles.hoverBackground}; " +
+                    "-fx-text-fill: ${Styles.hoverTextColor}; " +
+                    "-fx-padding: ${Styles.hoverPaddingPx};"
 
             // Show reference(s) on hover in tooltip
             area.mouseOverTextDelay = Duration.ofMillis(hoverDurationMillis)
@@ -98,24 +101,29 @@ class EditorView : View() {
 
             editorController.selectionBounds.bind(area.selectionProperty())
             // highlight references and set text manually
+            val selections = mutableListOf<SelectionImpl<String, String, String>>()
+            area.selection
             editorController.current.onChange { journalEntry ->
-                (0 until area.paragraphs.size).forEach { area.clearStyle(it) }
-                val setStyle: (ReferencePosition) -> Unit = {
-                    val selectionImpl = SelectionImpl("selection", area) { path ->
+                selections.forEach { area.removeSelection(it) }
+                selections.clear()
+
+                val setStyle: (Int, ReferencePosition) -> Unit = { index, referencePosition ->
+                    val selectionImpl = SelectionImpl("selection $index", area) { path ->
                         path.strokeWidth = 0.0
                         path.fill = Styles.highlightColor
                     }
+                    selections.add(selectionImpl)
                     area.addSelection(selectionImpl)
-                    if (area.text.length >= it.endProperty.get()) selectionImpl.selectRange(
-                        it.startProperty.get(),
-                        it.endProperty.get()
+                    if (area.text.length >= referencePosition.endProperty.get()) selectionImpl.selectRange(
+                        referencePosition.startProperty.get(),
+                        referencePosition.endProperty.get()
                     )
                 }
 
-                journalEntry?.referencesProperty?.forEach(setStyle)
+                journalEntry?.referencesProperty?.forEachIndexed(setStyle)
                 journalEntry?.referencesProperty?.onChange<ObservableList<ReferencePosition>> {
                     (0 until area.paragraphs.size).forEach { paragraph -> area.clearStyle(paragraph) }
-                    it?.forEach(setStyle)
+                    it?.forEachIndexed(setStyle)
                 }
             }
             area.textProperty().onChange { text ->
