@@ -105,8 +105,8 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
     }
 
     override fun serialize(encoder: Encoder, value: JournalEntry) = encoder.encodeStructure(descriptor) {
-        encodeLongElement(descriptor, 0, value.creationProperty.get().toEpochSecond(ZoneOffset.UTC))
-        encodeLongElement(descriptor, 1, value.lastEditProperty.get().toEpochSecond(ZoneOffset.UTC))
+        encodeLongElement(descriptor, 0, value.creationProperty.get().epochSeconds)
+        encodeLongElement(descriptor, 1, value.lastEditProperty.get().epochSeconds)
         encodeStringElement(descriptor, 2, value.titleProperty.get())
         encodeStringElement(descriptor, 3, value.textProperty.get())
         encodeSerializableElement(descriptor, 4, ListSerializer(KeywordSerializer), value.keywordsProperty.toList())
@@ -125,8 +125,8 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
 
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
-                0 -> creation = LocalDateTime.ofEpochSecond(decodeLongElement(descriptor, 0) * 1000, 0, ZoneOffset.UTC)
-                1 -> lastEdit = LocalDateTime.ofEpochSecond(decodeLongElement(descriptor, 1) * 1000, 0, ZoneOffset.UTC)
+                0 -> creation = LocalDateTime.ofEpochSecond(decodeLongElement(descriptor, 0), 0, ZoneOffset.UTC)
+                1 -> lastEdit = LocalDateTime.ofEpochSecond(decodeLongElement(descriptor, 1), 0, ZoneOffset.UTC)
                 2 -> title = decodeStringElement(descriptor, 2)
                 3 -> text = decodeStringElement(descriptor, 3)
                 4 -> keywords.addAll(decodeSerializableElement(descriptor, 4, ListSerializer(KeywordSerializer)))
