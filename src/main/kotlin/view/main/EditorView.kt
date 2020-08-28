@@ -2,11 +2,12 @@ package main.kotlin.view.main
 
 import javafx.collections.ObservableList
 import javafx.scene.layout.Priority
+import javafx.stage.Popup
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.model.Keyword
 import main.kotlin.model.ReferencePosition
-import main.kotlin.view.fragment.KeywordFragment
+import main.kotlin.view.keyword.KeywordFragment
 import org.fxmisc.richtext.InlineCssTextArea
 import org.fxmisc.richtext.SelectionImpl
 import org.fxmisc.richtext.event.MouseOverTextEvent
@@ -44,7 +45,7 @@ class EditorView : View() {
 
         run {
             val area = InlineCssTextArea()
-            val popup = javafx.stage.Popup()
+            val popup = Popup()
             val popupMsg = javafx.scene.control.Label()
             popupMsg.style = "-fx-background-color: ${Styles.hoverBackground}; " +
                     "-fx-text-fill: ${Styles.hoverTextColor}; " +

@@ -22,12 +22,14 @@ import tornadofx.cleanBind
 import java.io.File
 
 @Serializable(with = JournalSerializer::class)
-class Journal(title: String = "", items: List<JournalEntry> = listOf()) {
+class Journal(title: String = "", items: List<JournalEntry> = listOf(), keywords: List<Keyword> = listOf()) {
     val titleProperty = SimpleStringProperty(title)
 
     private val myItems = items.toMutableList().asObservable()
     val itemsProperty: ReadOnlyListProperty<JournalEntry> = SimpleListProperty(myItems)
     var editedProperty = SimpleBooleanProperty(false)
+    private val myKeywords = keywords.toMutableList().asObservable()
+    val keywords: SimpleListProperty<Keyword> = SimpleListProperty(myKeywords)
 
     companion object {
         fun load(file: File): Journal = Json.decodeFromString(file.readText())

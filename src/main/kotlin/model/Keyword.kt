@@ -16,7 +16,7 @@ import tornadofx.select
 @Serializable(with = KeywordSerializer::class)
 class Keyword(text: String = "") {
     val textProperty = SimpleStringProperty(text)
-    val colorProperty = SimpleObjectProperty<Color>(Color.WHITE)
+    val colorProperty = SimpleObjectProperty(Color.WHITE)
     val editedProperty: BooleanProperty = SimpleBooleanProperty(false)
 
     init {
@@ -39,6 +39,6 @@ object KeywordSerializer : KSerializer<Keyword> {
 
 class KeywordModel(property: ObjectProperty<Keyword>) : ItemViewModel<Keyword>(itemProperty = property) {
     val value = bind(autocommit = true) { property.select { it.textProperty } }
-    val color = bind(autocommit = true) { property.select { it.colorProperty } }
+    val text = bind(autocommit = true) { property.select { it.colorProperty } }
     val edited = bind(autocommit = true) { property.select { it.editedProperty } }
 }

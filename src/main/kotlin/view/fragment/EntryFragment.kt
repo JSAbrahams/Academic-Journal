@@ -4,6 +4,7 @@ import javafx.scene.layout.Priority
 import main.kotlin.Styles
 import main.kotlin.model.JournalEntry
 import main.kotlin.model.JournalEntryModel
+import main.kotlin.view.keyword.KeywordFragment
 import tornadofx.*
 
 class EntryFragment : ListCellFragment<JournalEntry>() {
@@ -35,8 +36,7 @@ class EntryFragment : ListCellFragment<JournalEntry>() {
             text("Keywords")
             listview(entry.keywords) {
                 addClass(Styles.keywords)
-                addClass(Styles.keywordsSmall)
-                cellFragment(SimpleKeywordFragment::class)
+                cellFragment(KeywordFragment::class)
             }
         }
     }

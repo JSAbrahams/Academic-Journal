@@ -1,6 +1,7 @@
 package main.kotlin
 
 import javafx.geometry.Orientation
+import javafx.scene.layout.CornerRadii
 import javafx.scene.paint.Color
 import tornadofx.*
 
@@ -9,7 +10,9 @@ class Styles : Stylesheet() {
         val title by cssid()
 
         val keywords by cssclass()
-        val keywordsSmall by cssclass()
+        val keywordTag by cssclass()
+        val keywordRadii = CornerRadii(2.0)
+
         val entryItem by cssclass()
 
         val customContainer by cssclass()
@@ -51,7 +54,7 @@ class Styles : Stylesheet() {
             maxHeight = 60.px
             backgroundColor += Color.TRANSPARENT
         }
-        keywordsSmall {
+        keywordTag {
             prefHeight = 40.px
             prefWidth = 170.px
         }

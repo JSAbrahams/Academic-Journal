@@ -5,6 +5,7 @@ import javafx.stage.FileChooser
 import main.kotlin.JournalApp.Companion.savePrompt
 import main.kotlin.controller.AppdirController
 import main.kotlin.controller.StoreController
+import main.kotlin.view.keyword.KeywordsView
 import main.kotlin.view.reference.ZoteroView
 import tornadofx.*
 
@@ -13,6 +14,7 @@ class MenuView : View() {
     private val storeController: StoreController by inject()
 
     val zoteroView: ZoteroView by inject()
+    val keywordsView: KeywordsView by inject()
 
     val filters = arrayOf(FileChooser.ExtensionFilter("Journal Entry", "*.journal"))
 
@@ -62,6 +64,11 @@ class MenuView : View() {
             item("Export") {
                 disableWhen { storeController.journal.isNull }
                 isVisible = false
+            }
+            separator()
+            item("Keywords") {
+                disableWhen { storeController.journal.isNull }
+                action { keywordsView.openWindow(owner = currentStage, block = true) }
             }
             separator { isVisible = false }
             item("Settings") {
