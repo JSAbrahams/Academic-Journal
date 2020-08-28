@@ -76,7 +76,8 @@ class JournalApp : App(MainView::class, Styles::class) {
 
         stage.setOnCloseRequest {
             if (storeController.journal.isNotNull.get() && storeController.journal.selectBoolean { it.editedProperty }.value) {
-                savePrompt(storeController, stage.owner)
+                val savePrompt = savePrompt(storeController, stage.owner)
+                if (!savePrompt) it.consume()
             }
             appdirController.writeToFile()
         }

@@ -1,11 +1,14 @@
 package main.kotlin.view.main
 
+import javafx.collections.ObservableList
 import javafx.scene.layout.Priority
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.model.Keyword
+import main.kotlin.model.ReferencePosition
 import main.kotlin.view.fragment.KeywordFragment
-import org.fxmisc.richtext.StyleClassedTextArea
+import org.fxmisc.richtext.InlineCssTextArea
+import org.fxmisc.richtext.SelectionImpl
 import org.fxmisc.richtext.event.MouseOverTextEvent
 import tornadofx.*
 import java.time.Duration
@@ -35,16 +38,18 @@ class EditorView : View() {
         }
 
         run {
-            val area = StyleClassedTextArea()
+            val area = InlineCssTextArea()
             val popup = javafx.stage.Popup()
             val popupMsg = javafx.scene.control.Label()
 
+            // Show reference(s) on hover in tooltip
             area.mouseOverTextDelay = Duration.ofMillis(100)
             area.addEventHandler(MouseOverTextEvent.MOUSE_OVER_TEXT_BEGIN) {
                 if (editorController.current.isNotNull.get()) {
                     val chIdx = it.characterIndex
                     val pos = it.screenPosition
                     val items = mutableListOf<Pair<Pair<Int, Int>, String>>()
+                    val referencePos = mutableListOf<ReferencePosition>()
 
                     for (referencePosition in editorController.current.get().referencesProperty) {
                         if (referencePosition.startProperty <= chIdx && referencePosition.endProperty >= chIdx
@@ -54,10 +59,13 @@ class EditorView : View() {
                                 Pair(referencePosition.startProperty.get(), referencePosition.endProperty.get()),
                                 referencePosition.referenceProperty.get().title
                             )
+                            referencePos.add(referencePosition)
                         }
                     }
 
                     if (items.isEmpty()) return@addEventHandler
+
+                    editorController.hoveredReferencePosition.addAll(referencePos)
                     if (items.size > 1) {
                         val stringBuilder = StringBuilder()
                         items.forEach { i -> stringBuilder.append("${i.first.first} - ${i.first.second}: ${i.second}\n") }
@@ -72,11 +80,39 @@ class EditorView : View() {
 
             area.addEventHandler(MouseOverTextEvent.MOUSE_OVER_TEXT_END) { popup.hide() }
             // binding does not work, so manually update each time instead
-            area.textProperty().onChange {
-                if (editorController.current.isNotNull.get()) editorController.current.value.textProperty.set(it)
+            area.textProperty().onChange { text ->
+                if (editorController.current.isNotNull.get()) {
+                    editorController.current.value.textProperty.set(text)
+                    // Remove references outside of bounds of text
+                    if (text != null) editorController.current.value.referencesProperty.removeIf { it.startProperty.get() > text.length }
+                }
             }
-            area.disableWhen(editorController.editMode.not())
 
+            // highlight references and set text manually
+            editorController.current.onChange { journalEntry ->
+                area.clear()
+                area.insertText(0, journalEntry?.textProperty?.get() ?: "")
+
+                val setStyle: (ReferencePosition) -> Unit = {
+                    val selectionImpl = SelectionImpl("selection", area) { path ->
+                        path.strokeWidth = 0.0
+                        path.fill = Styles.highlightColor
+                    }
+                    area.addSelection(selectionImpl)
+                    if (area.text.length >= it.endProperty.get()) selectionImpl.selectRange(
+                        it.startProperty.get(),
+                        it.endProperty.get()
+                    )
+                }
+
+                journalEntry?.referencesProperty?.forEach(setStyle)
+                journalEntry?.referencesProperty?.onChange<ObservableList<ReferencePosition>> { it?.forEach(setStyle) }
+
+                area.selectRange(0, 0)
+                area.requestFocus()
+            }
+
+            area.disableWhen(editorController.editMode.not())
             area.hgrow = Priority.ALWAYS
             area.vgrow = Priority.ALWAYS
             area.isWrapText = true
@@ -95,7 +131,7 @@ class EditorView : View() {
         hbox {
             addClass(Styles.buttons)
             button("+") {
-                disableWhen(editorController.current.isNull.or(editorController.editMode.not()))
+                disableWhen(editorController.validSelection.not().or(editorController.editMode.not()))
                 action { editorController.current.get().keywordsProperty.add(Keyword()) }
             }
             listview(editorController.current.select { it.keywordsProperty }) {

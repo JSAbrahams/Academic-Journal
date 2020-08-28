@@ -15,6 +15,8 @@ class Styles : Stylesheet() {
         val customContainer by cssclass()
         val nestedContainer by cssclass()
         val buttons by cssclass()
+
+        val highlightColor = Color.YELLOW
     }
 
     init {
