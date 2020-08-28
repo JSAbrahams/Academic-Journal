@@ -39,7 +39,7 @@ class EditorView : View() {
 
         textfield(editorController.current.select { it.titleProperty }) {
             promptText = "Title"
-            disableWhen(editorController.editable.not())
+            disableWhen(editorController.isEditable.not())
         }
 
         run {
@@ -136,10 +136,19 @@ class EditorView : View() {
             area.vgrow = Priority.ALWAYS
             area.isWrapText = true
 
+            editorController.rowPosition.bind(area.currentParagraphProperty())
+            editorController.colPosition.bind(area.caretColumnProperty())
+
             // does not work nicely with TornadoFX, so add manually
             popup.content.add(popupMsg)
             children.add(area)
-            area.disableWhen(editorController.editable.not())
+            area.disableWhen(editorController.isEditable.not())
+        }
+
+        hbox {
+            text(editorController.rowPosition.asString())
+            text(":")
+            text(editorController.colPosition.asString())
         }
 
         hbox {
@@ -152,7 +161,7 @@ class EditorView : View() {
         hbox {
             addClass(Styles.buttons)
             button("+") {
-                disableWhen(editorController.validSelection.not().or(editorController.editable.not()))
+                disableWhen(editorController.isValidSelection.not().or(editorController.isEditable.not()))
                 action { editorController.current.get().keywordsProperty.add(Keyword()) }
             }
             listview(editorController.current.select { it.keywordsProperty }) {

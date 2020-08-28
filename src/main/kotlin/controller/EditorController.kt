@@ -1,6 +1,7 @@
 package main.kotlin.controller
 
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.IndexRange
@@ -11,11 +12,13 @@ import tornadofx.asObservable
 
 class EditorController : Controller() {
     val current = SimpleObjectProperty<JournalEntry>()
-    val editMode = SimpleBooleanProperty()
-    val editable = current.isNotNull.and(editMode)
+    val isEditMode = SimpleBooleanProperty()
+    val isEditable = current.isNotNull.and(isEditMode)
 
     val selectionBounds = SimpleObjectProperty<IndexRange>()
-    val validSelection = current.isNotNull.and(selectionBounds.isNotNull)
+    val isValidSelection = current.isNotNull.and(selectionBounds.isNotNull)
 
+    val rowPosition = SimpleIntegerProperty()
+    val colPosition = SimpleIntegerProperty()
     val hoveredReferencePosition = SimpleListProperty(mutableListOf<ReferencePosition>().asObservable())
 }

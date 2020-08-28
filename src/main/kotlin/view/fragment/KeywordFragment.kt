@@ -23,7 +23,7 @@ class KeywordFragment : ListCellFragment<Keyword>() {
         }
 
         textfield(entry.value) {
-            disableWhen(editorController.editMode.not())
+            disableWhen(editorController.isEditMode.not())
         }
     }
 }
