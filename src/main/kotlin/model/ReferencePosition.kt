@@ -1,6 +1,5 @@
 package main.kotlin.model
 
-import javafx.beans.property.IntegerProperty
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -18,24 +17,27 @@ import tornadofx.select
 class ReferencePosition(val referenceId: Int, start: Int, end: Int) {
     val startProperty = SimpleIntegerProperty(start)
     val endProperty = SimpleIntegerProperty(end)
-    val reference = SimpleObjectProperty<Reference>()
+    val referenceProperty = SimpleObjectProperty<Reference>()
+
+    /**
+     * Set reference directly.
+     *
+     * Useful if all references have already been loaded.
+     */
+    constructor(reference: Reference, start: Int, end: Int) : this(reference.id, start, end) {
+        referenceProperty.set(reference)
+    }
 
     /**
      * Load reference based on mapping from identifier to actual reference.
      */
-    fun loadReference(referenceMapping: Map<Int, Reference>) {
-        reference.set(referenceMapping[referenceId])
-    }
+    fun loadReference(referenceMapping: Map<Int, Reference>) = referenceProperty.set(referenceMapping[referenceId])
 
-    override fun equals(other: Any?): Boolean =
-        other is ReferencePosition && startProperty.get() == other.startProperty.get()
-                && endProperty.get() == other.endProperty.get() && referenceId == other.referenceId
+    override fun equals(other: Any?): Boolean = other is ReferencePosition
+            && startProperty.get() == other.startProperty.get()
+            && endProperty.get() == other.endProperty.get() && referenceId == other.referenceId
 
-    override fun hashCode(): Int {
-        var result = startProperty.hashCode()
-        result = 31 * result + endProperty.hashCode()
-        return 31 * result + referenceId
-    }
+    override fun hashCode(): Int = 31 * (31 * startProperty.hashCode() + endProperty.hashCode()) + referenceId
 }
 
 /**
@@ -74,6 +76,7 @@ object ReferencePositionSerializer : KSerializer<ReferencePosition> {
 
 class NoteModel(property: ObjectProperty<ReferencePosition>) :
     ItemViewModel<ReferencePosition>(itemProperty = property) {
-    val start: IntegerProperty = bind(autocommit = true) { property.select { it.startProperty } }
-    val end: IntegerProperty = bind(autocommit = true) { property.select { it.endProperty } }
+    val start = bind(autocommit = true) { property.select { it.startProperty.asString() } }
+    val end = bind(autocommit = true) { property.select { it.endProperty.asString() } }
+    val reference: ObjectProperty<Reference> = bind(autocommit = true) { property.select { it.referenceProperty } }
 }

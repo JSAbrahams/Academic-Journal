@@ -9,11 +9,11 @@ class ReferencePositionFragment : ListCellFragment<ReferencePosition>() {
 
     override val root = vbox {
         hbox {
-            text(entry.start.asString())
+            text(entry.start)
             text("-")
-            text(entry.end.asString())
+            text(entry.end)
         }
 
-        ReferenceFragment(itemProperty.select { it.reference }).root
+        text(entry.reference.select { it.titleProperty })
     }
 }

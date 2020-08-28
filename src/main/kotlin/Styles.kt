@@ -15,6 +15,11 @@ class Styles : Stylesheet() {
         val customContainer by cssclass()
         val nestedContainer by cssclass()
         val buttons by cssclass()
+
+        val highlightColor = Color.YELLOW
+        val hoverBackground = "black"
+        val hoverTextColor = "white"
+        val hoverPaddingPx = 3
     }
 
     init {

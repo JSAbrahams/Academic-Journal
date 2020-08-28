@@ -1,6 +1,7 @@
 package main.kotlin.view.main
 
 import javafx.scene.control.ButtonType
+import javafx.scene.layout.Priority
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.controller.StoreController
@@ -22,6 +23,8 @@ class EntriesView : View() {
 
         listview(storeController.journal.select { it.itemsProperty }) {
             cellFragment(EntryFragment::class)
+            vgrow = Priority.ALWAYS
+            hgrow = Priority.NEVER
             bindSelected(editorController.current)
 
             storeController.journal.onChange { _ ->
@@ -36,7 +39,7 @@ class EntriesView : View() {
             addClass(Styles.buttons)
             togglebutton("Edit Mode") {
                 disableWhen(storeController.journal.isNull)
-                editorController.editMode.bind(this.selectedProperty())
+                editorController.isEditMode.bind(this.selectedProperty())
             }
             button("save") {
                 disableWhen(storeController.savedProperty)

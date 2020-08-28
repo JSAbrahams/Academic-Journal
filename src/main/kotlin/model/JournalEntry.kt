@@ -59,9 +59,15 @@ class JournalEntry(
         keywordsProperty.forEach { keyword -> keyword.editedProperty.onChange { editedProperty.set(editedProperty.get() || it) } }
     }
 
+    /**
+     * Sets edit status to false if true, else does nothing.
+     */
     fun reset() {
+        if (!editedProperty.get()) return
+
         keywordsProperty.forEach { it.editedProperty.set(false) }
         editedProperty.set(false)
+        lastEditProperty.set(LocalDateTime.now())
     }
 
     override fun equals(other: Any?): Boolean = other is JournalEntry

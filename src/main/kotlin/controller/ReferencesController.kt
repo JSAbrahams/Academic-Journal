@@ -23,6 +23,7 @@ class ReferencesController : Controller() {
     private val fieldTypes = mutableMapOf<String, Int>()
     val authorMapping = SimpleMapProperty<Int, Author>()
     val referenceMapping = SimpleMapProperty<Int, Reference>()
+    val selectedReference = SimpleObjectProperty<Reference>()
 
     init {
         referenceMapping.onChange {
