@@ -37,7 +37,8 @@ class ReferencePosition(val referenceId: Int, start: Int, end: Int) {
             && startProperty.get() == other.startProperty.get()
             && endProperty.get() == other.endProperty.get() && referenceId == other.referenceId
 
-    override fun hashCode(): Int = 31 * (31 * startProperty.hashCode() + endProperty.hashCode()) + referenceId
+    override fun hashCode(): Int =
+        31 * (31 * startProperty.get().hashCode() + endProperty.get().hashCode()) + referenceId
 }
 
 /**
