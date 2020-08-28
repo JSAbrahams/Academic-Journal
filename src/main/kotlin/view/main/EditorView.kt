@@ -16,6 +16,8 @@ import java.time.Duration
 class EditorView : View() {
     private val editorController: EditorController by inject()
 
+    private val hoverDurationMillis = 200L
+
     override val root = vbox {
         addClass(Styles.customContainer)
 
@@ -29,12 +31,15 @@ class EditorView : View() {
                     managedWhen(editorController.current.select { it.editedProperty })
                 }
             }
-            text(editorController.current.select { it.creationProperty.asString() }) { setId(Styles.title) }
+            text {
+                setId(Styles.title)
+                bind(editorController.current.select { it.creationProperty })
+            }
         }
 
         textfield(editorController.current.select { it.titleProperty }) {
             promptText = "Title"
-            disableWhen(editorController.editMode.not().or(editorController.current.isNull))
+            disableWhen(editorController.editable.not())
         }
 
         run {
@@ -43,7 +48,7 @@ class EditorView : View() {
             val popupMsg = javafx.scene.control.Label()
 
             // Show reference(s) on hover in tooltip
-            area.mouseOverTextDelay = Duration.ofMillis(100)
+            area.mouseOverTextDelay = Duration.ofMillis(hoverDurationMillis)
             area.addEventHandler(MouseOverTextEvent.MOUSE_OVER_TEXT_BEGIN) {
                 if (editorController.current.isNotNull.get()) {
                     val chIdx = it.characterIndex
@@ -76,23 +81,25 @@ class EditorView : View() {
                     popup.show(area, pos.x, pos.y + 10)
                 }
             }
-            editorController.selectionBounds.bind(area.selectionProperty())
-
             area.addEventHandler(MouseOverTextEvent.MOUSE_OVER_TEXT_END) { popup.hide() }
+
             // binding does not work, so manually update each time instead
-            area.textProperty().onChange { text ->
-                if (editorController.current.isNotNull.get()) {
-                    editorController.current.value.textProperty.set(text)
-                    // Remove references outside of bounds of text
-                    if (text != null) editorController.current.value.referencesProperty.removeIf { it.startProperty.get() > text.length }
-                }
+            editorController.current.addListener { _, oldValue, newValue ->
+                // After clearing make sure old value still has the proper text value
+                val oldText = area.text
+                area.clear()
+                oldValue?.textProperty?.set(oldText)
+
+                if (newValue != null) area.insertText(0, newValue.textProperty.value)
+            }
+            area.textProperty().onChange {
+                if (editorController.current.isNotNull.get()) editorController.current.value.textProperty.set(it)
             }
 
+            editorController.selectionBounds.bind(area.selectionProperty())
             // highlight references and set text manually
             editorController.current.onChange { journalEntry ->
-                area.clear()
-                area.insertText(0, journalEntry?.textProperty?.get() ?: "")
-
+                (0 until area.paragraphs.size).forEach { area.clearStyle(it) }
                 val setStyle: (ReferencePosition) -> Unit = {
                     val selectionImpl = SelectionImpl("selection", area) { path ->
                         path.strokeWidth = 0.0
@@ -106,19 +113,25 @@ class EditorView : View() {
                 }
 
                 journalEntry?.referencesProperty?.forEach(setStyle)
-                journalEntry?.referencesProperty?.onChange<ObservableList<ReferencePosition>> { it?.forEach(setStyle) }
-
-                area.selectRange(0, 0)
-                area.requestFocus()
+                journalEntry?.referencesProperty?.onChange<ObservableList<ReferencePosition>> {
+                    (0 until area.paragraphs.size).forEach { paragraph -> area.clearStyle(paragraph) }
+                    it?.forEach(setStyle)
+                }
+            }
+            area.textProperty().onChange { text ->
+                if (editorController.current.isNotNull.get() && text != null) {
+                    editorController.current.value.referencesProperty.removeIf { it.startProperty.get() >= text.length }
+                }
             }
 
-            area.disableWhen(editorController.editMode.not())
             area.hgrow = Priority.ALWAYS
             area.vgrow = Priority.ALWAYS
             area.isWrapText = true
-            popup.content.add(popupMsg)
+
             // does not work nicely with TornadoFX, so add manually
+            popup.content.add(popupMsg)
             children.add(area)
+            area.disableWhen(editorController.editable.not())
         }
 
         hbox {
@@ -131,7 +144,7 @@ class EditorView : View() {
         hbox {
             addClass(Styles.buttons)
             button("+") {
-                disableWhen(editorController.validSelection.not().or(editorController.editMode.not()))
+                disableWhen(editorController.validSelection.not().or(editorController.editable.not()))
                 action { editorController.current.get().keywordsProperty.add(Keyword()) }
             }
             listview(editorController.current.select { it.keywordsProperty }) {

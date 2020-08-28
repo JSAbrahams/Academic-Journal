@@ -11,11 +11,11 @@ import tornadofx.asObservable
 
 class EditorController : Controller() {
     val current = SimpleObjectProperty<JournalEntry>()
+    val editMode = SimpleBooleanProperty()
+    val editable = current.isNotNull.and(editMode)
 
     val selectionBounds = SimpleObjectProperty<IndexRange>()
     val validSelection = current.isNotNull.and(selectionBounds.isNotNull)
 
     val hoveredReferencePosition = SimpleListProperty(mutableListOf<ReferencePosition>().asObservable())
-
-    val editMode = SimpleBooleanProperty()
 }

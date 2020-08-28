@@ -1,6 +1,7 @@
 package main.kotlin
 
 import javafx.application.Application
+import javafx.application.Platform
 import javafx.beans.binding.Bindings
 import javafx.scene.control.ButtonType
 import javafx.scene.control.ButtonType.*
@@ -56,12 +57,14 @@ class JournalApp : App(MainView::class, Styles::class) {
         val userConfigDir = appDirs.getUserConfigDir(CREDENTIALS_APP_NAME, CREDENTIALS_VERSION, CREDENTIALS_AUTHOR)
         appdirController.appdir.set(File(userConfigDir))
 
-        try {
-            referencesController.connect()
-            referencesController.refreshReferences()
-        } catch (e: Exception) {
-            // TODO use logger
-            e.printStackTrace()
+        Platform.runLater {
+            try {
+                referencesController.connect()
+                referencesController.refreshReferences()
+            } catch (e: Exception) {
+                // TODO use logger
+                e.printStackTrace()
+            }
         }
 
         super.start(stage)
