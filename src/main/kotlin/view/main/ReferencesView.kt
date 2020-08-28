@@ -21,7 +21,6 @@ class ReferencesView : View() {
         listview(editorController.current.select { it.referencesProperty }) {
             vgrow = Priority.ALWAYS
             hgrow = Priority.NEVER
-            selectionModel
             cellFragment(ReferencePositionFragment::class)
 
             editorController.hoveredReferencePosition.onChange<ObservableList<ReferencePosition>> {
