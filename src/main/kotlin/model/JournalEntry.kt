@@ -55,6 +55,7 @@ class JournalEntry(
             it?.forEach { keyword -> keyword.editedProperty.onChange { editedProperty.set(editedProperty.get() || it) } }
             editedProperty.set(true)
         }
+        referencesProperty.onChange<ObservableList<ReferencePosition>> { editedProperty.set(true) }
 
         keywordsProperty.forEach { keyword -> keyword.editedProperty.onChange { editedProperty.set(editedProperty.get() || it) } }
     }
