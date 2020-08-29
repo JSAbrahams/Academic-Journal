@@ -6,6 +6,7 @@ import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
 import javafx.scene.layout.Priority
 import main.kotlin.Styles
+import main.kotlin.hex
 import main.kotlin.model.Keyword
 import main.kotlin.model.KeywordModel
 import tornadofx.*
@@ -18,18 +19,16 @@ class EditableKeywordFragment : ListCellFragment<Keyword>() {
         hbox {
             addClass(Styles.nestedContainer)
 
-            textfield {
+            textfield(entry.text) {
                 hgrow = Priority.ALWAYS
                 promptText = "Name"
 
-                text(entry.text) {
-                    fillProperty().bind(
-                        Bindings.createObjectBinding(
-                            { entry.colorValue.value.invert() },
-                            entry.colorValue
-                        )
+                styleProperty().bind(
+                    Bindings.createObjectBinding(
+                        { "-fx-text-inner-color: ${entry.colorValue.value.invert().hex}; " },
+                        entry.colorValue
                     )
-                }
+                )
 
                 background = Background(BackgroundFill(entry.colorValue.value, Styles.keywordRadii, Insets.EMPTY))
                 entry.colorValue.onChange {

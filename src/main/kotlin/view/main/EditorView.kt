@@ -1,12 +1,12 @@
 package main.kotlin.view.main
 
 import javafx.collections.ObservableList
+import javafx.scene.control.Label
 import javafx.scene.layout.Priority
+import javafx.stage.Popup
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
-import main.kotlin.controller.KeywordsController
-import main.kotlin.model.ReferencePosition
-import main.kotlin.model.Keyword
+import main.kotlin.controller.JournalController
 import main.kotlin.model.ReferencePosition
 import main.kotlin.view.keyword.KeywordFragment
 import org.fxmisc.richtext.InlineCssTextArea
@@ -17,7 +17,7 @@ import java.time.Duration
 
 class EditorView : View() {
     private val editorController: EditorController by inject()
-    private val keywordsController: KeywordsController by inject()
+    private val journalController: JournalController by inject()
 
     private val hoverDurationMillis = 200L
 
@@ -48,7 +48,7 @@ class EditorView : View() {
         run {
             val area = InlineCssTextArea()
             val popup = Popup()
-            val popupMsg = javafx.scene.control.Label()
+            val popupMsg = Label()
             popupMsg.style = "-fx-background-color: ${Styles.hoverBackground}; " +
                     "-fx-text-fill: ${Styles.hoverTextColor}; " +
                     "-fx-padding: ${Styles.hoverPaddingPx};"
@@ -171,17 +171,15 @@ class EditorView : View() {
                 text("Keywords")
                 addClass(Styles.buttons)
                 button("+") {
-                    disableWhen(editorController.isValidSelection.not().or(editorController.isEditable.not()))
+                    disableWhen(editorController.selectedKeywordProperty.isNull.or(editorController.isEditable.not()))
                     action {
                         if (editorController.selectedKeywordProperty.isNotNull.get()) {
                             editorController.current.get().keywordsProperty.add(editorController.selectedKeywordProperty.value)
                         }
                     }
                 }
-                combobox(keywordsController.allKeywords) {
-                    valueProperty().onChange {
-                        editorController.selectedKeywordProperty.set(it?.firstOrNull())
-                    }
+                combobox(editorController.selectedKeywordProperty) {
+                    valueProperty().onChange { editorController.selectedKeywordProperty.set(it) }
                 }
             }
 

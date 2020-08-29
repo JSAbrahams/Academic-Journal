@@ -19,7 +19,7 @@ class KeywordsView : View() {
             addClass(Styles.title)
         }
 
-        listview(keywordsController.allKeywords) {
+        listview(journalController.journal.select { it.keywords }) {
             cellFragment(EditableKeywordFragment::class)
 
             keywordsController.selectedKeywordProperty.onChange {
