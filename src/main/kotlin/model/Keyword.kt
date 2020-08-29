@@ -24,7 +24,7 @@ class Keyword(text: String = "", description: String = "") {
         textProperty.onChange { editedProperty.set(true) }
     }
 
-    override fun toString(): String = textProperty.get()
+    override fun toString(): String = "#${textProperty.get()}"
     override fun equals(other: Any?): Boolean = other is Keyword && textProperty.get() == other.textProperty.get()
     override fun hashCode(): Int = textProperty.get().hashCode()
 }

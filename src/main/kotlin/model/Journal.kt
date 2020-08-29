@@ -2,14 +2,14 @@ package main.kotlin.model
 
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.BooleanBinding
-import javafx.beans.property.ReadOnlyListProperty
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleListProperty
-import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.*
+import javafx.collections.ObservableSet
+import javafx.collections.SetChangeListener
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.SetSerializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
@@ -22,7 +22,7 @@ import tornadofx.cleanBind
 import java.io.File
 
 @Serializable(with = JournalSerializer::class)
-class Journal(title: String = "", items: List<JournalEntry> = listOf(), keywords: List<Keyword> = listOf()) {
+class Journal(title: String = "", items: List<JournalEntry> = listOf(), keywords: Set<Keyword> = setOf()) {
     val titleProperty = SimpleStringProperty(title)
 
     private val myItems = items.toMutableList().asObservable()
@@ -30,14 +30,21 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), keywords
 
     var editedProperty = SimpleBooleanProperty(false)
 
-    private val myKeywords = keywords.toMutableList().asObservable()
-    val keywords: SimpleListProperty<Keyword> = SimpleListProperty(myKeywords)
+    private val myKeywords = keywords.toMutableSet().asObservable()
+    val keywords: ObservableSet<Keyword> = SimpleSetProperty(myKeywords)
+    val keywordList = SimpleListProperty(mutableListOf<Keyword>().asObservable())
 
     companion object {
         fun load(file: File): Journal = Json.decodeFromString(file.readText())
     }
 
     init {
+        keywordList.addAll(keywords)
+        this.keywords.addListener { c: SetChangeListener.Change<out Keyword> ->
+            if (c.wasAdded()) keywordList.add(c.elementAdded)
+            if (c.wasRemoved()) keywordList.add(c.elementRemoved)
+        }
+
         itemsProperty.forEach { item -> item.loadKeywords(keywords.map { it.textProperty.get() to it }.toMap()) }
         resetEdited()
     }
@@ -91,13 +98,13 @@ object JournalSerializer : KSerializer<Journal> {
 
     override fun serialize(encoder: Encoder, value: Journal) = encoder.encodeStructure(descriptor) {
         encodeStringElement(descriptor, 0, value.titleProperty.get())
-        encodeSerializableElement(descriptor, 1, ListSerializer((KeywordSerializer)), value.keywords.get())
+        encodeSerializableElement(descriptor, 1, SetSerializer((KeywordSerializer)), value.keywords.toSet())
         encodeSerializableElement(descriptor, 2, ListSerializer(JournalEntrySerializer), value.itemsProperty.toList())
     }
 
     override fun deserialize(decoder: Decoder): Journal = decoder.decodeStructure(descriptor) {
         var title = ""
-        val (keywords, entries) = Pair(mutableListOf<Keyword>(), mutableListOf<JournalEntry>())
+        val (keywords, entries) = Pair(mutableSetOf<Keyword>(), mutableListOf<JournalEntry>())
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
                 0 -> title = decodeStringElement(descriptor, 0)

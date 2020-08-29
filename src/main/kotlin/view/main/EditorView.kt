@@ -168,22 +168,24 @@ class EditorView : View() {
 
         vbox {
             hbox {
-                text("Keywords")
+                text("Tags")
                 addClass(Styles.buttons)
                 button("+") {
                     disableWhen(editorController.selectedKeywordProperty.isNull.or(editorController.isEditable.not()))
                     action {
                         if (editorController.selectedKeywordProperty.isNotNull.get()) {
-                            editorController.current.get().keywordsProperty.add(editorController.selectedKeywordProperty.value)
+                            val selected = editorController.selectedKeywordProperty.value ?: null
+                            editorController.current.get().keywordsProperty.add(selected)
                         }
                     }
                 }
                 combobox(editorController.selectedKeywordProperty) {
-                    valueProperty().onChange { editorController.selectedKeywordProperty.set(it) }
+                    itemsProperty().bind(journalController.journal.select { it.keywordList })
+                    editorController.selectedKeywordProperty.bindBidirectional(valueProperty())
                 }
             }
 
-            listview(editorController.current.select { it.keywordsProperty }) {
+            listview(editorController.current.select { it.keywordList }) {
                 addClass(Styles.keywords)
                 hgrow = Priority.ALWAYS
                 cellFragment(KeywordFragment::class)

@@ -15,11 +15,11 @@ class KeywordsView : View() {
     override val root = vbox {
         addClass(Styles.customContainer)
 
-        text("Keywords") {
+        text("Tags") {
             addClass(Styles.title)
         }
 
-        listview(journalController.journal.select { it.keywords }) {
+        listview(journalController.journal.select { it.keywordList }) {
             cellFragment(EditableKeywordFragment::class)
 
             keywordsController.selectedKeywordProperty.onChange {

@@ -19,20 +19,21 @@ class EditableKeywordFragment : ListCellFragment<Keyword>() {
         hbox {
             addClass(Styles.nestedContainer)
 
+            text("#")
             textfield(entry.text) {
                 hgrow = Priority.ALWAYS
                 promptText = "Name"
 
                 styleProperty().bind(
                     Bindings.createObjectBinding(
-                        { "-fx-text-inner-color: ${entry.colorValue.value.invert().hex}; " },
+                        { "-fx-text-inner-color: ${entry.colorValue.value?.invert()?.hex}; " },
                         entry.colorValue
                     )
                 )
 
                 background = Background(BackgroundFill(entry.colorValue.value, Styles.keywordRadii, Insets.EMPTY))
                 entry.colorValue.onChange {
-                    if (it != null) background = Background(BackgroundFill(it, Styles.keywordRadii, Insets.EMPTY))
+                    background = Background(BackgroundFill(it, Styles.keywordRadii, Insets.EMPTY))
                 }
             }
             colorpicker(entry.colorValue.value) {

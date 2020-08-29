@@ -2,10 +2,13 @@ package main.kotlin.model
 
 import javafx.beans.property.*
 import javafx.collections.ObservableList
+import javafx.collections.ObservableSet
+import javafx.collections.SetChangeListener
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.SetSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
@@ -26,7 +29,7 @@ class JournalEntry(
     title: String = "",
     text: String = "",
     references: List<ReferencePosition> = listOf(),
-    private val keywords: List<String> = listOf()
+    private val keywords: Set<String> = setOf()
 ) {
     val lastEditProperty = SimpleObjectProperty(lastEdit)
     val creationProperty = SimpleObjectProperty(creation)
@@ -37,7 +40,8 @@ class JournalEntry(
     val textProperty = SimpleStringProperty(text)
 
     val referencesProperty = SimpleListProperty(references.toMutableList().asObservable())
-    val keywordsProperty = SimpleListProperty(mutableListOf<Keyword>().toObservable())
+    val keywordsProperty = SimpleSetProperty(mutableSetOf<Keyword>().toObservable())
+    val keywordList = SimpleListProperty(mutableListOf<Keyword>().asObservable())
 
     /**
      * Load reference based on mapping from identifier to actual reference.
@@ -51,18 +55,23 @@ class JournalEntry(
      */
     fun loadKeywords(keywordMapping: Map<String, Keyword>) {
         keywordsProperty.addAll(keywords.map { keywordMapping[it] })
+        keywordList.addAll(keywordsProperty)
     }
 
     init {
         titleProperty.onChange { editedProperty.set(true) }
         textProperty.onChange { editedProperty.set(true) }
-        keywordsProperty.onChange<ObservableList<Keyword>> {
+        keywordsProperty.onChange<ObservableSet<Keyword>> {
             it?.forEach { keyword -> keyword.editedProperty.onChange { editedProperty.set(editedProperty.get() || it) } }
             editedProperty.set(true)
         }
         referencesProperty.onChange<ObservableList<ReferencePosition>> { editedProperty.set(true) }
 
         keywordsProperty.forEach { keyword -> keyword.editedProperty.onChange { editedProperty.set(editedProperty.get() || it) } }
+        this.keywordsProperty.addListener { c: SetChangeListener.Change<out Keyword> ->
+            if (c.wasAdded()) keywordList.add(c.elementAdded)
+            if (c.wasRemoved()) keywordList.add(c.elementRemoved)
+        }
     }
 
     /**
@@ -131,7 +140,7 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
     override fun deserialize(decoder: Decoder): JournalEntry = decoder.decodeStructure(descriptor) {
         var (creation, lastEdit) = Pair(LocalDateTime.now(), LocalDateTime.now())
         var (title, text) = Pair("", "")
-        val (references, keywords) = Pair(mutableListOf<ReferencePosition>(), mutableListOf<String>())
+        val (references, keywords) = Pair(mutableListOf<ReferencePosition>(), mutableSetOf<String>())
 
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
@@ -139,7 +148,7 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
                 1 -> lastEdit = LocalDateTime.ofEpochSecond(decodeLongElement(descriptor, 1), 0, ZoneOffset.UTC)
                 2 -> title = decodeStringElement(descriptor, 2)
                 3 -> text = decodeStringElement(descriptor, 3)
-                4 -> keywords.addAll(decodeSerializableElement(descriptor, 4, ListSerializer(String.serializer())))
+                4 -> keywords.addAll(decodeSerializableElement(descriptor, 4, SetSerializer(String.serializer())))
                 5 -> references.addAll(
                     decodeSerializableElement(
                         descriptor,
@@ -163,5 +172,5 @@ class JournalEntryModel(property: ObjectProperty<JournalEntry>) :
     val edited = bind(autocommit = true) { property.select { it.editedProperty } }
     val lastEdit = bind(autocommit = true) { property.select { it.lastEditProperty } }
     val creation = bind(autocommit = true) { property.select { it.creationProperty } }
-    val keywords: ObservableList<Keyword> = bind(autocommit = true) { property.select { it.keywordsProperty } }
+    val keywords: ObservableList<Keyword> = bind(autocommit = true) { property.select { it.keywordList } }
 }
