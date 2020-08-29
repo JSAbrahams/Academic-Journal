@@ -107,11 +107,12 @@ class EditorView : View() {
                 selections.forEach { area.removeSelection(it) }
                 selections.clear()
 
-                val setStyle: (Int, ReferencePosition) -> Unit = { index, referencePosition ->
-                    val selectionImpl = SelectionImpl("selection $index", area) { path ->
+                val setStyle: (ReferencePosition) -> Unit = { referencePosition ->
+                    val selectionImpl = SelectionImpl("${referencePosition.hashCode()}", area) { path ->
                         path.strokeWidth = 0.0
                         path.fill = Styles.highlightColor
                     }
+
                     selections.add(selectionImpl)
                     area.addSelection(selectionImpl)
                     if (area.text.length >= referencePosition.endProperty.get()) selectionImpl.selectRange(
@@ -120,10 +121,10 @@ class EditorView : View() {
                     )
                 }
 
-                journalEntry?.referencesProperty?.forEachIndexed(setStyle)
+                journalEntry?.referencesProperty?.forEach(setStyle)
                 journalEntry?.referencesProperty?.onChange<ObservableList<ReferencePosition>> {
                     (0 until area.paragraphs.size).forEach { paragraph -> area.clearStyle(paragraph) }
-                    it?.forEachIndexed(setStyle)
+                    it?.forEach(setStyle)
                 }
             }
             area.textProperty().onChange { text ->
