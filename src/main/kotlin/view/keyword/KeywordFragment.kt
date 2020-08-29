@@ -1,10 +1,15 @@
 package main.kotlin.view.keyword
 
+import javafx.geometry.Insets
+import javafx.scene.layout.Background
+import javafx.scene.layout.BackgroundFill
+import main.kotlin.Styles
 import main.kotlin.controller.KeywordsController
 import main.kotlin.model.Keyword
 import main.kotlin.model.KeywordModel
 import tornadofx.ListCellFragment
 import tornadofx.hbox
+import tornadofx.onChange
 import tornadofx.text
 
 class KeywordFragment : ListCellFragment<Keyword>() {
@@ -15,7 +20,11 @@ class KeywordFragment : ListCellFragment<Keyword>() {
     val keywordsView: KeywordsView by inject()
 
     override val root = hbox {
-        text(entry.value)
+        text(entry.text)
+        background = Background(BackgroundFill(entry.colorValue.value, Styles.keywordRadii, Insets.EMPTY))
+        entry.colorValue.onChange {
+            background = Background(BackgroundFill(it, Styles.keywordRadii, Insets.EMPTY))
+        }
 
         setOnMouseClicked {
             if (it.clickCount == 2) {
