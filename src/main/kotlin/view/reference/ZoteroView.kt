@@ -48,6 +48,13 @@ class ZoteroView : View() {
                 text("Items") { setId(Styles.title) }
                 listview(observableListOf(referencesController.referenceMapping.values)) {
                     cellFragment(ReferenceFragment::class)
+
+                    referencesController.selectedReference.onChange {
+                        selectionModel.select(it)
+                        scrollTo(selectionModel.selectedIndex)
+                        focusModel.focus(selectionModel.selectedIndex)
+                        requestFocus()
+                    }
                 }
             }
         }
