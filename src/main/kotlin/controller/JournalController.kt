@@ -11,7 +11,7 @@ import tornadofx.cleanBind
 import tornadofx.select
 import java.io.File
 
-class StoreController : Controller() {
+class JournalController : Controller() {
     val location = SimpleObjectProperty<File>()
     val savedProperty = SimpleBooleanProperty(false)
 

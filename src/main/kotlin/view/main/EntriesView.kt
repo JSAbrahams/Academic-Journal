@@ -4,7 +4,7 @@ import javafx.scene.control.ButtonType
 import javafx.scene.layout.Priority
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
-import main.kotlin.controller.StoreController
+import main.kotlin.controller.JournalController
 import main.kotlin.view.fragment.EntryFragment
 import tornadofx.*
 import java.time.LocalDate
@@ -12,7 +12,7 @@ import java.time.temporal.ChronoUnit
 
 class EntriesView : View() {
     val editorController: EditorController by inject()
-    val storeController: StoreController by inject()
+    val journalController: JournalController by inject()
 
     val menuViewView: MenuView by inject()
 
@@ -21,13 +21,13 @@ class EntriesView : View() {
 
         text("Entries") { setId(Styles.title) }
 
-        listview(storeController.journal.select { it.itemsProperty }) {
+        listview(journalController.journal.select { it.itemsProperty }) {
             cellFragment(EntryFragment::class)
             vgrow = Priority.ALWAYS
             hgrow = Priority.NEVER
             bindSelected(editorController.current)
 
-            storeController.journal.onChange { _ ->
+            journalController.journal.onChange { _ ->
                 if (items.isNotEmpty()) {
                     scrollTo(items.size - 1)
                     selectionModel.select(items.size - 1)
@@ -38,20 +38,20 @@ class EntriesView : View() {
         hbox {
             addClass(Styles.buttons)
             togglebutton("Edit Mode") {
-                disableWhen(storeController.journal.isNull)
+                disableWhen(journalController.journal.isNull)
                 editorController.isEditMode.bind(this.selectedProperty())
             }
             button("save") {
-                disableWhen(storeController.savedProperty)
+                disableWhen(journalController.savedProperty)
                 action { menuViewView.save() }
             }
             button("+").action {
                 var selection = ButtonType.YES
 
-                if (storeController.journal.isNotNull.get() && storeController.journal.get().itemsProperty.isNotEmpty()) {
+                if (journalController.journal.isNotNull.get() && journalController.journal.get().itemsProperty.isNotEmpty()) {
                     val daysAfterEpoch = ChronoUnit.DAYS.between(LocalDate.ofEpochDay(0), LocalDate.now())
 
-                    val lastEntry = storeController.journal.get().itemsProperty.last()
+                    val lastEntry = journalController.journal.get().itemsProperty.last()
                     val lastDate = lastEntry.creationProperty.get()
                     val journalDaysAfterEpoch = ChronoUnit.DAYS.between(LocalDate.ofEpochDay(0), lastDate)
 
@@ -64,7 +64,7 @@ class EntriesView : View() {
                         )
                 }
 
-                if (selection == ButtonType.YES) editorController.current.set(storeController.newEntry())
+                if (selection == ButtonType.YES) editorController.current.set(journalController.newEntry())
             }
         }
     }

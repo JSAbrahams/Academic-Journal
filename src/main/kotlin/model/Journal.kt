@@ -27,7 +27,9 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), keywords
 
     private val myItems = items.toMutableList().asObservable()
     val itemsProperty: ReadOnlyListProperty<JournalEntry> = SimpleListProperty(myItems)
+
     var editedProperty = SimpleBooleanProperty(false)
+
     private val myKeywords = keywords.toMutableList().asObservable()
     val keywords: SimpleListProperty<Keyword> = SimpleListProperty(myKeywords)
 
@@ -36,11 +38,8 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), keywords
     }
 
     init {
-        val or = myItems.fold(
-            SimpleBooleanProperty(false),
-            fun(acc, b): BooleanBinding { return Bindings.or(acc, b.editedProperty) })
-
-        editedProperty.cleanBind(or)
+        itemsProperty.forEach { item -> item.loadKeywords(keywords.map { it.textProperty.get() to it }.toMap()) }
+        resetEdited()
     }
 
     fun reset() = itemsProperty.forEach { it.reset() }
@@ -52,12 +51,25 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), keywords
         itemsProperty.forEach { it.loadReference(referenceMapping) }
     }
 
+    fun addKeyword(keyword: Keyword) {
+        keywords.add(keyword)
+        resetEdited()
+    }
+
     fun addJournalEntry(journalEntry: JournalEntry) {
         myItems.add(journalEntry)
-        val or = myItems.fold(
-            SimpleBooleanProperty(false),
+        resetEdited()
+    }
+
+    private fun resetEdited() {
+        val or = keywords.fold(
+            myItems.fold(
+                SimpleBooleanProperty(false),
+                fun(acc, b): BooleanBinding { return Bindings.or(acc, b.editedProperty) }),
             fun(acc, b): BooleanBinding { return Bindings.or(acc, b.editedProperty) })
 
+        editedProperty.unbind()
+        editedProperty.set(true)
         editedProperty.cleanBind(or)
     }
 
@@ -73,25 +85,29 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), keywords
 object JournalSerializer : KSerializer<Journal> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Journal") {
         element<String>("title")
+        element<List<Keyword>>("keywords")
         element<List<JournalEntry>>("entries")
     }
 
     override fun serialize(encoder: Encoder, value: Journal) = encoder.encodeStructure(descriptor) {
         encodeStringElement(descriptor, 0, value.titleProperty.get())
-        encodeSerializableElement(descriptor, 1, ListSerializer(JournalEntrySerializer), value.itemsProperty.toList())
+        encodeSerializableElement(descriptor, 1, ListSerializer((KeywordSerializer)), value.keywords.get())
+        encodeSerializableElement(descriptor, 2, ListSerializer(JournalEntrySerializer), value.itemsProperty.toList())
     }
 
     override fun deserialize(decoder: Decoder): Journal = decoder.decodeStructure(descriptor) {
-        var (title, entries) = Pair("", mutableListOf<JournalEntry>())
+        var title = ""
+        val (keywords, entries) = Pair(mutableListOf<Keyword>(), mutableListOf<JournalEntry>())
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
                 0 -> title = decodeStringElement(descriptor, 0)
-                1 -> entries.addAll(decodeSerializableElement(descriptor, 1, ListSerializer(JournalEntrySerializer)))
+                1 -> keywords.addAll(decodeSerializableElement(descriptor, 1, ListSerializer(KeywordSerializer)))
+                2 -> entries.addAll(decodeSerializableElement(descriptor, 2, ListSerializer(JournalEntrySerializer)))
                 CompositeDecoder.DECODE_DONE -> break
                 else -> throw SerializationException("Unknown index $index")
             }
         }
 
-        Journal(title, entries)
+        Journal(title, entries, keywords)
     }
 }

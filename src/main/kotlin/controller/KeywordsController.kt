@@ -6,8 +6,9 @@ import tornadofx.Controller
 import tornadofx.select
 
 class KeywordsController : Controller() {
-    val editorController: EditorController by inject()
+    val journalCollection: JournalController by inject()
 
     val selectedKeywordProperty = SimpleObjectProperty<Keyword>()
-    val allKeywords = editorController.current.select { it.keywordsProperty }
+
+    val allKeywords = journalCollection.journal.select { it.keywords }
 }

@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.IndexRange
 import main.kotlin.model.JournalEntry
+import main.kotlin.model.Keyword
 import main.kotlin.model.ReferencePosition
 import tornadofx.Controller
 import tornadofx.asObservable
@@ -21,4 +22,6 @@ class EditorController : Controller() {
     val rowPosition = SimpleIntegerProperty()
     val colPosition = SimpleIntegerProperty()
     val hoveredReferencePosition = SimpleListProperty(mutableListOf<ReferencePosition>().asObservable())
+
+    val selectedKeywordProperty = SimpleObjectProperty<Keyword>()
 }

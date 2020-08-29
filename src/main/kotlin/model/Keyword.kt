@@ -17,7 +17,7 @@ import tornadofx.select
 class Keyword(text: String = "", description: String = "") {
     val textProperty = SimpleStringProperty(text)
     val descriptionProperty = SimpleStringProperty(description)
-    val colorProperty = SimpleObjectProperty(Color.WHITE)
+    val colorProperty = SimpleObjectProperty(Color.RED)
     val editedProperty: BooleanProperty = SimpleBooleanProperty(false)
 
     init {

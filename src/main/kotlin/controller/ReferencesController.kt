@@ -12,7 +12,7 @@ import java.io.File
 import java.time.LocalDateTime
 
 class ReferencesController : Controller() {
-    val storeController: StoreController by inject()
+    val journalController: JournalController by inject()
 
     // Hardcode for now
     val zoteroDirectory = File(System.getProperty("user.home"), "Zotero")
@@ -27,8 +27,8 @@ class ReferencesController : Controller() {
 
     init {
         referenceMapping.onChange {
-            if (storeController.journal.isNotNull.get()) {
-                storeController.journal.get().loadReference(referenceMapping.toMap())
+            if (journalController.journal.isNotNull.get()) {
+                journalController.journal.get().loadReference(referenceMapping.toMap())
             }
         }
     }

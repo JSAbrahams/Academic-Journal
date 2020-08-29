@@ -6,15 +6,13 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.*
 import main.kotlin.model.reference.Reference
-import tornadofx.ItemViewModel
-import tornadofx.asObservable
-import tornadofx.onChange
-import tornadofx.select
+import tornadofx.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -28,7 +26,7 @@ class JournalEntry(
     title: String = "",
     text: String = "",
     references: List<ReferencePosition> = listOf(),
-    keywords: List<Keyword> = listOf()
+    private val keywords: List<String> = listOf()
 ) {
     val lastEditProperty = SimpleObjectProperty(lastEdit)
     val creationProperty = SimpleObjectProperty(creation)
@@ -39,13 +37,20 @@ class JournalEntry(
     val textProperty = SimpleStringProperty(text)
 
     val referencesProperty = SimpleListProperty(references.toMutableList().asObservable())
-    val keywordsProperty = SimpleListProperty(keywords.toMutableList().asObservable())
+    val keywordsProperty = SimpleListProperty(mutableListOf<Keyword>().toObservable())
 
     /**
      * Load reference based on mapping from identifier to actual reference.
      */
     fun loadReference(referenceMapping: Map<Int, Reference>) {
         referencesProperty.forEach { it.loadReference(referenceMapping) }
+    }
+
+    /**
+     * Load keywords on boot, populating the keywordsProperty with keywords based on the keyword strings (keys).
+     */
+    fun loadKeywords(keywordMapping: Map<String, Keyword>) {
+        keywordsProperty.addAll(keywords.map { keywordMapping[it] })
     }
 
     init {
@@ -110,7 +115,11 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
         encodeLongElement(descriptor, 1, value.lastEditProperty.get().epochSeconds)
         encodeStringElement(descriptor, 2, value.titleProperty.get())
         encodeStringElement(descriptor, 3, value.textProperty.get())
-        encodeSerializableElement(descriptor, 4, ListSerializer(KeywordSerializer), value.keywordsProperty.toList())
+        encodeSerializableElement(
+            descriptor,
+            4,
+            ListSerializer(String.serializer()),
+            value.keywordsProperty.toList().map { it.textProperty.get() })
         encodeSerializableElement(
             descriptor,
             5,
@@ -122,7 +131,7 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
     override fun deserialize(decoder: Decoder): JournalEntry = decoder.decodeStructure(descriptor) {
         var (creation, lastEdit) = Pair(LocalDateTime.now(), LocalDateTime.now())
         var (title, text) = Pair("", "")
-        val (references, keywords) = Pair(mutableListOf<ReferencePosition>(), mutableListOf<Keyword>())
+        val (references, keywords) = Pair(mutableListOf<ReferencePosition>(), mutableListOf<String>())
 
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
@@ -130,7 +139,7 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
                 1 -> lastEdit = LocalDateTime.ofEpochSecond(decodeLongElement(descriptor, 1), 0, ZoneOffset.UTC)
                 2 -> title = decodeStringElement(descriptor, 2)
                 3 -> text = decodeStringElement(descriptor, 3)
-                4 -> keywords.addAll(decodeSerializableElement(descriptor, 4, ListSerializer(KeywordSerializer)))
+                4 -> keywords.addAll(decodeSerializableElement(descriptor, 4, ListSerializer(String.serializer())))
                 5 -> references.addAll(
                     decodeSerializableElement(
                         descriptor,

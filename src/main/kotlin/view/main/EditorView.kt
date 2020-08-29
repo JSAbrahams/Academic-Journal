@@ -2,9 +2,10 @@ package main.kotlin.view.main
 
 import javafx.collections.ObservableList
 import javafx.scene.layout.Priority
-import javafx.stage.Popup
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
+import main.kotlin.controller.KeywordsController
+import main.kotlin.model.ReferencePosition
 import main.kotlin.model.Keyword
 import main.kotlin.model.ReferencePosition
 import main.kotlin.view.keyword.KeywordFragment
@@ -16,6 +17,7 @@ import java.time.Duration
 
 class EditorView : View() {
     private val editorController: EditorController by inject()
+    private val keywordsController: KeywordsController by inject()
 
     private val hoverDurationMillis = 200L
 
@@ -164,13 +166,25 @@ class EditorView : View() {
             text(editorController.current.select { it.lastEditProperty.asString() })
         }
 
-        text("Keywords")
-        hbox {
-            addClass(Styles.buttons)
-            button("+") {
-                disableWhen(editorController.isValidSelection.not().or(editorController.isEditable.not()))
-                action { editorController.current.get().keywordsProperty.add(Keyword()) }
+        vbox {
+            hbox {
+                text("Keywords")
+                addClass(Styles.buttons)
+                button("+") {
+                    disableWhen(editorController.isValidSelection.not().or(editorController.isEditable.not()))
+                    action {
+                        if (editorController.selectedKeywordProperty.isNotNull.get()) {
+                            editorController.current.get().keywordsProperty.add(editorController.selectedKeywordProperty.value)
+                        }
+                    }
+                }
+                combobox(keywordsController.allKeywords) {
+                    valueProperty().onChange {
+                        editorController.selectedKeywordProperty.set(it?.firstOrNull())
+                    }
+                }
             }
+
             listview(editorController.current.select { it.keywordsProperty }) {
                 addClass(Styles.keywords)
                 hgrow = Priority.ALWAYS
