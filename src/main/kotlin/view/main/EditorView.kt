@@ -113,12 +113,17 @@ class EditorView : View() {
                         path.fill = Styles.highlightColor
                     }
 
-                    selections.add(selectionImpl)
-                    area.addSelection(selectionImpl)
-                    if (area.text.length >= referencePosition.endProperty.get()) selectionImpl.selectRange(
-                        referencePosition.startProperty.get(),
-                        referencePosition.endProperty.get()
-                    )
+                    if (area.text.length >= referencePosition.endProperty.get()) {
+                        selections.add(selectionImpl)
+                        area.addSelection(selectionImpl)
+
+                        selectionImpl.selectRange(
+                            referencePosition.startProperty.get(),
+                            referencePosition.endProperty.get()
+                        )
+                        referencePosition.startProperty.bind(selectionImpl.startPositionProperty())
+                        referencePosition.endProperty.bind(selectionImpl.endPositionProperty())
+                    }
                 }
 
                 journalEntry?.referencesProperty?.forEach(setStyle)
