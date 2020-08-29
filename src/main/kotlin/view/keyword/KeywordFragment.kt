@@ -1,5 +1,6 @@
 package main.kotlin.view.keyword
 
+import javafx.beans.binding.Bindings
 import javafx.geometry.Insets
 import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
@@ -20,10 +21,13 @@ class KeywordFragment : ListCellFragment<Keyword>() {
     val keywordsView: KeywordsView by inject()
 
     override val root = hbox {
-        text(entry.text)
-        background = Background(BackgroundFill(entry.colorValue.value, Styles.keywordRadii, Insets.EMPTY))
-        entry.colorValue.onChange {
-            background = Background(BackgroundFill(it, Styles.keywordRadii, Insets.EMPTY))
+        text(entry.text) {
+            fillProperty().bind(Bindings.createObjectBinding({ entry.colorValue.value.invert() }, entry.colorValue))
+
+            background = Background(BackgroundFill(entry.colorValue.value, Styles.keywordRadii, Insets.EMPTY))
+            entry.colorValue.onChange {
+                background = Background(BackgroundFill(it, Styles.keywordRadii, Insets.EMPTY))
+            }
         }
 
         setOnMouseClicked {

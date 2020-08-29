@@ -22,7 +22,7 @@ class Styles : Stylesheet() {
         val highlightColor = Color.YELLOW
         val hoverBackground = "black"
         val hoverTextColor = "white"
-        val hoverPaddingPx = 3
+        val hoverPaddingPx = 5
     }
 
     init {

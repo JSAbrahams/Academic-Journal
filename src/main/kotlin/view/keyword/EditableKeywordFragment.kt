@@ -1,5 +1,6 @@
 package main.kotlin.view.keyword
 
+import javafx.beans.binding.Bindings
 import javafx.geometry.Insets
 import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
@@ -17,8 +18,19 @@ class EditableKeywordFragment : ListCellFragment<Keyword>() {
         hbox {
             addClass(Styles.nestedContainer)
 
-            textfield(entry.text) {
+            textfield {
                 hgrow = Priority.ALWAYS
+                promptText = "Name"
+
+                text(entry.text) {
+                    fillProperty().bind(
+                        Bindings.createObjectBinding(
+                            { entry.colorValue.value.invert() },
+                            entry.colorValue
+                        )
+                    )
+                }
+
                 background = Background(BackgroundFill(entry.colorValue.value, Styles.keywordRadii, Insets.EMPTY))
                 entry.colorValue.onChange {
                     if (it != null) background = Background(BackgroundFill(it, Styles.keywordRadii, Insets.EMPTY))
@@ -29,6 +41,8 @@ class EditableKeywordFragment : ListCellFragment<Keyword>() {
             }
         }
 
-        textfield(entry.description)
+        textfield(entry.description) {
+            promptText = "Description"
+        }
     }
 }
