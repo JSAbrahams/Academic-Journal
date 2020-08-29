@@ -10,9 +10,9 @@ import main.kotlin.view.reference.ZoteroView
 import tornadofx.*
 
 class ReferencesView : View() {
-    val editorController: EditorController by inject()
+    private val editorController: EditorController by inject()
 
-    val zoteroView: ZoteroView by inject()
+    private val zoteroView: ZoteroView by inject()
 
     override val root = vbox {
         addClass(Styles.customContainer)
