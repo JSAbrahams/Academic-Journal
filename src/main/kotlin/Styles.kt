@@ -6,7 +6,7 @@ import javafx.scene.layout.CornerRadii
 import javafx.scene.paint.Color
 import tornadofx.*
 
-val Color.hex: String
+val Color.web: String
     get() = {
         val r = Math.round(this.red * 255).toInt() shl 24
         val g = Math.round(this.green * 255).toInt() shl 16

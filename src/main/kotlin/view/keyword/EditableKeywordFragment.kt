@@ -6,9 +6,9 @@ import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
 import javafx.scene.layout.Priority
 import main.kotlin.Styles
-import main.kotlin.hex
 import main.kotlin.model.Keyword
 import main.kotlin.model.KeywordModel
+import main.kotlin.web
 import tornadofx.*
 
 class EditableKeywordFragment : ListCellFragment<Keyword>() {
@@ -26,7 +26,7 @@ class EditableKeywordFragment : ListCellFragment<Keyword>() {
 
                 styleProperty().bind(
                     Bindings.createObjectBinding(
-                        { "-fx-text-inner-color: ${entry.colorValue.value?.invert()?.hex}; " },
+                        { "-fx-text-inner-color: ${entry.colorValue.value?.invert()?.web}; " },
                         entry.colorValue
                     )
                 )

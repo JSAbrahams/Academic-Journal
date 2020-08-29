@@ -21,9 +21,12 @@ class KeywordFragment : ListCellFragment<Keyword>() {
 
     override val root = hbox {
         addClass(Styles.keywordTag)
+        tooltip { textProperty().bind(entry.description) }
+
         text(Bindings.concat("#", entry.text)) {
             hgrow = Priority.NEVER
             vgrow = Priority.NEVER
+
 
             fillProperty().bind(
                 Bindings.createObjectBinding(

@@ -55,7 +55,6 @@ class JournalEntry(
      */
     fun loadKeywords(keywordMapping: Map<String, Keyword>) {
         keywordsProperty.addAll(keywords.map { keywordMapping[it] })
-        keywordList.addAll(keywordsProperty)
     }
 
     init {
