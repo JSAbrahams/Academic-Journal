@@ -61,12 +61,11 @@ class Styles : Stylesheet() {
 
         keywords {
             orientation = Orientation.HORIZONTAL
-            maxHeight = 60.px
-            backgroundColor += Color.TRANSPARENT
+            maxHeight = 40.px
         }
         keywordTag {
-            prefHeight = 20.px
-            prefWidth = 45.px
+            maxHeight = 20.px
+            prefWidth = 60.px
             alignment = Pos.CENTER
         }
 

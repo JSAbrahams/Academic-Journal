@@ -1,7 +1,9 @@
 package main.kotlin.view.main
 
 import javafx.collections.ObservableList
+import javafx.geometry.Pos
 import javafx.scene.control.Label
+import javafx.scene.layout.Background
 import javafx.scene.layout.Priority
 import javafx.stage.Popup
 import main.kotlin.Styles
@@ -155,41 +157,43 @@ class EditorView : View() {
         }
 
         hbox {
-            text(editorController.rowPosition.asString())
-            text(":")
-            text(editorController.colPosition.asString())
-        }
-
-        hbox {
             addClass(Styles.buttons)
             text("Last Edit")
             text(editorController.current.select { it.lastEditProperty.asString() })
+
+            hbox {
+                alignment = Pos.CENTER_RIGHT
+
+                text(editorController.rowPosition.asString())
+                text(":")
+                text(editorController.colPosition.asString())
+            }
         }
 
-        vbox {
-            hbox {
-                text("Tags")
-                addClass(Styles.buttons)
-                button("+") {
-                    disableWhen(editorController.selectedKeywordProperty.isNull.or(editorController.isEditable.not()))
-                    action {
-                        if (editorController.selectedKeywordProperty.isNotNull.get()) {
-                            val selected = editorController.selectedKeywordProperty.value ?: null
-                            editorController.current.get().keywordsProperty.add(selected)
-                        }
+        hbox {
+            text("Tags")
+            addClass(Styles.buttons)
+            button("+") {
+                disableWhen(editorController.selectedKeywordProperty.isNull.or(editorController.isEditable.not()))
+                action {
+                    if (editorController.selectedKeywordProperty.isNotNull.get()) {
+                        val selected = editorController.selectedKeywordProperty.value ?: null
+                        editorController.current.get().keywordsProperty.add(selected)
                     }
                 }
-                combobox(editorController.selectedKeywordProperty) {
-                    itemsProperty().bind(journalController.journal.select { it.keywordList })
-                    editorController.selectedKeywordProperty.bindBidirectional(valueProperty())
-                }
             }
+            combobox(editorController.selectedKeywordProperty) {
+                itemsProperty().bind(journalController.journal.select { it.keywordList })
+                editorController.selectedKeywordProperty.bindBidirectional(valueProperty())
+            }
+        }
 
-            listview(editorController.current.select { it.keywordList }) {
-                addClass(Styles.keywords)
-                hgrow = Priority.ALWAYS
-                cellFragment(KeywordFragment::class)
-            }
+        listview(editorController.current.select { it.keywordList }) {
+            addClass(Styles.keywords)
+            hgrow = Priority.ALWAYS
+            background = Background.EMPTY
+
+            cellFragment(KeywordFragment::class)
         }
     }
 }
