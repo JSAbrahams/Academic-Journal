@@ -61,6 +61,7 @@ class Styles : Stylesheet() {
 
         keywords {
             orientation = Orientation.HORIZONTAL
+            backgroundInsets = multi(box(0.em))
             maxHeight = 40.px
         }
         keywordTag {
