@@ -27,6 +27,12 @@ class MenuView : View() {
 
     override val root = menubar {
         menu("File") {
+            item("New").action {
+                if (savePrompt(journalController, currentStage?.owner)) {
+                    val files = chooseFile(title = "New", mode = FileChooserMode.Save, filters = filters)
+                    if (files.isNotEmpty()) journalController.newJournal(files[0])
+                }
+            }
             item("Open").action {
                 if (savePrompt(journalController, currentStage?.owner)) {
                     val files = chooseFile(title = "Open", mode = FileChooserMode.Single, filters = filters)

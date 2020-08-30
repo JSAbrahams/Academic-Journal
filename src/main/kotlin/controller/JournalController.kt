@@ -17,6 +17,13 @@ class JournalController : Controller() {
 
     val journal = SimpleObjectProperty(Journal())
 
+    fun newJournal(file: File) {
+        journal.set(Journal(file.name))
+        location.set(file)
+        saveJournal()
+        savedProperty.cleanBind(journal.select { it.editedProperty.not() })
+    }
+
     fun loadJournal(file: File) {
         journal.set(Journal.load(file))
         location.set(file)
