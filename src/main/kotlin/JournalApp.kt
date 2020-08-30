@@ -70,10 +70,10 @@ class JournalApp : App(MainView::class, Styles::class) {
         super.start(stage)
         stage.titleProperty().bind(
             Bindings.concat(
-//                Bindings.`when`(journalController.location.isNotNull)
-//                    .then(Bindings.concat(" [", journalController.location.asString(), "] ")).otherwise(""),
+                Bindings.`when`(journalController.location.isNotNull)
+                    .then(Bindings.concat(" [", journalController.location.asString(), "] ")).otherwise(""),
                 journalController.journal.select { it.titleProperty },
-//                Bindings.`when`(SimpleBooleanProperty(true)).then("").otherwise(" [Unsaved]")
+                Bindings.`when`(journalController.savedProperty).then("").otherwise(" [Unsaved]")
             )
         )
 
