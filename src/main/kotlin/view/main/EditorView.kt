@@ -37,7 +37,7 @@ class EditorView : View() {
                 }
             }
             text {
-                setId(Styles.title)
+                addClass(Styles.title)
                 bind(editorController.current.select { it.creationProperty })
             }
         }

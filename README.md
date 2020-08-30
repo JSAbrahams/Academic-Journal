@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src=".github/img/overview.JPG" width="776"/>
+    <img src=".github/img/overview.png" width="827"/>
     <br/>
     📚 Academic Journal
 </h1>
