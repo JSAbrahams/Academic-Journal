@@ -11,6 +11,13 @@ buildscript {
 
 plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlinVersion"
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+}
+
+javafx {
+    version = "11.0.2"
+    modules = [ 'javafx.controls' ]
 }
 
 apply plugin: 'kotlin'
