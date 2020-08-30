@@ -10,7 +10,6 @@
     <a href="https://github.com/JSAbrahams/Academic-Journal/actions?query=workflow%3A%22Gradle+Build%22">
     <img src="https://img.shields.io/github/workflow/status/JSAbrahams/Academic-Journal/Gradle%20Build?style=for-the-badge" alt="Gradle Build"/>
     </a>
-    <img src="https://forthebadge.com/images/badges/built-with-love.svg" alt="Built with Love"/>
 </p>
 
 Academic Journal is a small journal application meant for researchers where they can take notes on their progress daily.
