@@ -38,14 +38,14 @@ class ZoteroView : View() {
 
         row {
             vbox {
-                text("Authors") { setId(Styles.title) }
+                text("Authors") { addClass(Styles.title) }
                 listview(observableListOf(referencesController.authorMapping.values)) {
                     cellFragment(AuthorFragment::class)
                 }
             }
 
             vbox {
-                text("Items") { setId(Styles.title) }
+                text("Items") { addClass(Styles.title) }
                 listview(observableListOf(referencesController.referenceMapping.values)) {
                     cellFragment(ReferenceFragment::class)
 

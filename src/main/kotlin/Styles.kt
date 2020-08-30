@@ -1,15 +1,28 @@
 package main.kotlin
 
 import javafx.geometry.Orientation
+import javafx.geometry.Pos
+import javafx.scene.layout.CornerRadii
 import javafx.scene.paint.Color
 import tornadofx.*
 
+val Color.web: String
+    get() = {
+        val r = Math.round(this.red * 255).toInt() shl 24
+        val g = Math.round(this.green * 255).toInt() shl 16
+        val b = Math.round(this.blue * 255).toInt() shl 8
+        val a = Math.round(this.opacity * 255).toInt()
+        String.format("#%08X", r + g + b + a)
+    }.invoke()
+
 class Styles : Stylesheet() {
     companion object {
-        val title by cssid()
+        val title by cssclass()
 
         val keywords by cssclass()
-        val keywordsSmall by cssclass()
+        val keywordTag by cssclass()
+        val keywordRadii = CornerRadii(5.0)
+
         val entryItem by cssclass()
 
         val customContainer by cssclass()
@@ -19,7 +32,7 @@ class Styles : Stylesheet() {
         val highlightColor = Color.YELLOW
         val hoverBackground = "black"
         val hoverTextColor = "white"
-        val hoverPaddingPx = 3
+        val hoverPaddingPx = 5
     }
 
     init {
@@ -48,12 +61,13 @@ class Styles : Stylesheet() {
 
         keywords {
             orientation = Orientation.HORIZONTAL
-            maxHeight = 60.px
-            backgroundColor += Color.TRANSPARENT
+            backgroundInsets = multi(box(0.em))
+            maxHeight = 40.px
         }
-        keywordsSmall {
-            prefHeight = 40.px
-            prefWidth = 170.px
+        keywordTag {
+            maxHeight = 20.px
+            prefWidth = 60.px
+            alignment = Pos.CENTER
         }
 
         entryItem {

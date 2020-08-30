@@ -1,12 +1,16 @@
 package main.kotlin.view.main
 
 import javafx.collections.ObservableList
+import javafx.geometry.Pos
+import javafx.scene.control.Label
+import javafx.scene.layout.Background
 import javafx.scene.layout.Priority
+import javafx.stage.Popup
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
-import main.kotlin.model.Keyword
+import main.kotlin.controller.JournalController
 import main.kotlin.model.ReferencePosition
-import main.kotlin.view.fragment.KeywordFragment
+import main.kotlin.view.keyword.KeywordFragment
 import org.fxmisc.richtext.InlineCssTextArea
 import org.fxmisc.richtext.SelectionImpl
 import org.fxmisc.richtext.event.MouseOverTextEvent
@@ -15,6 +19,7 @@ import java.time.Duration
 
 class EditorView : View() {
     private val editorController: EditorController by inject()
+    private val journalController: JournalController by inject()
 
     private val hoverDurationMillis = 200L
 
@@ -44,8 +49,8 @@ class EditorView : View() {
 
         run {
             val area = InlineCssTextArea()
-            val popup = javafx.stage.Popup()
-            val popupMsg = javafx.scene.control.Label()
+            val popup = Popup()
+            val popupMsg = Label()
             popupMsg.style = "-fx-background-color: ${Styles.hoverBackground}; " +
                     "-fx-text-fill: ${Styles.hoverTextColor}; " +
                     "-fx-padding: ${Styles.hoverPaddingPx};"
@@ -152,29 +157,43 @@ class EditorView : View() {
         }
 
         hbox {
-            text(editorController.rowPosition.asString())
-            text(":")
-            text(editorController.colPosition.asString())
-        }
-
-        hbox {
             addClass(Styles.buttons)
             text("Last Edit")
             text(editorController.current.select { it.lastEditProperty.asString() })
+
+            hbox {
+                alignment = Pos.CENTER_RIGHT
+
+                text(editorController.rowPosition.asString())
+                text(":")
+                text(editorController.colPosition.asString())
+            }
         }
 
-        text("Keywords")
         hbox {
+            text("Tags")
             addClass(Styles.buttons)
             button("+") {
-                disableWhen(editorController.isValidSelection.not().or(editorController.isEditable.not()))
-                action { editorController.current.get().keywordsProperty.add(Keyword()) }
+                disableWhen(editorController.selectedKeywordProperty.isNull.or(editorController.isEditable.not()))
+                action {
+                    if (editorController.selectedKeywordProperty.isNotNull.get()) {
+                        val selected = editorController.selectedKeywordProperty.value ?: null
+                        editorController.current.get().tagsProperty.add(selected)
+                    }
+                }
             }
-            listview(editorController.current.select { it.keywordsProperty }) {
-                addClass(Styles.keywords)
-                hgrow = Priority.ALWAYS
-                cellFragment(KeywordFragment::class)
+            combobox(editorController.selectedKeywordProperty) {
+                itemsProperty().bind(journalController.journal.select { it.keywordList })
+                editorController.selectedKeywordProperty.bindBidirectional(valueProperty())
             }
+        }
+
+        listview(editorController.current.select { it.tagList }) {
+            addClass(Styles.keywords)
+            hgrow = Priority.ALWAYS
+            background = Background.EMPTY
+
+            cellFragment(KeywordFragment::class)
         }
     }
 }

@@ -17,7 +17,7 @@ class ReferencesView : View() {
     override val root = vbox {
         addClass(Styles.customContainer)
 
-        text("References") { setId(Styles.title) }
+        text("References") { addClass(Styles.title) }
         listview(editorController.current.select { it.referencesProperty }) {
             vgrow = Priority.ALWAYS
             hgrow = Priority.NEVER

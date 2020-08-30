@@ -4,31 +4,33 @@ import javafx.scene.control.MenuItem
 import javafx.stage.FileChooser
 import main.kotlin.JournalApp.Companion.savePrompt
 import main.kotlin.controller.AppdirController
-import main.kotlin.controller.StoreController
+import main.kotlin.controller.JournalController
+import main.kotlin.view.keyword.KeywordsView
 import main.kotlin.view.reference.ZoteroView
 import tornadofx.*
 
 class MenuView : View() {
     private val appdirController: AppdirController by inject()
-    private val storeController: StoreController by inject()
+    private val journalController: JournalController by inject()
 
     val zoteroView: ZoteroView by inject()
+    val keywordsView: KeywordsView by inject()
 
     val filters = arrayOf(FileChooser.ExtensionFilter("Journal Entry", "*.journal"))
 
     fun save(saveAs: Boolean = false) {
-        if (saveAs || storeController.location.isNull.get()) {
+        if (saveAs || journalController.location.isNull.get()) {
             val files = chooseFile(title = "Save As", mode = FileChooserMode.Save, filters = filters)
-            if (files.isNotEmpty()) storeController.saveJournal(files[0])
-        } else storeController.saveJournal()
+            if (files.isNotEmpty()) journalController.saveJournal(files[0])
+        } else journalController.saveJournal()
     }
 
     override val root = menubar {
         menu("File") {
             item("Open").action {
-                if (savePrompt(storeController, currentStage?.owner)) {
+                if (savePrompt(journalController, currentStage?.owner)) {
                     val files = chooseFile(title = "Open", mode = FileChooserMode.Single, filters = filters)
-                    if (files.isNotEmpty()) storeController.loadJournal(files[0])
+                    if (files.isNotEmpty()) journalController.loadJournal(files[0])
                 }
             }
             menu("Open Recent") {
@@ -39,12 +41,12 @@ class MenuView : View() {
                         if (!path.toFile().exists()) {
                             warning("Unknown file", "File no longer exists, and will be removed")
                             appdirController.files.value.recentFiles.remove(path)
-                        } else if (storeController.location.isNull.get()
-                            || storeController.location.isNotNull.get() && path != storeController.location.get()
+                        } else if (journalController.location.isNull.get()
+                            || journalController.location.isNotNull.get() && path != journalController.location.get()
                                 .toPath()
-                            && savePrompt(storeController, currentStage?.owner)
+                            && savePrompt(journalController, currentStage?.owner)
                         ) {
-                            storeController.loadJournal(path.toFile())
+                            journalController.loadJournal(path.toFile())
                         }
                     }
                     menuItem
@@ -52,16 +54,21 @@ class MenuView : View() {
             }
             separator()
             item("Save") {
-                disableWhen { storeController.journal.isNull }
+                disableWhen { journalController.journal.isNull }
                 action { save() }
             }
             item("Save As") {
-                disableWhen { storeController.journal.isNull }
+                disableWhen { journalController.journal.isNull }
                 action { save(true) }
             }
             item("Export") {
-                disableWhen { storeController.journal.isNull }
+                disableWhen { journalController.journal.isNull }
                 isVisible = false
+            }
+            separator()
+            item("Edit Tags") {
+                disableWhen { journalController.journal.isNull }
+                action { keywordsView.openWindow(owner = currentStage, block = true) }
             }
             separator { isVisible = false }
             item("Settings") {

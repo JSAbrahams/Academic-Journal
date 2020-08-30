@@ -10,7 +10,7 @@ import java.io.File
 private val FILES = "files.toml"
 
 class AppdirController : Controller() {
-    val storeController: StoreController by inject()
+    val journalController: JournalController by inject()
 
     val appdir = SimpleObjectProperty<File>()
 
@@ -25,7 +25,7 @@ class AppdirController : Controller() {
             if (it != null) setup(it)
         }
 
-        storeController.location.onChange { if (it != null) files.get().addLocation(it) }
+        journalController.location.onChange { if (it != null) files.get().addLocation(it) }
     }
 
     private fun setup(file: File) {
@@ -37,8 +37,8 @@ class AppdirController : Controller() {
             writeFilesOnClose = fromToml.first
             files.set(fromToml.second)
 
-            if (files.get().lastOpened.isNotNull.get() && storeController.location.isNull.get()) {
-                storeController.loadJournal(files.get().lastOpened.get().toFile())
+            if (files.get().lastOpened.isNotNull.get() && journalController.location.isNull.get()) {
+                journalController.loadJournal(files.get().lastOpened.get().toFile())
             }
         }
     }

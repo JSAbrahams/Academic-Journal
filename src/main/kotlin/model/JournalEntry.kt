@@ -2,21 +2,23 @@ package main.kotlin.model
 
 import javafx.beans.property.*
 import javafx.collections.ObservableList
+import javafx.collections.ObservableSet
+import javafx.collections.SetChangeListener
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.SetSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.*
 import main.kotlin.model.reference.Reference
-import tornadofx.ItemViewModel
-import tornadofx.asObservable
-import tornadofx.onChange
-import tornadofx.select
+import tornadofx.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.util.*
 
 private val LocalDateTime.epochSeconds: Long
     get() = this.toEpochSecond(ZoneOffset.UTC)
@@ -28,7 +30,7 @@ class JournalEntry(
     title: String = "",
     text: String = "",
     references: List<ReferencePosition> = listOf(),
-    keywords: List<Keyword> = listOf()
+    private val tags: Set<UUID> = setOf()
 ) {
     val lastEditProperty = SimpleObjectProperty(lastEdit)
     val creationProperty = SimpleObjectProperty(creation)
@@ -39,7 +41,8 @@ class JournalEntry(
     val textProperty = SimpleStringProperty(text)
 
     val referencesProperty = SimpleListProperty(references.toMutableList().asObservable())
-    val keywordsProperty = SimpleListProperty(keywords.toMutableList().asObservable())
+    val tagsProperty = SimpleSetProperty(mutableSetOf<Tag>().toObservable())
+    val tagList = SimpleListProperty(mutableListOf<Tag>().asObservable())
 
     /**
      * Load reference based on mapping from identifier to actual reference.
@@ -48,16 +51,27 @@ class JournalEntry(
         referencesProperty.forEach { it.loadReference(referenceMapping) }
     }
 
+    /**
+     * Load keywords on boot, populating the keywordsProperty with keywords based on the keyword strings (keys).
+     */
+    fun loadTags(tagMapping: Map<UUID, Tag>) {
+        tagsProperty.addAll(tags.map { tagMapping[it] })
+    }
+
     init {
         titleProperty.onChange { editedProperty.set(true) }
         textProperty.onChange { editedProperty.set(true) }
-        keywordsProperty.onChange<ObservableList<Keyword>> {
+        tagsProperty.onChange<ObservableSet<Tag>> {
             it?.forEach { keyword -> keyword.editedProperty.onChange { editedProperty.set(editedProperty.get() || it) } }
             editedProperty.set(true)
         }
         referencesProperty.onChange<ObservableList<ReferencePosition>> { editedProperty.set(true) }
 
-        keywordsProperty.forEach { keyword -> keyword.editedProperty.onChange { editedProperty.set(editedProperty.get() || it) } }
+        tagsProperty.forEach { keyword -> keyword.editedProperty.onChange { editedProperty.set(editedProperty.get() || it) } }
+        this.tagsProperty.addListener { c: SetChangeListener.Change<out Tag> ->
+            if (c.wasAdded()) tagList.add(c.elementAdded)
+            if (c.wasRemoved()) tagList.add(c.elementRemoved)
+        }
     }
 
     /**
@@ -66,7 +80,7 @@ class JournalEntry(
     fun reset() {
         if (!editedProperty.get()) return
 
-        keywordsProperty.forEach { it.editedProperty.set(false) }
+        tagsProperty.forEach { it.editedProperty.set(false) }
         editedProperty.set(false)
         lastEditProperty.set(LocalDateTime.now())
     }
@@ -78,7 +92,7 @@ class JournalEntry(
             && titleProperty.get() == other.titleProperty.get()
             && textProperty.get() == other.textProperty.get()
             && referencesProperty.get().toList() == other.referencesProperty.get().toList()
-            && keywordsProperty.get().toList() == other.keywordsProperty.get().toList()
+            && tagsProperty.get().toList() == other.tagsProperty.get().toList()
 
     override fun hashCode(): Int {
         var result = lastEditProperty.get().epochSeconds.hashCode()
@@ -86,7 +100,7 @@ class JournalEntry(
         result = 31 * result + titleProperty.hashCode()
         result = 31 * result + textProperty.hashCode()
         result = 31 * result + referencesProperty.hashCode()
-        result = 31 * result + keywordsProperty.hashCode()
+        result = 31 * result + tagsProperty.hashCode()
         return result
     }
 }
@@ -101,7 +115,7 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
         element<Long>("last_edit")
         element<String>("title")
         element<String>("text")
-        element<List<String>>("keywords")
+        element<List<String>>("tags")
         element<List<ReferencePosition>>("references")
     }
 
@@ -110,7 +124,11 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
         encodeLongElement(descriptor, 1, value.lastEditProperty.get().epochSeconds)
         encodeStringElement(descriptor, 2, value.titleProperty.get())
         encodeStringElement(descriptor, 3, value.textProperty.get())
-        encodeSerializableElement(descriptor, 4, ListSerializer(KeywordSerializer), value.keywordsProperty.toList())
+        encodeSerializableElement(
+            descriptor,
+            4,
+            ListSerializer(String.serializer()),
+            value.tagsProperty.toList().map { it.id.toString() })
         encodeSerializableElement(
             descriptor,
             5,
@@ -122,7 +140,7 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
     override fun deserialize(decoder: Decoder): JournalEntry = decoder.decodeStructure(descriptor) {
         var (creation, lastEdit) = Pair(LocalDateTime.now(), LocalDateTime.now())
         var (title, text) = Pair("", "")
-        val (references, keywords) = Pair(mutableListOf<ReferencePosition>(), mutableListOf<Keyword>())
+        val (references, keywords) = Pair(mutableListOf<ReferencePosition>(), mutableSetOf<String>())
 
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
@@ -130,7 +148,7 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
                 1 -> lastEdit = LocalDateTime.ofEpochSecond(decodeLongElement(descriptor, 1), 0, ZoneOffset.UTC)
                 2 -> title = decodeStringElement(descriptor, 2)
                 3 -> text = decodeStringElement(descriptor, 3)
-                4 -> keywords.addAll(decodeSerializableElement(descriptor, 4, ListSerializer(KeywordSerializer)))
+                4 -> keywords.addAll(decodeSerializableElement(descriptor, 4, SetSerializer(String.serializer())))
                 5 -> references.addAll(
                     decodeSerializableElement(
                         descriptor,
@@ -143,7 +161,7 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
             }
         }
 
-        JournalEntry(creation, lastEdit, title, text, references, keywords)
+        JournalEntry(creation, lastEdit, title, text, references, keywords.map { UUID.fromString(it) }.toSet())
     }
 }
 
@@ -154,5 +172,5 @@ class JournalEntryModel(property: ObjectProperty<JournalEntry>) :
     val edited = bind(autocommit = true) { property.select { it.editedProperty } }
     val lastEdit = bind(autocommit = true) { property.select { it.lastEditProperty } }
     val creation = bind(autocommit = true) { property.select { it.creationProperty } }
-    val keywords: ObservableList<Keyword> = bind(autocommit = true) { property.select { it.keywordsProperty } }
+    val tags: ObservableList<Tag> = bind(autocommit = true) { property.select { it.tagList } }
 }
