@@ -45,7 +45,7 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), tags: Se
             if (c.wasRemoved()) keywordList.add(c.elementRemoved)
         }
 
-        itemsProperty.forEach { item -> item.loadKeywords(tags.map { it.id to it }.toMap()) }
+        itemsProperty.forEach { item -> item.loadTags(tags.map { it.id to it }.toMap()) }
         resetEdited()
     }
 

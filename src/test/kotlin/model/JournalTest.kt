@@ -52,5 +52,24 @@ class JournalTest : FreeSpec({
 
             newJournal shouldBe journal
         }
+        "can be written to json with tags" {
+            val tag = Tag(UUID.randomUUID())
+            val journal = Journal(
+                title = "title",
+                tags = setOf(tag),
+                items = listOf(
+                    JournalEntry(
+                        creation = LocalDateTime.ofEpochSecond(300, 0, ZoneOffset.UTC),
+                        lastEdit = LocalDateTime.ofEpochSecond(400, 0, ZoneOffset.UTC),
+                        title = "bh9nc",
+                        text = "731fsI7M",
+                        tags = setOf(tag.id)
+                    )
+                )
+            )
+            val newJournal = Json.decodeFromString<Journal>(Json.encodeToString(journal))
+
+            newJournal shouldBe journal
+        }
     }
 })

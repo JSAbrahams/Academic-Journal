@@ -17,6 +17,7 @@ class JournalEntryTest : FreeSpec({
 
             journalEntry.titleProperty.get() shouldBe "testTitle"
             journalEntry.textProperty.get() shouldBe "text"
+            journalEntry.referencesProperty.size shouldBe 3
             journalEntry.creationProperty.get().toEpochSecond(ZoneOffset.UTC) shouldBe 10
             journalEntry.lastEditProperty.get().toEpochSecond(ZoneOffset.UTC) shouldBe 20
         }

@@ -30,7 +30,7 @@ class JournalEntry(
     title: String = "",
     text: String = "",
     references: List<ReferencePosition> = listOf(),
-    private val keywords: Set<UUID> = setOf()
+    private val tags: Set<UUID> = setOf()
 ) {
     val lastEditProperty = SimpleObjectProperty(lastEdit)
     val creationProperty = SimpleObjectProperty(creation)
@@ -41,8 +41,8 @@ class JournalEntry(
     val textProperty = SimpleStringProperty(text)
 
     val referencesProperty = SimpleListProperty(references.toMutableList().asObservable())
-    val keywordsProperty = SimpleSetProperty(mutableSetOf<Tag>().toObservable())
-    val keywordList = SimpleListProperty(mutableListOf<Tag>().asObservable())
+    val tagsProperty = SimpleSetProperty(mutableSetOf<Tag>().toObservable())
+    val tagList = SimpleListProperty(mutableListOf<Tag>().asObservable())
 
     /**
      * Load reference based on mapping from identifier to actual reference.
@@ -54,23 +54,23 @@ class JournalEntry(
     /**
      * Load keywords on boot, populating the keywordsProperty with keywords based on the keyword strings (keys).
      */
-    fun loadKeywords(tagMapping: Map<UUID, Tag>) {
-        keywordsProperty.addAll(keywords.map { tagMapping[it] })
+    fun loadTags(tagMapping: Map<UUID, Tag>) {
+        tagsProperty.addAll(tags.map { tagMapping[it] })
     }
 
     init {
         titleProperty.onChange { editedProperty.set(true) }
         textProperty.onChange { editedProperty.set(true) }
-        keywordsProperty.onChange<ObservableSet<Tag>> {
+        tagsProperty.onChange<ObservableSet<Tag>> {
             it?.forEach { keyword -> keyword.editedProperty.onChange { editedProperty.set(editedProperty.get() || it) } }
             editedProperty.set(true)
         }
         referencesProperty.onChange<ObservableList<ReferencePosition>> { editedProperty.set(true) }
 
-        keywordsProperty.forEach { keyword -> keyword.editedProperty.onChange { editedProperty.set(editedProperty.get() || it) } }
-        this.keywordsProperty.addListener { c: SetChangeListener.Change<out Tag> ->
-            if (c.wasAdded()) keywordList.add(c.elementAdded)
-            if (c.wasRemoved()) keywordList.add(c.elementRemoved)
+        tagsProperty.forEach { keyword -> keyword.editedProperty.onChange { editedProperty.set(editedProperty.get() || it) } }
+        this.tagsProperty.addListener { c: SetChangeListener.Change<out Tag> ->
+            if (c.wasAdded()) tagList.add(c.elementAdded)
+            if (c.wasRemoved()) tagList.add(c.elementRemoved)
         }
     }
 
@@ -80,7 +80,7 @@ class JournalEntry(
     fun reset() {
         if (!editedProperty.get()) return
 
-        keywordsProperty.forEach { it.editedProperty.set(false) }
+        tagsProperty.forEach { it.editedProperty.set(false) }
         editedProperty.set(false)
         lastEditProperty.set(LocalDateTime.now())
     }
@@ -92,7 +92,7 @@ class JournalEntry(
             && titleProperty.get() == other.titleProperty.get()
             && textProperty.get() == other.textProperty.get()
             && referencesProperty.get().toList() == other.referencesProperty.get().toList()
-            && keywordsProperty.get().toList() == other.keywordsProperty.get().toList()
+            && tagsProperty.get().toList() == other.tagsProperty.get().toList()
 
     override fun hashCode(): Int {
         var result = lastEditProperty.get().epochSeconds.hashCode()
@@ -100,7 +100,7 @@ class JournalEntry(
         result = 31 * result + titleProperty.hashCode()
         result = 31 * result + textProperty.hashCode()
         result = 31 * result + referencesProperty.hashCode()
-        result = 31 * result + keywordsProperty.hashCode()
+        result = 31 * result + tagsProperty.hashCode()
         return result
     }
 }
@@ -128,7 +128,7 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
             descriptor,
             4,
             ListSerializer(String.serializer()),
-            value.keywordsProperty.toList().map { it.textProperty.get() })
+            value.tagsProperty.toList().map { it.id.toString() })
         encodeSerializableElement(
             descriptor,
             5,
@@ -172,5 +172,5 @@ class JournalEntryModel(property: ObjectProperty<JournalEntry>) :
     val edited = bind(autocommit = true) { property.select { it.editedProperty } }
     val lastEdit = bind(autocommit = true) { property.select { it.lastEditProperty } }
     val creation = bind(autocommit = true) { property.select { it.creationProperty } }
-    val tags: ObservableList<Tag> = bind(autocommit = true) { property.select { it.keywordList } }
+    val tags: ObservableList<Tag> = bind(autocommit = true) { property.select { it.tagList } }
 }

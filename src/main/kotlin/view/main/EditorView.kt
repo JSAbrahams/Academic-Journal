@@ -178,7 +178,7 @@ class EditorView : View() {
                 action {
                     if (editorController.selectedKeywordProperty.isNotNull.get()) {
                         val selected = editorController.selectedKeywordProperty.value ?: null
-                        editorController.current.get().keywordsProperty.add(selected)
+                        editorController.current.get().tagsProperty.add(selected)
                     }
                 }
             }
@@ -188,7 +188,7 @@ class EditorView : View() {
             }
         }
 
-        listview(editorController.current.select { it.keywordList }) {
+        listview(editorController.current.select { it.tagList }) {
             addClass(Styles.keywords)
             hgrow = Priority.ALWAYS
             background = Background.EMPTY
