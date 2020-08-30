@@ -22,7 +22,7 @@ import tornadofx.cleanBind
 import java.io.File
 
 @Serializable(with = JournalSerializer::class)
-class Journal(title: String = "", items: List<JournalEntry> = listOf(), keywords: Set<Keyword> = setOf()) {
+class Journal(title: String = "", items: List<JournalEntry> = listOf(), tags: Set<Tag> = setOf()) {
     val titleProperty = SimpleStringProperty(title)
 
     private val myItems = items.toMutableList().asObservable()
@@ -30,22 +30,22 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), keywords
 
     var editedProperty = SimpleBooleanProperty(false)
 
-    private val myKeywords = keywords.toMutableSet().asObservable()
-    val keywords: ObservableSet<Keyword> = SimpleSetProperty(myKeywords)
-    val keywordList = SimpleListProperty(mutableListOf<Keyword>().asObservable())
+    private val myKeywords = tags.toMutableSet().asObservable()
+    val tags: ObservableSet<Tag> = SimpleSetProperty(myKeywords)
+    val keywordList = SimpleListProperty(mutableListOf<Tag>().asObservable())
 
     companion object {
         fun load(file: File): Journal = Json.decodeFromString(file.readText())
     }
 
     init {
-        keywordList.addAll(keywords)
-        this.keywords.addListener { c: SetChangeListener.Change<out Keyword> ->
+        keywordList.addAll(tags)
+        this.tags.addListener { c: SetChangeListener.Change<out Tag> ->
             if (c.wasAdded()) keywordList.add(c.elementAdded)
             if (c.wasRemoved()) keywordList.add(c.elementRemoved)
         }
 
-        itemsProperty.forEach { item -> item.loadKeywords(keywords.map { it.textProperty.get() to it }.toMap()) }
+        itemsProperty.forEach { item -> item.loadKeywords(tags.map { it.id to it }.toMap()) }
         resetEdited()
     }
 
@@ -58,8 +58,8 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), keywords
         itemsProperty.forEach { it.loadReference(referenceMapping) }
     }
 
-    fun addKeyword(keyword: Keyword) {
-        keywords.add(keyword)
+    fun addKeyword(tag: Tag) {
+        tags.add(tag)
         resetEdited()
     }
 
@@ -69,7 +69,7 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), keywords
     }
 
     private fun resetEdited() {
-        val or = keywords.fold(
+        val or = tags.fold(
             myItems.fold(
                 SimpleBooleanProperty(false),
                 fun(acc, b): BooleanBinding { return Bindings.or(acc, b.editedProperty) }),
@@ -92,23 +92,23 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), keywords
 object JournalSerializer : KSerializer<Journal> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Journal") {
         element<String>("title")
-        element<List<Keyword>>("keywords")
+        element<Set<Tag>>("tags")
         element<List<JournalEntry>>("entries")
     }
 
     override fun serialize(encoder: Encoder, value: Journal) = encoder.encodeStructure(descriptor) {
         encodeStringElement(descriptor, 0, value.titleProperty.get())
-        encodeSerializableElement(descriptor, 1, SetSerializer((KeywordSerializer)), value.keywords.toSet())
+        encodeSerializableElement(descriptor, 1, SetSerializer((KeywordSerializer)), value.tags.toSet())
         encodeSerializableElement(descriptor, 2, ListSerializer(JournalEntrySerializer), value.itemsProperty.toList())
     }
 
     override fun deserialize(decoder: Decoder): Journal = decoder.decodeStructure(descriptor) {
         var title = ""
-        val (keywords, entries) = Pair(mutableSetOf<Keyword>(), mutableListOf<JournalEntry>())
+        val (keywords, entries) = Pair(mutableSetOf<Tag>(), mutableListOf<JournalEntry>())
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
                 0 -> title = decodeStringElement(descriptor, 0)
-                1 -> keywords.addAll(decodeSerializableElement(descriptor, 1, ListSerializer(KeywordSerializer)))
+                1 -> keywords.addAll(decodeSerializableElement(descriptor, 1, SetSerializer(KeywordSerializer)))
                 2 -> entries.addAll(decodeSerializableElement(descriptor, 2, ListSerializer(JournalEntrySerializer)))
                 CompositeDecoder.DECODE_DONE -> break
                 else -> throw SerializationException("Unknown index $index")

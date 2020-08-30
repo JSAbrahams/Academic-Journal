@@ -19,7 +19,7 @@ class EntriesView : View() {
     override val root = vbox {
         addClass(Styles.customContainer)
 
-        text("Entries") { setId(Styles.title) }
+        text("Entries") { addClass(Styles.title) }
 
         listview(journalController.journal.select { it.itemsProperty }) {
             cellFragment(EntryFragment::class)

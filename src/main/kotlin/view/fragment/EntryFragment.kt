@@ -32,11 +32,11 @@ class EntryFragment : ListCellFragment<JournalEntry>() {
 
             hbox {
                 addClass(Styles.entryItem)
-                visibleWhen(entry.keywords.sizeProperty.greaterThan(0))
-                managedWhen(entry.keywords.sizeProperty.greaterThan(0))
+                visibleWhen(entry.tags.sizeProperty.greaterThan(0))
+                managedWhen(entry.tags.sizeProperty.greaterThan(0))
 
                 text("Tags")
-                listview(entry.keywords) {
+                listview(entry.tags) {
                     addClass(Styles.keywords)
                     background = Background.EMPTY
                     cellFragment(KeywordFragment::class)

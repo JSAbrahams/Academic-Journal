@@ -6,7 +6,8 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import main.kotlin.model.JournalEntry
-import java.util.*
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 class JournalEntryTest : FreeSpec({
     "an journal entry" - {
@@ -16,11 +17,16 @@ class JournalEntryTest : FreeSpec({
 
             journalEntry.titleProperty.get() shouldBe "testTitle"
             journalEntry.textProperty.get() shouldBe "text"
-            journalEntry.creationProperty.get().toInstant().epochSecond shouldBe 10
-            journalEntry.lastEditProperty.get().toInstant().epochSecond shouldBe 20
+            journalEntry.creationProperty.get().toEpochSecond(ZoneOffset.UTC) shouldBe 10
+            journalEntry.lastEditProperty.get().toEpochSecond(ZoneOffset.UTC) shouldBe 20
         }
         "can be written to json" {
-            val entry = JournalEntry(Date(100), Date(200), "title", "text")
+            val entry = JournalEntry(
+                LocalDateTime.ofEpochSecond(100, 0, ZoneOffset.UTC),
+                LocalDateTime.ofEpochSecond(200, 0, ZoneOffset.UTC),
+                "title",
+                "text"
+            )
             val newEntry = Json.decodeFromString<JournalEntry>(Json.encodeToString(entry))
 
             newEntry shouldBe entry

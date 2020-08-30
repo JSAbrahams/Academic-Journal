@@ -18,6 +18,7 @@ import main.kotlin.model.reference.Reference
 import tornadofx.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.util.*
 
 private val LocalDateTime.epochSeconds: Long
     get() = this.toEpochSecond(ZoneOffset.UTC)
@@ -29,7 +30,7 @@ class JournalEntry(
     title: String = "",
     text: String = "",
     references: List<ReferencePosition> = listOf(),
-    private val keywords: Set<String> = setOf()
+    private val keywords: Set<UUID> = setOf()
 ) {
     val lastEditProperty = SimpleObjectProperty(lastEdit)
     val creationProperty = SimpleObjectProperty(creation)
@@ -40,8 +41,8 @@ class JournalEntry(
     val textProperty = SimpleStringProperty(text)
 
     val referencesProperty = SimpleListProperty(references.toMutableList().asObservable())
-    val keywordsProperty = SimpleSetProperty(mutableSetOf<Keyword>().toObservable())
-    val keywordList = SimpleListProperty(mutableListOf<Keyword>().asObservable())
+    val keywordsProperty = SimpleSetProperty(mutableSetOf<Tag>().toObservable())
+    val keywordList = SimpleListProperty(mutableListOf<Tag>().asObservable())
 
     /**
      * Load reference based on mapping from identifier to actual reference.
@@ -53,21 +54,21 @@ class JournalEntry(
     /**
      * Load keywords on boot, populating the keywordsProperty with keywords based on the keyword strings (keys).
      */
-    fun loadKeywords(keywordMapping: Map<String, Keyword>) {
-        keywordsProperty.addAll(keywords.map { keywordMapping[it] })
+    fun loadKeywords(tagMapping: Map<UUID, Tag>) {
+        keywordsProperty.addAll(keywords.map { tagMapping[it] })
     }
 
     init {
         titleProperty.onChange { editedProperty.set(true) }
         textProperty.onChange { editedProperty.set(true) }
-        keywordsProperty.onChange<ObservableSet<Keyword>> {
+        keywordsProperty.onChange<ObservableSet<Tag>> {
             it?.forEach { keyword -> keyword.editedProperty.onChange { editedProperty.set(editedProperty.get() || it) } }
             editedProperty.set(true)
         }
         referencesProperty.onChange<ObservableList<ReferencePosition>> { editedProperty.set(true) }
 
         keywordsProperty.forEach { keyword -> keyword.editedProperty.onChange { editedProperty.set(editedProperty.get() || it) } }
-        this.keywordsProperty.addListener { c: SetChangeListener.Change<out Keyword> ->
+        this.keywordsProperty.addListener { c: SetChangeListener.Change<out Tag> ->
             if (c.wasAdded()) keywordList.add(c.elementAdded)
             if (c.wasRemoved()) keywordList.add(c.elementRemoved)
         }
@@ -114,7 +115,7 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
         element<Long>("last_edit")
         element<String>("title")
         element<String>("text")
-        element<List<String>>("keywords")
+        element<List<String>>("tags")
         element<List<ReferencePosition>>("references")
     }
 
@@ -160,7 +161,7 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
             }
         }
 
-        JournalEntry(creation, lastEdit, title, text, references, keywords)
+        JournalEntry(creation, lastEdit, title, text, references, keywords.map { UUID.fromString(it) }.toSet())
     }
 }
 
@@ -171,5 +172,5 @@ class JournalEntryModel(property: ObjectProperty<JournalEntry>) :
     val edited = bind(autocommit = true) { property.select { it.editedProperty } }
     val lastEdit = bind(autocommit = true) { property.select { it.lastEditProperty } }
     val creation = bind(autocommit = true) { property.select { it.creationProperty } }
-    val keywords: ObservableList<Keyword> = bind(autocommit = true) { property.select { it.keywordList } }
+    val tags: ObservableList<Tag> = bind(autocommit = true) { property.select { it.keywordList } }
 }

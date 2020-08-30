@@ -66,7 +66,7 @@ class MenuView : View() {
                 isVisible = false
             }
             separator()
-            item("Keywords") {
+            item("Edit Tags") {
                 disableWhen { journalController.journal.isNull }
                 action { keywordsView.openWindow(owner = currentStage, block = true) }
             }

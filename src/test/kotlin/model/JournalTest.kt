@@ -7,6 +7,9 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import main.kotlin.model.Journal
 import main.kotlin.model.JournalEntry
+import main.kotlin.model.Tag
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.util.*
 
 class JournalTest : FreeSpec({
@@ -17,15 +20,34 @@ class JournalTest : FreeSpec({
 
             journal.titleProperty.get() shouldBe "title"
             journal.itemsProperty.size shouldBe 1
-
-            val journalEntry = journal.itemsProperty.toList()[0]
-            journalEntry.titleProperty.get() shouldBe "otherTitle"
-            journalEntry.textProperty.get() shouldBe "text"
-            journalEntry.creationProperty.get().toInstant().epochSecond shouldBe 10
-            journalEntry.lastEditProperty.get().toInstant().epochSecond shouldBe 20
+            journal.tags.size shouldBe 1
+            journal.itemsProperty.size shouldBe 1
         }
+
         "can be written to json" {
-            val journal = Journal("title", listOf(JournalEntry(Date(300), Date(400), "title", "text")))
+            val journal = Journal(
+                "title", listOf(
+                    JournalEntry(
+                        LocalDateTime.ofEpochSecond(300, 0, ZoneOffset.UTC),
+                        LocalDateTime.ofEpochSecond(400, 0, ZoneOffset.UTC), "title", "text"
+                    )
+                )
+            )
+            val newJournal = Json.decodeFromString<Journal>(Json.encodeToString(journal))
+
+            newJournal shouldBe journal
+        }
+        "can be written to json with keywords" {
+            val journal = Journal(
+                title = "title",
+                tags = setOf(Tag(UUID.randomUUID())),
+                items = listOf(
+                    JournalEntry(
+                        LocalDateTime.ofEpochSecond(300, 0, ZoneOffset.UTC),
+                        LocalDateTime.ofEpochSecond(400, 0, ZoneOffset.UTC), "title", "text"
+                    )
+                )
+            )
             val newJournal = Json.decodeFromString<Journal>(Json.encodeToString(journal))
 
             newJournal shouldBe journal

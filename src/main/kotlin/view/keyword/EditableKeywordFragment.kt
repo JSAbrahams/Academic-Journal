@@ -6,12 +6,12 @@ import javafx.scene.layout.Background
 import javafx.scene.layout.BackgroundFill
 import javafx.scene.layout.Priority
 import main.kotlin.Styles
-import main.kotlin.model.Keyword
 import main.kotlin.model.KeywordModel
+import main.kotlin.model.Tag
 import main.kotlin.web
 import tornadofx.*
 
-class EditableKeywordFragment : ListCellFragment<Keyword>() {
+class EditableKeywordFragment : ListCellFragment<Tag>() {
     val entry = KeywordModel(itemProperty)
 
     override val root = vbox {

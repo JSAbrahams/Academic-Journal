@@ -48,7 +48,7 @@ object ReferencePositionSerializer : KSerializer<ReferencePosition> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Note") {
         element<Int>("start")
         element<Int>("end")
-        element<List<Int>>("reference")
+        element<Int>("reference")
     }
 
     override fun serialize(encoder: Encoder, value: ReferencePosition) = encoder.encodeStructure(descriptor) {

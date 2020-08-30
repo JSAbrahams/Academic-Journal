@@ -7,15 +7,15 @@ import javafx.scene.layout.BackgroundFill
 import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
 import main.kotlin.Styles
-import main.kotlin.controller.KeywordsController
-import main.kotlin.model.Keyword
+import main.kotlin.controller.KeywordController
 import main.kotlin.model.KeywordModel
+import main.kotlin.model.Tag
 import tornadofx.*
 
-class KeywordFragment : ListCellFragment<Keyword>() {
+class KeywordFragment : ListCellFragment<Tag>() {
     val entry = KeywordModel(itemProperty)
 
-    val keywordController: KeywordsController by inject()
+    val keywordController: KeywordController by inject()
 
     val keywordsView: KeywordsView by inject()
 
@@ -27,12 +27,8 @@ class KeywordFragment : ListCellFragment<Keyword>() {
             hgrow = Priority.NEVER
             vgrow = Priority.NEVER
 
-
             fillProperty().bind(
-                Bindings.createObjectBinding(
-                    { (entry.colorValue.value ?: Color.WHITE).invert() },
-                    entry.colorValue
-                )
+                Bindings.createObjectBinding({ (entry.colorValue.value ?: Color.WHITE).invert() }, entry.colorValue)
             )
 
             background = Background(BackgroundFill(entry.colorValue.value, Styles.keywordRadii, Insets.EMPTY))

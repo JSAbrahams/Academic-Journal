@@ -17,7 +17,7 @@ val Color.web: String
 
 class Styles : Stylesheet() {
     companion object {
-        val title by cssid()
+        val title by cssclass()
 
         val keywords by cssclass()
         val keywordTag by cssclass()

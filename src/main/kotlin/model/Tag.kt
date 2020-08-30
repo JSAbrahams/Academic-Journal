@@ -12,9 +12,10 @@ import main.kotlin.web
 import tornadofx.ItemViewModel
 import tornadofx.onChange
 import tornadofx.select
+import java.util.*
 
 @Serializable(with = KeywordSerializer::class)
-class Keyword(text: String = "", description: String = "", color: Color = Color.RED) {
+class Tag(val id: UUID = UUID.randomUUID(), text: String = "", description: String = "", color: Color = Color.RED) {
     val textProperty = SimpleStringProperty(text)
     val descriptionProperty = SimpleStringProperty(description)
     val colorProperty = SimpleObjectProperty(color)
@@ -25,45 +26,49 @@ class Keyword(text: String = "", description: String = "", color: Color = Color.
     }
 
     override fun toString(): String = "#${textProperty.get()}"
-    override fun equals(other: Any?): Boolean = other is Keyword && textProperty.get() == other.textProperty.get()
+    override fun equals(other: Any?): Boolean = other is Tag && textProperty.get() == other.textProperty.get()
     override fun hashCode(): Int = textProperty.get().hashCode()
 }
 
 /**
  * Custom KeywordSerializer to handle the ObjectProperty's.
  */
-object KeywordSerializer : KSerializer<Keyword> {
+object KeywordSerializer : KSerializer<Tag> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Keyword") {
-        element<String>("word")
+        element<String>("id")
+        element<String>("text")
         element<String>("description")
         element<String>("color")
     }
 
-    override fun serialize(encoder: Encoder, value: Keyword) = encoder.encodeStructure(descriptor) {
-        encodeStringElement(descriptor, 0, value.textProperty.get())
-        encodeStringElement(descriptor, 1, value.descriptionProperty.get())
-        encodeStringElement(descriptor, 2, value.colorProperty.get().web)
+    override fun serialize(encoder: Encoder, value: Tag) = encoder.encodeStructure(descriptor) {
+        encodeStringElement(descriptor, 0, value.id.toString())
+        encodeStringElement(descriptor, 1, value.textProperty.get())
+        encodeStringElement(descriptor, 2, value.descriptionProperty.get())
+        encodeStringElement(descriptor, 3, value.colorProperty.get().web)
     }
 
-    override fun deserialize(decoder: Decoder): Keyword = decoder.decodeStructure(descriptor) {
+    override fun deserialize(decoder: Decoder): Tag = decoder.decodeStructure(descriptor) {
+        var uuid = UUID.randomUUID()
         var (word, description) = Pair("", "")
         var color = Color.WHITE
 
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
-                0 -> word = decodeStringElement(descriptor, 0)
-                1 -> description = decodeStringElement(descriptor, 1)
-                2 -> color = Color.web(decodeStringElement(descriptor, 2))
+                0 -> uuid = UUID.fromString(decodeStringElement(descriptor, 0))
+                1 -> word = decodeStringElement(descriptor, 1)
+                2 -> description = decodeStringElement(descriptor, 2)
+                3 -> color = Color.web(decodeStringElement(descriptor, 3))
                 CompositeDecoder.DECODE_DONE -> break
                 else -> error("Unexpected index: $index")
             }
         }
 
-        Keyword(word, description, color)
+        Tag(uuid, word, description, color)
     }
 }
 
-class KeywordModel(property: ObjectProperty<Keyword>) : ItemViewModel<Keyword>(itemProperty = property) {
+class KeywordModel(property: ObjectProperty<Tag>) : ItemViewModel<Tag>(itemProperty = property) {
     val text = bind(autocommit = true) { property.select { it.textProperty } }
     val description = bind(autocommit = true) { property.select { it.descriptionProperty } }
     val color = bind(autocommit = true) { property.select { it.colorProperty.asString() } }
