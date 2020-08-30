@@ -11,10 +11,11 @@ import tornadofx.cleanBind
 import tornadofx.select
 import java.io.File
 
-class StoreController : Controller() {
+class JournalController : Controller() {
     val location = SimpleObjectProperty<File>()
-    val journal = SimpleObjectProperty(Journal())
     val savedProperty = SimpleBooleanProperty(false)
+
+    val journal = SimpleObjectProperty(Journal())
 
     fun loadJournal(file: File) {
         journal.set(Journal.load(file))

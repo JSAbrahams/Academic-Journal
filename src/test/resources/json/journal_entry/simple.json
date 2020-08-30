@@ -2,5 +2,26 @@
   "creation": 10,
   "last_edit": 20,
   "title": "testTitle",
-  "text": "text"
+  "text": "text",
+  "tags": [
+    "95e0b9dc-81b3-412a-9c23-2b7ed4d98cab",
+    "00b7ceb2-c4d4-40f1-ab10-b5eb7088157a"
+  ],
+  "references": [
+    {
+      "start": 835,
+      "end": 721,
+      "reference": 769
+    },
+    {
+      "start": 709,
+      "end": 732,
+      "reference": 970
+    },
+    {
+      "start": 782,
+      "end": 412,
+      "reference": 206
+    }
+  ]
 }

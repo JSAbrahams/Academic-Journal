@@ -1,5 +1,13 @@
 {
   "title": "title",
+  "tags": [
+    {
+      "id": "1d836f08-133e-434d-ada6-8866855c5628",
+      "text": "01YO",
+      "description": "W2ne",
+      "color": "#453241"
+    }
+  ],
   "entries": [
     {
       "creation": 10,
