@@ -4,6 +4,7 @@ import javafx.beans.binding.Bindings
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.scene.layout.Priority
 import main.kotlin.controller.ReferencesController
 import main.kotlin.model.reference.Reference
 import main.kotlin.model.reference.ReferenceModel
@@ -20,6 +21,7 @@ class ReferenceFragment(item: Property<Reference>? = null) : ListCellFragment<Re
     private val WIDTH = 200.0
 
     override val root = vbox {
+        hgrow = Priority.ALWAYS
         maxWidth = WIDTH
 
         onLeftClick {

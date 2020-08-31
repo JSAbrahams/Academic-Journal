@@ -39,7 +39,7 @@ class EntriesView : View() {
             addClass(Styles.buttons)
             togglebutton("Edit Mode") {
                 disableWhen(journalController.journalProperty.isNull)
-                editorController.isEditMode.bind(this.selectedProperty())
+                editorController.isEditMode.bindBidirectional(this.selectedProperty())
             }
             button("save") {
                 disableWhen(journalController.journalProperty.select { it.editedProperty.not() })

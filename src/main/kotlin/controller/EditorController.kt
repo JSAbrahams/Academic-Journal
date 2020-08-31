@@ -13,7 +13,7 @@ import tornadofx.asObservable
 import tornadofx.onChange
 
 class EditorController : Controller() {
-    val journalController: JournalController by inject()
+    private val journalController: JournalController by inject()
 
     val current = SimpleObjectProperty<JournalEntry>()
     val isEditMode = SimpleBooleanProperty()
@@ -29,6 +29,11 @@ class EditorController : Controller() {
     val selectedKeywordProperty = SimpleObjectProperty<Tag>()
 
     init {
+        // Set as this controller is initialized after journal is loaded
+        if (journalController.journalProperty.isNotNull.get() && journalController.journalProperty.value.entriesProperty.isNotEmpty()) {
+            current.set(journalController.journalProperty.value.entriesProperty.last())
+        }
+
         journalController.journalProperty.onChange {
             if (it != null && it.entriesProperty.isNotEmpty()) current.set(it.entriesProperty.last())
         }
