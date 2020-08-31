@@ -19,9 +19,9 @@ class JournalTest : FreeSpec({
             val journal = Json.decodeFromString<Journal>(string)
 
             journal.titleProperty.get() shouldBe "title"
-            journal.itemsProperty.size shouldBe 1
+            journal.entriesProperty.size shouldBe 1
             journal.tags.size shouldBe 1
-            journal.itemsProperty.size shouldBe 1
+            journal.entriesProperty.size shouldBe 1
         }
 
         "can be written to json" {

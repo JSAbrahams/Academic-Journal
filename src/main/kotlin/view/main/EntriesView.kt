@@ -21,7 +21,7 @@ class EntriesView : View() {
 
         text("Entries") { addClass(Styles.title) }
 
-        listview(journalController.journalProperty.select { it.itemsProperty }) {
+        listview(journalController.journalProperty.select { it.entriesProperty }) {
             cellFragment(EntryFragment::class)
             vgrow = Priority.ALWAYS
             hgrow = Priority.NEVER
@@ -48,10 +48,10 @@ class EntriesView : View() {
             button("+").action {
                 var selection = ButtonType.YES
 
-                if (journalController.journalProperty.isNotNull.get() && journalController.journalProperty.get().itemsProperty.isNotEmpty()) {
+                if (journalController.journalProperty.isNotNull.get() && journalController.journalProperty.get().entriesProperty.isNotEmpty()) {
                     val daysAfterEpoch = ChronoUnit.DAYS.between(LocalDate.ofEpochDay(0), LocalDate.now())
 
-                    val lastEntry = journalController.journalProperty.get().itemsProperty.last()
+                    val lastEntry = journalController.journalProperty.get().entriesProperty.last()
                     val lastDate = lastEntry.creationProperty.get()
                     val journalDaysAfterEpoch = ChronoUnit.DAYS.between(LocalDate.ofEpochDay(0), lastDate)
 

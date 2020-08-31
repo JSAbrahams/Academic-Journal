@@ -10,8 +10,11 @@ import main.kotlin.model.ReferencePosition
 import main.kotlin.model.Tag
 import tornadofx.Controller
 import tornadofx.asObservable
+import tornadofx.onChange
 
 class EditorController : Controller() {
+    val journalController: JournalController by inject()
+
     val current = SimpleObjectProperty<JournalEntry>()
     val isEditMode = SimpleBooleanProperty()
     val isEditable = current.isNotNull.and(isEditMode)
@@ -24,4 +27,10 @@ class EditorController : Controller() {
     val hoveredReferencePosition = SimpleListProperty(mutableListOf<ReferencePosition>().asObservable())
 
     val selectedKeywordProperty = SimpleObjectProperty<Tag>()
+
+    init {
+        journalController.journalProperty.onChange {
+            if (it != null && it.entriesProperty.isNotEmpty()) current.set(it.entriesProperty.last())
+        }
+    }
 }
