@@ -1,6 +1,7 @@
 package main.kotlin.model.journal
 
 import javafx.beans.property.ObjectProperty
+import javafx.beans.property.ReadOnlyStringProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import kotlinx.serialization.Serializable
@@ -14,7 +15,7 @@ import java.io.File
 @Serializable
 data class JournalMeta(val title: String = "") {
     @Transient
-    val titleProperty = SimpleStringProperty(title)
+    val titleProperty: ReadOnlyStringProperty = SimpleStringProperty(title)
 
     @Transient
     val fileProperty = SimpleObjectProperty<File>()
@@ -31,6 +32,11 @@ data class JournalMeta(val title: String = "") {
             it.fileProperty.set(file)
         }
     }
+
+    override fun equals(other: Any?): Boolean =
+        other is JournalMeta && this.title == other.title && this.fileProperty.value == other.fileProperty.value
+
+    override fun hashCode(): Int = title.hashCode() + 31 * fileProperty.hashCode()
 }
 
 class JournalMetaModel(property: ObjectProperty<JournalMeta>) : ItemViewModel<JournalMeta>(itemProperty = property) {

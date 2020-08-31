@@ -88,5 +88,9 @@ class AppdirController : Controller() {
     /**
      * Store journal meta data for later use.
      */
-    fun loadedJournal(journal: Journal, file: File) = recentJournals.add(JournalMeta.from(journal, file))
+    fun loadedJournal(journal: Journal, file: File) {
+        val journalMeta = JournalMeta.from(journal, file)
+        recentJournals.removeAll { it == journalMeta }
+        recentJournals.add(journalMeta)
+    }
 }
