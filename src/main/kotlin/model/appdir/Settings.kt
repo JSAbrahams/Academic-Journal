@@ -13,7 +13,7 @@ private val MAX_RECENT = 10
 private val SEPARATOR = "/"
 
 class Settings(opened: List<Path> = listOf()) {
-    val lastOpened = SimpleObjectProperty<Path>(if (opened.isEmpty()) null else opened.first())
+    val lastOpened = SimpleObjectProperty<Path>(if (opened.isEmpty()) null else opened.last())
     val recentFiles = SimpleListProperty(opened.toMutableList().toObservable())
 
     companion object {
