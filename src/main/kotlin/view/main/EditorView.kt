@@ -91,31 +91,21 @@ class EditorView : View() {
             }
             area.addEventHandler(MouseOverTextEvent.MOUSE_OVER_TEXT_END) { popup.hide() }
 
-            val selections = mutableListOf<SelectionImpl<String, String, String>>()
-            // Used to unbind positions to highlights before clearing text
-            val referencePositions = mutableSetOf<ReferencePosition>()
-
             // binding does not work, so manually update each time instead
-            editorController.current.addListener { _, oldValue, newValue ->
-                // After clearing make sure old value still has the proper text value
-                val oldText = area.text
-                referencePositions.forEach {
+            editorController.current.addListener { _, oldEntry, newEntry ->
+                // Unbind so changes to area do not affect old value
+                oldEntry?.textProperty?.unbind()
+                oldEntry?.referencesProperty?.forEach {
                     it.startProperty.unbind()
                     it.endProperty.unbind()
                 }
 
                 area.clear()
-                oldValue?.textProperty?.set(oldText)
+                if (newEntry == null) return@addListener
 
-                if (newValue != null) area.insertText(0, newValue.textProperty.value)
-            }
-            area.textProperty().onChange {
-                if (editorController.current.isNotNull.get()) editorController.current.value.textProperty.set(it)
-            }
+                area.insertText(0, newEntry.textProperty.value)
+                newEntry.textProperty.bind(area.textProperty())
 
-            editorController.selectionBounds.bind(area.selectionProperty())
-            // highlight references and set text manually
-            editorController.current.onChange { journalEntry ->
                 val setStyle: (ReferencePosition) -> Unit = { referencePosition ->
                     val selectionImpl = SelectionImpl("${referencePosition.hashCode()}", area) { path ->
                         path.strokeWidth = 0.0
@@ -123,9 +113,7 @@ class EditorView : View() {
                     }
 
                     if (area.text.length >= referencePosition.endProperty.get()) {
-                        selections.add(selectionImpl)
                         area.addSelection(selectionImpl)
-
                         selectionImpl.selectRange(
                             referencePosition.startProperty.get(),
                             referencePosition.endProperty.get()
@@ -136,22 +124,14 @@ class EditorView : View() {
                     }
                 }
 
-                referencePositions.addAll(journalEntry?.referencesProperty ?: emptySet())
-                journalEntry?.referencesProperty?.forEach(setStyle)
-                journalEntry?.referencesProperty?.onChange<ObservableList<ReferencePosition>> {
+                newEntry.referencesProperty.forEach(setStyle)
+                newEntry.referencesProperty.onChange<ObservableList<ReferencePosition>> {
                     (0 until area.paragraphs.size).forEach { paragraph -> area.clearStyle(paragraph) }
                     it?.forEach(setStyle)
-
-                    referencePositions.clear()
-                    referencePositions.addAll(it?.toSet() ?: emptySet())
-                }
-            }
-            area.textProperty().onChange { text ->
-                if (editorController.current.isNotNull.get() && text != null) {
-                    editorController.current.value.referencesProperty.removeIf { it.startProperty.get() >= text.length }
                 }
             }
 
+            editorController.selectionBounds.bind(area.selectionProperty())
             area.hgrow = Priority.ALWAYS
             area.vgrow = Priority.ALWAYS
             area.isWrapText = true
