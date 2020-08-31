@@ -42,7 +42,7 @@ class EntriesView : View() {
                 editorController.isEditMode.bind(this.selectedProperty())
             }
             button("save") {
-                disableWhen(journalController.savedProperty)
+                disableWhen(journalController.journalProperty.select { it.editedProperty.not() })
                 action { menuViewView.save() }
             }
             button("+").action {

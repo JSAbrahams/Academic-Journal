@@ -1,14 +1,11 @@
 package main.kotlin.controller
 
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import main.kotlin.model.JournalEntry
 import main.kotlin.model.journal.Journal
 import tornadofx.Controller
-import tornadofx.cleanBind
-import tornadofx.select
 import java.io.File
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -17,7 +14,6 @@ class JournalController : Controller() {
     val appdirController: AppdirController by inject()
 
     val location = SimpleObjectProperty<File>()
-    val savedProperty = SimpleBooleanProperty(false)
 
     val journalProperty = SimpleObjectProperty(Journal())
 
@@ -35,7 +31,6 @@ class JournalController : Controller() {
         journalProperty.set(journal)
         location.set(file)
         appdirController.loadedJournal(journal, file)
-        savedProperty.cleanBind(journalProperty.select { it.editedProperty.not() })
     }
 
     fun saveJournal() = when {

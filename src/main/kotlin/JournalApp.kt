@@ -71,7 +71,8 @@ class JournalApp : App(MainView::class, Styles::class) {
         stage.titleProperty().bind(
             Bindings.concat(
                 journalController.journalProperty.select { it.titleProperty },
-                Bindings.`when`(journalController.savedProperty).then("").otherwise(" [Unsaved]")
+                Bindings.`when`(journalController.journalProperty.selectBoolean { it.editedProperty })
+                    .then(" [Unsaved]").otherwise("")
             )
         )
 

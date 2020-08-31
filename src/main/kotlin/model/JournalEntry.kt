@@ -46,16 +46,22 @@ class JournalEntry(
 
     /**
      * Load reference based on mapping from identifier to actual reference.
+     * Edited property remains unchanged.
      */
     fun loadReference(referenceMapping: Map<Int, Reference>) {
+        val oldEdited = editedProperty.get()
         referencesProperty.forEach { it.loadReference(referenceMapping) }
+        editedProperty.set(oldEdited)
     }
 
     /**
      * Load keywords on boot, populating the keywordsProperty with keywords based on the keyword strings (keys).
+     * Edited property remains unchanged.
      */
     fun loadTags(tagMapping: Map<UUID, Tag>) {
+        val oldEdited = editedProperty.get()
         tagsProperty.addAll(tags.map { tagMapping[it] })
+        editedProperty.set(oldEdited)
     }
 
     init {
