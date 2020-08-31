@@ -55,7 +55,6 @@ class JournalApp : App(MainView::class, Styles::class) {
     override fun start(stage: Stage) {
         val appDirs = AppDirsFactory.getInstance()
         val userConfigDir = appDirs.getUserConfigDir(CREDENTIALS_APP_NAME, CREDENTIALS_VERSION, CREDENTIALS_AUTHOR)
-        println(userConfigDir)
         appdirController.appdir.set(File(userConfigDir))
 
         Platform.runLater {

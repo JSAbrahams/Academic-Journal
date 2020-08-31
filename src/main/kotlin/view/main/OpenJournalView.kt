@@ -24,6 +24,7 @@ class OpenJournalView : View() {
 
 class OpenJournalFragment : ListCellFragment<JournalMeta>() {
     val journalController: JournalController by inject()
+    val appdirController: AppdirController by inject()
 
     val entry = JournalMetaModel(itemProperty)
 
@@ -31,7 +32,14 @@ class OpenJournalFragment : ListCellFragment<JournalMeta>() {
         text(entry.title)
 
         setOnMouseClicked {
-            if (it.clickCount == 2) journalController.loadJournal(entry.file.value)
+            if (it.clickCount == 2) {
+                if (!entry.file.value.exists()) {
+                    warning("Unknown file", "File no longer exists, and will be removed")
+                    appdirController.recentJournals.remove(item)
+                } else {
+                    journalController.loadJournal(entry.file.value)
+                }
+            }
         }
     }
 }

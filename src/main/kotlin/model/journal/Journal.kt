@@ -50,7 +50,7 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), tags: Se
         }
 
         itemsProperty.forEach { item -> item.loadTags(tags.map { it.id to it }.toMap()) }
-        resetEdited()
+        rebindEdited()
     }
 
     fun reset() = itemsProperty.forEach { it.reset() }
@@ -64,15 +64,15 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), tags: Se
 
     fun addKeyword(tag: Tag) {
         tags.add(tag)
-        resetEdited()
+        rebindEdited(true)
     }
 
     fun addJournalEntry(journalEntry: JournalEntry) {
         myItems.add(journalEntry)
-        resetEdited()
+        rebindEdited(true)
     }
 
-    private fun resetEdited() {
+    private fun rebindEdited(edited: Boolean = false) {
         val or = tags.fold(
             myItems.fold(
                 SimpleBooleanProperty(false),
@@ -80,7 +80,7 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), tags: Se
             fun(acc, b): BooleanBinding { return Bindings.or(acc, b.editedProperty) })
 
         editedProperty.unbind()
-        editedProperty.set(true)
+        editedProperty.set(edited)
         editedProperty.cleanBind(or)
     }
 

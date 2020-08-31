@@ -51,6 +51,8 @@ class MenuView : View() {
                 disableWhen(appdirController.recentJournals.sizeProperty().isEqualTo(0))
                 items.bind(appdirController.recentJournals) { journalMeta ->
                     val menuItem = MenuItem(journalMeta.title)
+                    menuItem.disableWhen(journalController.location.isEqualTo(journalMeta.fileProperty))
+
                     menuItem.action {
                         if (journalMeta.fileProperty.isNull.get() || !journalMeta.fileProperty.get().exists()) {
                             warning("Unknown file", "File no longer exists, and will be removed")
