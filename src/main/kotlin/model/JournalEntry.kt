@@ -168,9 +168,7 @@ object JournalEntrySerializer : KSerializer<JournalEntry> {
 class JournalEntryModel(property: ObjectProperty<JournalEntry>) :
     ItemViewModel<JournalEntry>(itemProperty = property) {
     val title = bind(autocommit = true) { property.select { it.titleProperty } }
-    val text = bind(autocommit = true) { property.select { it.textProperty } }
     val edited = bind(autocommit = true) { property.select { it.editedProperty } }
-    val lastEdit = bind(autocommit = true) { property.select { it.lastEditProperty } }
     val creation = bind(autocommit = true) { property.select { it.creationProperty } }
     val tags: ObservableList<Tag> = bind(autocommit = true) { property.select { it.tagList } }
 }
