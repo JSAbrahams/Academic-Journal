@@ -19,7 +19,7 @@ class KeywordsView : View() {
             addClass(Styles.title)
         }
 
-        listview(journalController.journal.select { it.keywordList }) {
+        listview(journalController.journalProperty.select { it.keywordList }) {
             cellFragment(EditableKeywordFragment::class)
 
             keywordController.selectedKeywordProperty.onChange {
@@ -31,7 +31,9 @@ class KeywordsView : View() {
         button("+") {
             disableWhen(editorController.isEditMode.not())
             action {
-                if (journalController.journal.isNotNull.get()) journalController.journal.value.addKeyword(Tag())
+                if (journalController.journalProperty.isNotNull.get()) journalController.journalProperty.value.addKeyword(
+                    Tag()
+                )
             }
         }
     }

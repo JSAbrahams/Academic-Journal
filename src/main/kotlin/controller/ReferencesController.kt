@@ -27,8 +27,8 @@ class ReferencesController : Controller() {
 
     init {
         referenceMapping.onChange {
-            if (journalController.journal.isNotNull.get()) {
-                journalController.journal.get().loadReference(referenceMapping.toMap())
+            if (journalController.journalProperty.isNotNull.get()) {
+                journalController.journalProperty.get().loadReference(referenceMapping.toMap())
             }
         }
     }

@@ -4,23 +4,38 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import main.kotlin.model.Journal
 import main.kotlin.model.JournalEntry
+import main.kotlin.model.journal.Journal
 import tornadofx.Controller
 import tornadofx.cleanBind
 import tornadofx.select
 import java.io.File
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 class JournalController : Controller() {
+    val appdirController: AppdirController by inject()
+
     val location = SimpleObjectProperty<File>()
     val savedProperty = SimpleBooleanProperty(false)
 
-    val journal = SimpleObjectProperty(Journal())
+    val journalProperty = SimpleObjectProperty(Journal())
+
+    /**
+     * Create new journal with given title and load said journal.
+     */
+    fun newJournal(title: String) {
+        val fileName = "${LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)}.json"
+        val file = appdirController.newJournal(title, fileName)
+        loadJournal(file)
+    }
 
     fun loadJournal(file: File) {
-        journal.set(Journal.load(file))
+        val journal = Journal.load(file)
+        journalProperty.set(journal)
         location.set(file)
-        savedProperty.cleanBind(journal.select { it.editedProperty.not() })
+        appdirController.loadedJournal(journal, file)
+        savedProperty.cleanBind(journalProperty.select { it.editedProperty.not() })
     }
 
     fun saveJournal() = when {
@@ -32,19 +47,19 @@ class JournalController : Controller() {
      * Save Journal to given location and set location.
      */
     fun saveJournal(file: File) = when {
-        journal.isNull.get() -> throw IllegalStateException("Journal must be be loaded.")
+        journalProperty.isNull.get() -> throw IllegalStateException("Journal must be be loaded.")
         else -> {
             location.set(file)
-            if (journal.get().titleProperty.isEmpty.get()) journal.get().titleProperty.set(file.nameWithoutExtension)
-            file.writeText(Json.encodeToString(journal.get()))
-            journal.value.reset()
+            if (journalProperty.get().titleProperty.isEmpty.get()) journalProperty.get().titleProperty.set(file.nameWithoutExtension)
+            file.writeText(Json.encodeToString(journalProperty.get()))
+            journalProperty.value.reset()
         }
     }
 
     fun newEntry(): JournalEntry {
         val journalEntry = JournalEntry()
-        if (journal.isNotNull.get()) {
-            journal.value.addJournalEntry(journalEntry)
+        if (journalProperty.isNotNull.get()) {
+            journalProperty.value.addJournalEntry(journalEntry)
         }
         return journalEntry
     }

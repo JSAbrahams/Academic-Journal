@@ -192,7 +192,7 @@ class EditorView : View() {
                 }
             }
             combobox(editorController.selectedKeywordProperty) {
-                itemsProperty().bind(journalController.journal.select { it.keywordList })
+                itemsProperty().bind(journalController.journalProperty.select { it.keywordList })
                 editorController.selectedKeywordProperty.bindBidirectional(valueProperty())
             }
         }

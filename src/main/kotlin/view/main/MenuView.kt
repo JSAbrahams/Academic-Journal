@@ -1,6 +1,7 @@
 package main.kotlin.view.main
 
 import javafx.scene.control.MenuItem
+import javafx.scene.control.TextInputDialog
 import javafx.stage.FileChooser
 import main.kotlin.JournalApp.Companion.savePrompt
 import main.kotlin.controller.AppdirController
@@ -15,6 +16,7 @@ class MenuView : View() {
 
     val zoteroView: ZoteroView by inject()
     val keywordsView: KeywordsView by inject()
+    val openJournalView: OpenJournalView by inject()
 
     val filters = arrayOf(FileChooser.ExtensionFilter("Journal Entry", "*.journal"))
 
@@ -27,62 +29,59 @@ class MenuView : View() {
 
     override val root = menubar {
         menu("File") {
-            item("Open").action {
-                if (savePrompt(journalController, currentStage?.owner)) {
-                    val files = chooseFile(title = "Open", mode = FileChooserMode.Single, filters = filters)
-                    if (files.isNotEmpty()) journalController.loadJournal(files[0])
+            item("New").action {
+                savePrompt(journalController, currentStage?.owner)
+
+                val title = TextInputDialog().also {
+                    it.title = "Create New Journal"
+                    it.headerText = "Please Give the New Journal A Name"
+                    it.contentText = "Name"
+                }.showAndWait()
+
+                title.ifPresent { journalController.newJournal(it) }
+            }
+            item("Open") {
+                journalController.journalProperty.onChange { openJournalView.close() }
+                action {
+                    savePrompt(journalController, currentStage?.owner)
+                    openJournalView.openWindow(owner = currentStage, block = true)
                 }
             }
             menu("Open Recent") {
-                disableWhen(appdirController.files.isNull)
-                items.bind(appdirController.files.select { it.recentFiles }.value) { path ->
-                    val menuItem = MenuItem(path.toString())
+                disableWhen(appdirController.recentJournals.sizeProperty().isEqualTo(0))
+                items.bind(appdirController.recentJournals) { journalMeta ->
+                    val menuItem = MenuItem(journalMeta.title)
+                    menuItem.disableWhen(journalController.location.isEqualTo(journalMeta.fileProperty))
+
                     menuItem.action {
-                        if (!path.toFile().exists()) {
+                        if (journalMeta.fileProperty.isNull.get() || !journalMeta.fileProperty.get().exists()) {
                             warning("Unknown file", "File no longer exists, and will be removed")
-                            appdirController.files.value.recentFiles.remove(path)
-                        } else if (journalController.location.isNull.get()
-                            || journalController.location.isNotNull.get() && path != journalController.location.get()
-                                .toPath()
-                            && savePrompt(journalController, currentStage?.owner)
-                        ) {
-                            journalController.loadJournal(path.toFile())
+                            appdirController.recentJournals.remove(journalMeta)
+                            return@action
                         }
+
+                        savePrompt(journalController, currentStage?.owner)
+                        journalController.loadJournal(journalMeta.fileProperty.value)
                     }
+
                     menuItem
                 }
             }
             separator()
             item("Save") {
-                disableWhen { journalController.journal.isNull }
+                disableWhen { journalController.journalProperty.isNull }
                 action { save() }
-            }
-            item("Save As") {
-                disableWhen { journalController.journal.isNull }
-                action { save(true) }
-            }
-            item("Export") {
-                disableWhen { journalController.journal.isNull }
-                isVisible = false
             }
             separator()
             item("Edit Tags") {
-                disableWhen { journalController.journal.isNull }
+                disableWhen { journalController.journalProperty.isNull }
                 action { keywordsView.openWindow(owner = currentStage, block = true) }
-            }
-            separator { isVisible = false }
-            item("Settings") {
-                isVisible = false
             }
         }
         menu("References") {
             item("Zotero").action {
                 zoteroView.openWindow(owner = currentStage, block = true)
             }
-        }
-        menu("Help") {
-            item("About")
-            isVisible = false
         }
     }
 }

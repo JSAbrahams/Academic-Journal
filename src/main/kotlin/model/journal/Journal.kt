@@ -1,4 +1,4 @@
-package main.kotlin.model
+package main.kotlin.model.journal
 
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.BooleanBinding
@@ -16,6 +16,10 @@ import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.*
 import kotlinx.serialization.json.Json
+import main.kotlin.model.JournalEntry
+import main.kotlin.model.JournalEntrySerializer
+import main.kotlin.model.KeywordSerializer
+import main.kotlin.model.Tag
 import main.kotlin.model.reference.Reference
 import tornadofx.asObservable
 import tornadofx.cleanBind
@@ -46,7 +50,7 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), tags: Se
         }
 
         itemsProperty.forEach { item -> item.loadTags(tags.map { it.id to it }.toMap()) }
-        resetEdited()
+        rebindEdited()
     }
 
     fun reset() = itemsProperty.forEach { it.reset() }
@@ -60,15 +64,15 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), tags: Se
 
     fun addKeyword(tag: Tag) {
         tags.add(tag)
-        resetEdited()
+        rebindEdited(true)
     }
 
     fun addJournalEntry(journalEntry: JournalEntry) {
         myItems.add(journalEntry)
-        resetEdited()
+        rebindEdited(true)
     }
 
-    private fun resetEdited() {
+    private fun rebindEdited(edited: Boolean = false) {
         val or = tags.fold(
             myItems.fold(
                 SimpleBooleanProperty(false),
@@ -76,7 +80,7 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), tags: Se
             fun(acc, b): BooleanBinding { return Bindings.or(acc, b.editedProperty) })
 
         editedProperty.unbind()
-        editedProperty.set(true)
+        editedProperty.set(edited)
         editedProperty.cleanBind(or)
     }
 
