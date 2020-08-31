@@ -1,4 +1,4 @@
-package main.kotlin.model
+package main.kotlin.model.journal
 
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.BooleanBinding
@@ -16,6 +16,10 @@ import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.*
 import kotlinx.serialization.json.Json
+import main.kotlin.model.JournalEntry
+import main.kotlin.model.JournalEntrySerializer
+import main.kotlin.model.KeywordSerializer
+import main.kotlin.model.Tag
 import main.kotlin.model.reference.Reference
 import tornadofx.asObservable
 import tornadofx.cleanBind

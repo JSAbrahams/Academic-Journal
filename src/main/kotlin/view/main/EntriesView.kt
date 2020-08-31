@@ -21,13 +21,13 @@ class EntriesView : View() {
 
         text("Entries") { addClass(Styles.title) }
 
-        listview(journalController.journal.select { it.itemsProperty }) {
+        listview(journalController.journalProperty.select { it.itemsProperty }) {
             cellFragment(EntryFragment::class)
             vgrow = Priority.ALWAYS
             hgrow = Priority.NEVER
             bindSelected(editorController.current)
 
-            journalController.journal.onChange { _ ->
+            journalController.journalProperty.onChange { _ ->
                 if (items.isNotEmpty()) {
                     scrollTo(items.size - 1)
                     selectionModel.select(items.size - 1)
@@ -38,7 +38,7 @@ class EntriesView : View() {
         hbox {
             addClass(Styles.buttons)
             togglebutton("Edit Mode") {
-                disableWhen(journalController.journal.isNull)
+                disableWhen(journalController.journalProperty.isNull)
                 editorController.isEditMode.bind(this.selectedProperty())
             }
             button("save") {
@@ -48,10 +48,10 @@ class EntriesView : View() {
             button("+").action {
                 var selection = ButtonType.YES
 
-                if (journalController.journal.isNotNull.get() && journalController.journal.get().itemsProperty.isNotEmpty()) {
+                if (journalController.journalProperty.isNotNull.get() && journalController.journalProperty.get().itemsProperty.isNotEmpty()) {
                     val daysAfterEpoch = ChronoUnit.DAYS.between(LocalDate.ofEpochDay(0), LocalDate.now())
 
-                    val lastEntry = journalController.journal.get().itemsProperty.last()
+                    val lastEntry = journalController.journalProperty.get().itemsProperty.last()
                     val lastDate = lastEntry.creationProperty.get()
                     val journalDaysAfterEpoch = ChronoUnit.DAYS.between(LocalDate.ofEpochDay(0), lastDate)
 

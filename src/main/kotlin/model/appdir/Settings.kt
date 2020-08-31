@@ -12,7 +12,7 @@ private val MAX_RECENT = 10
 // Escape characters do not work well in TOML
 private val SEPARATOR = "/"
 
-class Files(opened: List<Path> = listOf()) : Tomable<Files> {
+class Settings(opened: List<Path> = listOf()) {
     val lastOpened = SimpleObjectProperty<Path>(if (opened.isEmpty()) null else opened.first())
     val recentFiles = SimpleListProperty(opened.toMutableList().toObservable())
 
@@ -23,14 +23,14 @@ class Files(opened: List<Path> = listOf()) : Tomable<Files> {
          * If exception, then log this exception and return false if this is not a NullPointerException,
          * which is allowed on first boot.
          */
-        fun fromToml(file: File): Pair<Boolean, Files> = try {
+        fun fromToml(file: File): Pair<Boolean, Settings> = try {
             val toml = Toml().read(file)
             val opened = toml.getList<String>("opened").map { pathString -> File(pathString).toPath() }
-            Pair(true, Files(opened))
+            Pair(true, Settings(opened))
         } catch (e: Exception) {
             // TODO log exception
             // NullpointerException is allowed on first boot for now
-            Pair(e !is NullPointerException, Files(emptyList()))
+            Pair(e !is NullPointerException, Settings(emptyList()))
         }
     }
 
@@ -49,7 +49,7 @@ class Files(opened: List<Path> = listOf()) : Tomable<Files> {
         this.recentFiles.setAll(newLocations)
     }
 
-    override fun toTomlMap(): Map<String, *> {
+    fun toTomlMap(): Map<String, *> {
         val map = HashMap<String, List<String>>()
         map["opened"] = recentFiles.toList().map { it.toString().replace("\\", SEPARATOR) }
         return map

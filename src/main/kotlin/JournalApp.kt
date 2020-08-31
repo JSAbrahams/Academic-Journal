@@ -34,7 +34,7 @@ class JournalApp : App(MainView::class, Styles::class) {
          * @return false if cancelled. Useful if we don't wish to continue execution of consecutive actions.
          */
         fun savePrompt(journalController: JournalController, owner: Window?): Boolean {
-            if (journalController.journal.isNotNull.get() && journalController.journal.selectBoolean { it.editedProperty }.value) {
+            if (journalController.journalProperty.isNotNull.get() && journalController.journalProperty.selectBoolean { it.editedProperty }.value) {
                 warning(
                     header = "Unsaved Changes, do you wish to save first?",
                     buttons = arrayOf<ButtonType>(YES, NO, CANCEL),
@@ -55,6 +55,7 @@ class JournalApp : App(MainView::class, Styles::class) {
     override fun start(stage: Stage) {
         val appDirs = AppDirsFactory.getInstance()
         val userConfigDir = appDirs.getUserConfigDir(CREDENTIALS_APP_NAME, CREDENTIALS_VERSION, CREDENTIALS_AUTHOR)
+        println(userConfigDir)
         appdirController.appdir.set(File(userConfigDir))
 
         Platform.runLater {
@@ -70,15 +71,13 @@ class JournalApp : App(MainView::class, Styles::class) {
         super.start(stage)
         stage.titleProperty().bind(
             Bindings.concat(
-                Bindings.`when`(journalController.location.isNotNull)
-                    .then(Bindings.concat(" [", journalController.location.asString(), "] ")).otherwise(""),
-                journalController.journal.select { it.titleProperty },
+                journalController.journalProperty.select { it.titleProperty },
                 Bindings.`when`(journalController.savedProperty).then("").otherwise(" [Unsaved]")
             )
         )
 
         stage.setOnCloseRequest {
-            if (journalController.journal.isNotNull.get() && journalController.journal.selectBoolean { it.editedProperty }.value) {
+            if (journalController.journalProperty.isNotNull.get() && journalController.journalProperty.selectBoolean { it.editedProperty }.value) {
                 val savePrompt = savePrompt(journalController, stage.owner)
                 if (!savePrompt) it.consume()
             }
