@@ -92,7 +92,8 @@ class JournalEntry(
     }
 
     fun asMarkdown(): String = "# ${titleProperty.get()}\n" +
-            "on ${creationProperty.asString()}\n\n" +
+            "_on ${creationProperty.value}_\n\n" +
+            "_last edit ${lastEditProperty.value}_\n\n" +
             textProperty.get()
 
     override fun equals(other: Any?): Boolean = other is JournalEntry

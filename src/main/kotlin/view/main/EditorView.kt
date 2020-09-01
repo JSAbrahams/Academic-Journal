@@ -47,14 +47,17 @@ class EditorView : JournalView() {
 
         webview {
             val parser = Parser.builder().build()
-            editorController.isEditable.onChange { isEditable ->
-                if (!isEditable && editorController.current.isNotNull.get()) {
+            fun update() {
+                if (editorController.isEditable.not().get() && editorController.current.isNotNull.get()) {
                     val text = editorController.current.value.asMarkdown()
                     val document = parser.parse(text)
                     val html = HtmlRenderer.builder().build().render(document)
                     engine.loadContent(html)
                 }
             }
+
+            editorController.isEditable.onChange { update() }
+            editorController.current.onChange { update() }
 
             hgrow = Priority.ALWAYS
             vgrow = Priority.ALWAYS
