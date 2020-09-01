@@ -2,8 +2,7 @@ package main.kotlin.view.main
 
 import javafx.scene.control.MenuItem
 import javafx.scene.control.TextInputDialog
-import javafx.stage.FileChooser
-import main.kotlin.JournalApp.Companion.savePrompt
+import main.kotlin.JournalApp
 import main.kotlin.controller.AppdirController
 import main.kotlin.controller.JournalController
 import main.kotlin.view.keyword.KeywordsView
@@ -11,26 +10,19 @@ import main.kotlin.view.reference.ZoteroView
 import tornadofx.*
 
 class MenuView : View() {
+    private val journalApp: JournalApp by inject()
+
     private val appdirController: AppdirController by inject()
     private val journalController: JournalController by inject()
 
-    val zoteroView: ZoteroView by inject()
-    val keywordsView: KeywordsView by inject()
-    val openJournalView: OpenJournalView by inject()
-
-    val filters = arrayOf(FileChooser.ExtensionFilter("Journal Entry", "*.journal"))
-
-    fun save(saveAs: Boolean = false) {
-        if (saveAs || journalController.location.isNull.get()) {
-            val files = chooseFile(title = "Save As", mode = FileChooserMode.Save, filters = filters)
-            if (files.isNotEmpty()) journalController.saveJournal(files[0])
-        } else journalController.saveJournal()
-    }
+    private val zoteroView: ZoteroView by inject()
+    private val keywordsView: KeywordsView by inject()
+    private val openJournalView: OpenJournalView by inject()
 
     override val root = menubar {
         menu("File") {
             item("New").action {
-                savePrompt(journalController, currentStage?.owner)
+                journalApp.savePrompt(currentStage?.owner)
 
                 val title = TextInputDialog().also {
                     it.title = "Create New Journal"
@@ -43,7 +35,7 @@ class MenuView : View() {
             item("Open") {
                 journalController.journalProperty.onChange { openJournalView.close() }
                 action {
-                    savePrompt(journalController, currentStage?.owner)
+                    journalApp.savePrompt(currentStage?.owner)
                     openJournalView.openWindow(owner = currentStage, block = true)
                 }
             }
@@ -60,7 +52,7 @@ class MenuView : View() {
                             return@action
                         }
 
-                        savePrompt(journalController, currentStage?.owner)
+                        journalApp.savePrompt(currentStage?.owner)
                         journalController.loadJournal(journalMeta.fileProperty.value)
                     }
 
@@ -70,7 +62,7 @@ class MenuView : View() {
             separator()
             item("Save") {
                 disableWhen { journalController.journalProperty.isNull }
-                action { save() }
+                action { journalApp.save() }
             }
             separator()
             item("Edit Tags") {
