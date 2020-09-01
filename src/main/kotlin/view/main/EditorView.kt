@@ -10,6 +10,8 @@ import main.kotlin.controller.EditorController
 import main.kotlin.controller.JournalController
 import main.kotlin.model.JournalEntry
 import main.kotlin.model.ReferencePosition
+import org.commonmark.parser.Parser
+import org.commonmark.renderer.html.HtmlRenderer
 import main.kotlin.view.JournalView
 import main.kotlin.view.tag.tagbar
 import org.fxmisc.richtext.InlineCssTextArea
@@ -43,9 +45,30 @@ class EditorView : JournalView() {
             }
         }
 
+        webview {
+            val parser = Parser.builder().build()
+            editorController.isEditable.onChange { isEditable ->
+                if (!isEditable && editorController.current.isNotNull.get()) {
+                    val text = editorController.current.value.asMarkdown()
+                    val document = parser.parse(text)
+                    val html = HtmlRenderer.builder().build().render(document)
+                    engine.loadContent(html)
+                }
+            }
+
+            hgrow = Priority.ALWAYS
+            vgrow = Priority.ALWAYS
+
+            disableWhen(editorController.isEditable)
+            visibleWhen(editorController.isEditable.not())
+            managedWhen(editorController.isEditable.not())
+        }
+
         textfield(editorController.current.select { it.titleProperty }) {
             promptText = "Title"
             disableWhen(editorController.isEditable.not())
+            visibleWhen(editorController.isEditable)
+            managedWhen(editorController.isEditable)
         }
 
         run {
@@ -145,7 +168,10 @@ class EditorView : JournalView() {
             // does not work nicely with TornadoFX, so add manually
             popup.content.add(popupMsg)
             children.add(area)
+
             area.disableWhen(editorController.isEditable.not())
+            area.visibleWhen(editorController.isEditable)
+            area.managedWhen(editorController.isEditable)
         }
 
         hbox {

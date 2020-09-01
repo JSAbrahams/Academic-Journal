@@ -2,6 +2,7 @@ buildscript {
     ext.kotlin_version = '1.4.0'
     repositories {
         maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "http://sandec.bintray.com/repo" }
         mavenCentral()
     }
     dependencies {
@@ -38,9 +39,12 @@ dependencies {
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     compile "no.tornado:tornadofx:$tornadoVersion"
-    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: richTextFxVersion
     compile group: 'net.harawata', name: 'appdirs', version: appdirsVersion
     compile group: 'com.moandjiezana.toml', name: 'toml4j', version: toml4jVersion
+
+    // Text
+    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: richTextFxVersion
+    compile group: 'com.atlassian.commonmark', name: 'commonmark', version: commonMarkJavaVersion
 
     // Database
     compile group: 'org.jetbrains.exposed', name: 'exposed-core', version: exposedVersion
