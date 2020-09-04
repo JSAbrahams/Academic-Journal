@@ -11,31 +11,24 @@ class EntryFragment : ListCellFragment<JournalEntry>() {
     val entry = JournalEntryModel(itemProperty)
 
     override val root = hbox {
+        addClass(Styles.entryItem)
+
         region {
+            visibleWhen(entry.edited)
+            managedWhen(entry.edited)
+
             vgrow = Priority.ALWAYS
             val height = heightProperty()
-            circle(radius = 3) {
-                centerYProperty().bind(height.divide(2.0))
-                visibleWhen(entry.edited)
-                managedWhen(entry.edited)
-            }
+            circle(radius = 3) { centerYProperty().bind(height.divide(2.0)) }
         }
 
         vbox {
-            hbox {
-                addClass(Styles.entryItem)
-                text().bind(entry.creation)
-                text("•")
-                text(entry.title)
-            }
+            text(entry.title)
+            text().bind(entry.creation)
 
-            hbox {
-                addClass(Styles.entryItem)
+            tagbar(entry.tags) {
                 visibleWhen(entry.tags.sizeProperty.greaterThan(0))
                 managedWhen(entry.tags.sizeProperty.greaterThan(0))
-
-                text("Tags")
-                tagbar(entry.tags)
             }
         }
     }

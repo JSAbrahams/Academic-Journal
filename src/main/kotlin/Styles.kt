@@ -19,9 +19,9 @@ class Styles : Stylesheet() {
     companion object {
         val title by cssclass()
 
-        val keywords by cssclass()
-        val keywordTag by cssclass()
-        val keywordRadii = CornerRadii(5.0)
+        val tags by cssclass()
+        val tag by cssclass()
+        val tagRadii = CornerRadii(5.0)
 
         val entryItem by cssclass()
 
@@ -59,21 +59,22 @@ class Styles : Stylesheet() {
             spacing = 10.px
         }
 
-        keywords {
+        tags {
             orientation = Orientation.HORIZONTAL
             backgroundInsets = multi(box(0.em))
-            prefHeight = 20.px
+
+            minHeight = 23.px
+            spacing = 3.px
         }
-        keywordTag {
-            maxHeight = 20.px
-            prefWidth = 60.px
+        tag {
+            minHeight = 20.px
             padding = box(3.px)
             alignment = Pos.CENTER
         }
 
         entryItem {
             padding = box(0.px, 3.px)
-            spacing = 3.px
+            spacing = 5.px
         }
     }
 }

@@ -15,19 +15,20 @@ import main.kotlin.model.Tag
 import main.kotlin.model.TagModel
 import tornadofx.*
 
-fun tagbar(values: ObservableValue<ObservableList<Tag>>) = TagBar(values)
-fun tagbar(values: ObservableList<Tag>? = null) = TagBar(values)
+fun tagbar(values: ObservableValue<ObservableList<Tag>>, op: TagBar.() -> Unit = {}) = TagBar(values, op)
+fun tagbar(values: ObservableList<Tag>? = null, op: TagBar.() -> Unit = {}) = TagBar(values, op)
 
-class TagBar(private val values: ObservableList<Tag>? = SimpleListProperty(mutableListOf<Tag>().asObservable())) :
-    HBox() {
-    constructor(values: ObservableValue<ObservableList<Tag>>) : this() {
+class TagBar(
+    private val values: ObservableList<Tag>? = SimpleListProperty(mutableListOf<Tag>().asObservable()),
+    op: TagBar.() -> Unit = {}
+) : HBox() {
+    constructor(values: ObservableValue<ObservableList<Tag>>, op: TagBar.() -> Unit) : this(op = op) {
         values.onChange { list -> if (list != null) this.values?.bind(list) { it } }
     }
 
     init {
-        addClass(Styles.keywords)
-        hgrow = Priority.ALWAYS
-        background = Background.EMPTY
+        addClass(Styles.tags)
+        op.invoke(this)
 
         values?.onChange { change ->
             while (change.next()) {
@@ -48,14 +49,15 @@ class TagBar(private val values: ObservableList<Tag>? = SimpleListProperty(mutab
         val entry = TagModel(itemProperty)
 
         init {
-            addClass(Styles.keywordTag)
-            tooltip { textProperty().bind(entry.description) }
+            addClass(Styles.tag)
+            background = Background(BackgroundFill(entry.colorValue.value, Styles.tagRadii, Insets.EMPTY))
+            entry.colorValue.onChange { background = Background(BackgroundFill(it, Styles.tagRadii, Insets.EMPTY)) }
 
-            background = Background(BackgroundFill(entry.colorValue.value, Styles.keywordRadii, Insets.EMPTY))
-            entry.colorValue.onChange { background = Background(BackgroundFill(it, Styles.keywordRadii, Insets.EMPTY)) }
+            hgrow = Priority.ALWAYS
 
             text("#")
             text(entry.text)
+            tooltip { textProperty().bind(entry.description) }
         }
     }
 }
