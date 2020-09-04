@@ -4,9 +4,10 @@ import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.controller.ReferencesController
 import main.kotlin.model.ReferencePosition
+import main.kotlin.view.JournalView
 import tornadofx.*
 
-class ZoteroView : View() {
+class ZoteroView : JournalView() {
     val referencesController: ReferencesController by inject()
     val editorController: EditorController by inject()
 

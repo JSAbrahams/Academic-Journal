@@ -5,11 +5,12 @@ import javafx.scene.layout.Priority
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.model.ReferencePosition
+import main.kotlin.view.JournalView
 import main.kotlin.view.reference.ReferencePositionFragment
 import main.kotlin.view.reference.ZoteroView
 import tornadofx.*
 
-class ReferencesView : View() {
+class ReferencesView : JournalView() {
     private val editorController: EditorController by inject()
 
     private val zoteroView: ZoteroView by inject()

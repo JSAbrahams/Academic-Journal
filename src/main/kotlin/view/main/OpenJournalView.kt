@@ -5,9 +5,10 @@ import main.kotlin.controller.AppdirController
 import main.kotlin.controller.JournalController
 import main.kotlin.model.journal.JournalMeta
 import main.kotlin.model.journal.JournalMetaModel
+import main.kotlin.view.JournalView
 import tornadofx.*
 
-class OpenJournalView : View() {
+class OpenJournalView : JournalView() {
     val journalController: JournalController by inject()
     val appdirController: AppdirController by inject()
 

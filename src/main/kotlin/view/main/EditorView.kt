@@ -11,6 +11,7 @@ import main.kotlin.controller.EditorController
 import main.kotlin.controller.JournalController
 import main.kotlin.model.JournalEntry
 import main.kotlin.model.ReferencePosition
+import main.kotlin.view.JournalView
 import main.kotlin.view.keyword.KeywordFragment
 import org.fxmisc.richtext.InlineCssTextArea
 import org.fxmisc.richtext.SelectionImpl
@@ -18,7 +19,7 @@ import org.fxmisc.richtext.event.MouseOverTextEvent
 import tornadofx.*
 import java.time.Duration
 
-class EditorView : View() {
+class EditorView : JournalView() {
     private val editorController: EditorController by inject()
     private val journalController: JournalController by inject()
 

@@ -2,18 +2,16 @@ package main.kotlin.view.main
 
 import javafx.scene.control.ButtonType
 import javafx.scene.layout.Priority
-import main.kotlin.JournalApp
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.controller.JournalController
+import main.kotlin.view.JournalView
 import main.kotlin.view.fragment.EntryFragment
 import tornadofx.*
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
-class EntriesView : View() {
-    private val journalApp: JournalApp by inject()
-
+class EntriesView : JournalView() {
     val editorController: EditorController by inject()
     val journalController: JournalController by inject()
 
@@ -50,7 +48,7 @@ class EntriesView : View() {
             }
             button("save") {
                 disableWhen(journalController.journalProperty.select { it.editedProperty.not() })
-                action { journalApp.save() }
+                action { save() }
             }
             button("+").action {
                 var selection = ButtonType.YES

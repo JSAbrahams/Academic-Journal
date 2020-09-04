@@ -5,11 +5,12 @@ import javafx.scene.control.TextInputDialog
 import main.kotlin.JournalApp
 import main.kotlin.controller.AppdirController
 import main.kotlin.controller.JournalController
+import main.kotlin.view.JournalView
 import main.kotlin.view.keyword.KeywordsView
 import main.kotlin.view.reference.ZoteroView
 import tornadofx.*
 
-class MenuView : View() {
+class MenuView : JournalView() {
     private val journalApp: JournalApp by inject()
 
     private val appdirController: AppdirController by inject()
@@ -22,7 +23,7 @@ class MenuView : View() {
     override val root = menubar {
         menu("File") {
             item("New").action {
-                journalApp.savePrompt(currentStage?.owner)
+                savePrompt(currentStage?.owner)
 
                 val title = TextInputDialog().also {
                     it.title = "Create New Journal"
@@ -35,7 +36,7 @@ class MenuView : View() {
             item("Open") {
                 journalController.journalProperty.onChange { openJournalView.close() }
                 action {
-                    journalApp.savePrompt(currentStage?.owner)
+                    savePrompt(currentStage?.owner)
                     openJournalView.openWindow(owner = currentStage, block = true)
                 }
             }
@@ -52,7 +53,7 @@ class MenuView : View() {
                             return@action
                         }
 
-                        journalApp.savePrompt(currentStage?.owner)
+                        savePrompt(currentStage?.owner)
                         journalController.loadJournal(journalMeta.fileProperty.value)
                     }
 
@@ -62,7 +63,7 @@ class MenuView : View() {
             separator()
             item("Save") {
                 disableWhen { journalController.journalProperty.isNull }
-                action { journalApp.save() }
+                action { save() }
             }
             separator()
             item("Edit Tags") {

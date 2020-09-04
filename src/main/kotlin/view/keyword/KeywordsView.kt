@@ -5,9 +5,10 @@ import main.kotlin.controller.EditorController
 import main.kotlin.controller.JournalController
 import main.kotlin.controller.KeywordController
 import main.kotlin.model.Tag
+import main.kotlin.view.JournalView
 import tornadofx.*
 
-class KeywordsView : View() {
+class KeywordsView : JournalView() {
     val keywordController: KeywordController by inject()
     val journalController: JournalController by inject()
     val editorController: EditorController by inject()
