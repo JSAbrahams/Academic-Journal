@@ -42,8 +42,9 @@ dependencies {
     compile group: 'net.harawata', name: 'appdirs', version: appdirsVersion
     compile group: 'com.moandjiezana.toml', name: 'toml4j', version: toml4jVersion
 
-    // Text
+    // Fancy Textarea
     compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: richTextFxVersion
+    // Render Markdown
     compile group: 'com.atlassian.commonmark', name: 'commonmark', version: commonMarkJavaVersion
 
     // Database
