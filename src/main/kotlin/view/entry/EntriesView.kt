@@ -1,4 +1,4 @@
-package main.kotlin.view.main
+package main.kotlin.view.entry
 
 import javafx.scene.control.ButtonType
 import javafx.scene.layout.Priority

@@ -68,10 +68,10 @@ object KeywordSerializer : KSerializer<Tag> {
     }
 }
 
-class KeywordModel(property: ObjectProperty<Tag>) : ItemViewModel<Tag>(itemProperty = property) {
+class TagModel(property: ObjectProperty<Tag>) : ItemViewModel<Tag>(itemProperty = property) {
     val text = bind(autocommit = true) { property.select { it.textProperty } }
     val description = bind(autocommit = true) { property.select { it.descriptionProperty } }
     val color = bind(autocommit = true) { property.select { it.colorProperty.asString() } }
-    val colorValue = bind(autocommit = true) { property.select { it.colorProperty } }
+    val colorValue: Property<Color> = bind(autocommit = true) { property.select { it.colorProperty } }
     val edited = bind(autocommit = true) { property.select { it.editedProperty } }
 }

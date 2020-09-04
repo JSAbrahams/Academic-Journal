@@ -3,7 +3,6 @@ package main.kotlin.view.main
 import javafx.collections.ObservableList
 import javafx.geometry.Pos
 import javafx.scene.control.Label
-import javafx.scene.layout.Background
 import javafx.scene.layout.Priority
 import javafx.stage.Popup
 import main.kotlin.Styles
@@ -12,7 +11,7 @@ import main.kotlin.controller.JournalController
 import main.kotlin.model.JournalEntry
 import main.kotlin.model.ReferencePosition
 import main.kotlin.view.JournalView
-import main.kotlin.view.keyword.KeywordFragment
+import main.kotlin.view.tag.tagbar
 import org.fxmisc.richtext.InlineCssTextArea
 import org.fxmisc.richtext.SelectionImpl
 import org.fxmisc.richtext.event.MouseOverTextEvent
@@ -181,12 +180,6 @@ class EditorView : JournalView() {
             }
         }
 
-        listview(editorController.current.select { it.tagList }) {
-            addClass(Styles.keywords)
-            hgrow = Priority.ALWAYS
-            background = Background.EMPTY
-
-            cellFragment(KeywordFragment::class)
-        }
+        tagbar(editorController.current.select { it.tagList })
     }
 }

@@ -1,4 +1,4 @@
-package main.kotlin.view.keyword
+package main.kotlin.view.tag
 
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
@@ -8,7 +8,7 @@ import main.kotlin.model.Tag
 import main.kotlin.view.JournalView
 import tornadofx.*
 
-class KeywordsView : JournalView() {
+class TagView : JournalView() {
     val keywordController: KeywordController by inject()
     val journalController: JournalController by inject()
     val editorController: EditorController by inject()
@@ -21,7 +21,7 @@ class KeywordsView : JournalView() {
         }
 
         listview(journalController.journalProperty.select { it.keywordList }) {
-            cellFragment(EditableKeywordFragment::class)
+            cellFragment(EditableTagFragment::class)
 
             keywordController.selectedKeywordProperty.onChange {
                 selectionModel.select(it)

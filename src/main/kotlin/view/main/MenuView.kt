@@ -2,22 +2,19 @@ package main.kotlin.view.main
 
 import javafx.scene.control.MenuItem
 import javafx.scene.control.TextInputDialog
-import main.kotlin.JournalApp
 import main.kotlin.controller.AppdirController
 import main.kotlin.controller.JournalController
 import main.kotlin.view.JournalView
-import main.kotlin.view.keyword.KeywordsView
 import main.kotlin.view.reference.ZoteroView
+import main.kotlin.view.tag.TagView
 import tornadofx.*
 
 class MenuView : JournalView() {
-    private val journalApp: JournalApp by inject()
-
     private val appdirController: AppdirController by inject()
     private val journalController: JournalController by inject()
 
     private val zoteroView: ZoteroView by inject()
-    private val keywordsView: KeywordsView by inject()
+    private val tagView: TagView by inject()
     private val openJournalView: OpenJournalView by inject()
 
     override val root = menubar {
@@ -68,7 +65,7 @@ class MenuView : JournalView() {
             separator()
             item("Edit Tags") {
                 disableWhen { journalController.journalProperty.isNull }
-                action { keywordsView.openWindow(owner = currentStage, block = true) }
+                action { tagView.openWindow(owner = currentStage, block = true) }
             }
         }
         menu("References") {
