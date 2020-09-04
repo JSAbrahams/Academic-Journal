@@ -5,23 +5,22 @@ import javafx.scene.layout.Priority
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.controller.JournalController
+import main.kotlin.view.JournalView
 import main.kotlin.view.fragment.EntryFragment
 import tornadofx.*
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
-class EntriesView : View() {
+class EntriesView : JournalView() {
     val editorController: EditorController by inject()
     val journalController: JournalController by inject()
-
-    val menuViewView: MenuView by inject()
 
     override val root = vbox {
         addClass(Styles.customContainer)
 
         text("Entries") { addClass(Styles.title) }
 
-        listview(journalController.journalProperty.select { it.entriesProperty }) {
+        listview(journalController.journalProperty.select { it.itemsProperty }) {
             cellFragment(EntryFragment::class)
             vgrow = Priority.ALWAYS
             hgrow = Priority.NEVER
@@ -49,15 +48,15 @@ class EntriesView : View() {
             }
             button("save") {
                 disableWhen(journalController.journalProperty.select { it.editedProperty.not() })
-                action { menuViewView.save() }
+                action { save() }
             }
             button("+").action {
                 var selection = ButtonType.YES
 
-                if (journalController.journalProperty.isNotNull.get() && journalController.journalProperty.get().entriesProperty.isNotEmpty()) {
+                if (journalController.journalProperty.isNotNull.get() && journalController.journalProperty.get().itemsProperty.isNotEmpty()) {
                     val daysAfterEpoch = ChronoUnit.DAYS.between(LocalDate.ofEpochDay(0), LocalDate.now())
 
-                    val lastEntry = journalController.journalProperty.get().entriesProperty.last()
+                    val lastEntry = journalController.journalProperty.get().itemsProperty.last()
                     val lastDate = lastEntry.creationProperty.get()
                     val journalDaysAfterEpoch = ChronoUnit.DAYS.between(LocalDate.ofEpochDay(0), lastDate)
 
