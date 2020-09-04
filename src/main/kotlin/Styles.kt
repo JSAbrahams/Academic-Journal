@@ -34,7 +34,7 @@ class Styles : Stylesheet() {
         val hoverTextColor = "white"
         val hoverPaddingPx = 5
 
-        val webviewFontSizePx = 14
+        val webviewFontSizePx = 13
         val webViewFont = "Helvetica"
     }
 

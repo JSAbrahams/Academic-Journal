@@ -5,15 +5,16 @@ import javafx.geometry.Pos
 import javafx.scene.control.Label
 import javafx.scene.layout.Priority
 import javafx.stage.Popup
+import main.kotlin.JournalApp
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.controller.JournalController
 import main.kotlin.model.JournalEntry
 import main.kotlin.model.ReferencePosition
-import org.commonmark.parser.Parser
-import org.commonmark.renderer.html.HtmlRenderer
 import main.kotlin.view.JournalView
 import main.kotlin.view.tag.tagbar
+import org.commonmark.parser.Parser
+import org.commonmark.renderer.html.HtmlRenderer
 import org.fxmisc.richtext.InlineCssTextArea
 import org.fxmisc.richtext.SelectionImpl
 import org.fxmisc.richtext.event.MouseOverTextEvent
@@ -60,11 +61,17 @@ class EditorView : JournalView() {
 
             webview {
                 val parser = Parser.builder().build()
+                // Retrieved from https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js
+                val script = JournalApp::class.java.getResource("/javascript/mathjax.js").readText()
+                val config = JournalApp::class.java.getResource("/javascript/config.js").readText()
+
                 fun update() {
                     if (editorController.isEditable.not().get() && editorController.current.isNotNull.get()) {
                         val text = editorController.current.value.asSimpleMarkdown()
                         val document = parser.parse(text)
-                        val html = HtmlRenderer.builder().build().render(document)
+                        val html = "<script>$config</script>" +
+                                "<script type=\"text/javascript\" id=\"MathJax-script\" async>$script</script>" +
+                                HtmlRenderer.builder().build().render(document)
                         engine.loadContent(html)
                     }
                 }
