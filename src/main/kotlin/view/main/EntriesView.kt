@@ -27,12 +27,18 @@ class EntriesView : View() {
             hgrow = Priority.NEVER
             bindSelected(editorController.current)
 
-            journalController.journalProperty.onChange { _ ->
+            val selectLastItem = {
                 if (items.isNotEmpty()) {
-                    scrollTo(items.size - 1)
                     selectionModel.select(items.size - 1)
+                    scrollTo(selectionModel.selectedIndex)
+                    focusModel.focus(selectionModel.selectedIndex)
                 }
             }
+
+            journalController.journalProperty.onChange { selectLastItem.invoke() }
+            // If journal set before attaching listener, still select last item
+            if (journalController.journalProperty.isNotNull.get()) selectLastItem.invoke()
+
         }
 
         hbox {
