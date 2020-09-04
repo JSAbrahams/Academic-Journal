@@ -62,11 +62,12 @@ class Styles : Stylesheet() {
         keywords {
             orientation = Orientation.HORIZONTAL
             backgroundInsets = multi(box(0.em))
-            maxHeight = 40.px
+            prefHeight = 20.px
         }
         keywordTag {
             maxHeight = 20.px
             prefWidth = 60.px
+            padding = box(3.px)
             alignment = Pos.CENTER
         }
 

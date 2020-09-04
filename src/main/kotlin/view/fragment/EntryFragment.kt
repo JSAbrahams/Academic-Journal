@@ -1,11 +1,10 @@
 package main.kotlin.view.fragment
 
-import javafx.scene.layout.Background
 import javafx.scene.layout.Priority
 import main.kotlin.Styles
 import main.kotlin.model.JournalEntry
 import main.kotlin.model.JournalEntryModel
-import main.kotlin.view.keyword.KeywordFragment
+import main.kotlin.view.tag.tagbar
 import tornadofx.*
 
 class EntryFragment : ListCellFragment<JournalEntry>() {
@@ -36,11 +35,7 @@ class EntryFragment : ListCellFragment<JournalEntry>() {
                 managedWhen(entry.tags.sizeProperty.greaterThan(0))
 
                 text("Tags")
-                listview(entry.tags) {
-                    addClass(Styles.keywords)
-                    background = Background.EMPTY
-                    cellFragment(KeywordFragment::class)
-                }
+                tagbar(entry.tags)
             }
         }
     }

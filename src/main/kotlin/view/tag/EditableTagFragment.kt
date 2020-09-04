@@ -1,13 +1,13 @@
-package main.kotlin.view.keyword
+package main.kotlin.view.tag
 
 import javafx.scene.layout.Priority
 import main.kotlin.Styles
-import main.kotlin.model.KeywordModel
 import main.kotlin.model.Tag
+import main.kotlin.model.TagModel
 import tornadofx.*
 
-class EditableKeywordFragment : ListCellFragment<Tag>() {
-    val entry = KeywordModel(itemProperty)
+class EditableTagFragment : ListCellFragment<Tag>() {
+    val entry = TagModel(itemProperty)
 
     override val root = vbox {
         addClass(Styles.nestedContainer)
