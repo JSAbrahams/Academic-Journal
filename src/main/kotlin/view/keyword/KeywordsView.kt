@@ -29,7 +29,7 @@ class KeywordsView : View() {
         }
 
         button("+") {
-            disableWhen(editorController.isEditMode.not())
+            disableWhen(editorController.isEditable.not())
             action {
                 if (journalController.journalProperty.isNotNull.get()) journalController.journalProperty.value.addKeyword(
                     Tag()

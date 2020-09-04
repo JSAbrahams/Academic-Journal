@@ -30,7 +30,7 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), tags: Se
     val titleProperty = SimpleStringProperty(title)
 
     private val myItems = items.toMutableList().asObservable()
-    val itemsProperty: ReadOnlyListProperty<JournalEntry> = SimpleListProperty(myItems)
+    val entriesProperty: ReadOnlyListProperty<JournalEntry> = SimpleListProperty(myItems)
 
     var editedProperty = SimpleBooleanProperty(false)
 
@@ -49,17 +49,17 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), tags: Se
             if (c.wasRemoved()) keywordList.add(c.elementRemoved)
         }
 
-        itemsProperty.forEach { item -> item.loadTags(tags.map { it.id to it }.toMap()) }
+        entriesProperty.forEach { item -> item.loadTags(tags.map { it.id to it }.toMap()) }
         rebindEdited()
     }
 
-    fun reset() = itemsProperty.forEach { it.reset() }
+    fun reset() = entriesProperty.forEach { it.reset() }
 
     /**
      * Load reference based on mapping from identifier to actual reference.
      */
     fun loadReference(referenceMapping: Map<Int, Reference>) {
-        itemsProperty.forEach { it.loadReference(referenceMapping) }
+        entriesProperty.forEach { it.loadReference(referenceMapping) }
     }
 
     fun addKeyword(tag: Tag) {
@@ -85,9 +85,9 @@ class Journal(title: String = "", items: List<JournalEntry> = listOf(), tags: Se
     }
 
     override fun equals(other: Any?): Boolean = other is Journal && titleProperty.get() == other.titleProperty.get()
-            && itemsProperty.toList() == other.itemsProperty.toList()
+            && entriesProperty.toList() == other.entriesProperty.toList()
 
-    override fun hashCode(): Int = 31 * titleProperty.hashCode() + itemsProperty.hashCode()
+    override fun hashCode(): Int = 31 * titleProperty.hashCode() + entriesProperty.hashCode()
 }
 
 /**
@@ -103,7 +103,7 @@ object JournalSerializer : KSerializer<Journal> {
     override fun serialize(encoder: Encoder, value: Journal) = encoder.encodeStructure(descriptor) {
         encodeStringElement(descriptor, 0, value.titleProperty.get())
         encodeSerializableElement(descriptor, 1, SetSerializer((KeywordSerializer)), value.tags.toSet())
-        encodeSerializableElement(descriptor, 2, ListSerializer(JournalEntrySerializer), value.itemsProperty.toList())
+        encodeSerializableElement(descriptor, 2, ListSerializer(JournalEntrySerializer), value.entriesProperty.toList())
     }
 
     override fun deserialize(decoder: Decoder): Journal = decoder.decodeStructure(descriptor) {

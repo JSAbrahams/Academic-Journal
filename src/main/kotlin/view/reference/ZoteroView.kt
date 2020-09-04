@@ -63,7 +63,7 @@ class ZoteroView : View() {
             button("+") {
                 disableWhen(
                     editorController.isValidSelection.not()
-                        .or(editorController.isEditMode.not())
+                        .or(editorController.isEditable.not())
                         .or(referencesController.selectedReference.isNull)
                 )
                 action {

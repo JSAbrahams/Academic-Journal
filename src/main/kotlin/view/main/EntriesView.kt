@@ -21,37 +21,43 @@ class EntriesView : View() {
 
         text("Entries") { addClass(Styles.title) }
 
-        listview(journalController.journalProperty.select { it.itemsProperty }) {
+        listview(journalController.journalProperty.select { it.entriesProperty }) {
             cellFragment(EntryFragment::class)
             vgrow = Priority.ALWAYS
             hgrow = Priority.NEVER
             bindSelected(editorController.current)
 
-            journalController.journalProperty.onChange { _ ->
+            val selectLastItem = {
                 if (items.isNotEmpty()) {
-                    scrollTo(items.size - 1)
                     selectionModel.select(items.size - 1)
+                    scrollTo(selectionModel.selectedIndex)
+                    focusModel.focus(selectionModel.selectedIndex)
                 }
             }
+
+            journalController.journalProperty.onChange { selectLastItem.invoke() }
+            // If journal set before attaching listener, still select last item
+            if (journalController.journalProperty.isNotNull.get()) selectLastItem.invoke()
+
         }
 
         hbox {
             addClass(Styles.buttons)
             togglebutton("Edit Mode") {
                 disableWhen(journalController.journalProperty.isNull)
-                editorController.isEditMode.bind(this.selectedProperty())
+                editorController.isEditMode.bindBidirectional(this.selectedProperty())
             }
             button("save") {
-                disableWhen(journalController.savedProperty)
+                disableWhen(journalController.journalProperty.select { it.editedProperty.not() })
                 action { menuViewView.save() }
             }
             button("+").action {
                 var selection = ButtonType.YES
 
-                if (journalController.journalProperty.isNotNull.get() && journalController.journalProperty.get().itemsProperty.isNotEmpty()) {
+                if (journalController.journalProperty.isNotNull.get() && journalController.journalProperty.get().entriesProperty.isNotEmpty()) {
                     val daysAfterEpoch = ChronoUnit.DAYS.between(LocalDate.ofEpochDay(0), LocalDate.now())
 
-                    val lastEntry = journalController.journalProperty.get().itemsProperty.last()
+                    val lastEntry = journalController.journalProperty.get().entriesProperty.last()
                     val lastDate = lastEntry.creationProperty.get()
                     val journalDaysAfterEpoch = ChronoUnit.DAYS.between(LocalDate.ofEpochDay(0), lastDate)
 

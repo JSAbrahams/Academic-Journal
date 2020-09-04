@@ -9,6 +9,7 @@ import javafx.stage.Popup
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.controller.JournalController
+import main.kotlin.model.JournalEntry
 import main.kotlin.model.ReferencePosition
 import main.kotlin.view.keyword.KeywordFragment
 import org.fxmisc.richtext.InlineCssTextArea
@@ -92,7 +93,7 @@ class EditorView : View() {
             area.addEventHandler(MouseOverTextEvent.MOUSE_OVER_TEXT_END) { popup.hide() }
 
             // binding does not work, so manually update each time instead
-            editorController.current.addListener { _, oldEntry, newEntry ->
+            val updateTextArea = { oldEntry: JournalEntry?, newEntry: JournalEntry? ->
                 // Unbind so changes to area do not affect old value
                 oldEntry?.textProperty?.unbind()
                 oldEntry?.referencesProperty?.forEach {
@@ -101,10 +102,8 @@ class EditorView : View() {
                 }
 
                 area.clear()
-                if (newEntry == null) return@addListener
-
-                area.insertText(0, newEntry.textProperty.value)
-                newEntry.textProperty.bind(area.textProperty())
+                if (newEntry != null) area.insertText(0, newEntry.textProperty.value)
+                newEntry?.textProperty?.bind(area.textProperty())
 
                 val setStyle: (ReferencePosition) -> Unit = { referencePosition ->
                     val selectionImpl = SelectionImpl("${referencePosition.hashCode()}", area) { path ->
@@ -124,12 +123,16 @@ class EditorView : View() {
                     }
                 }
 
-                newEntry.referencesProperty.forEach(setStyle)
-                newEntry.referencesProperty.onChange<ObservableList<ReferencePosition>> {
+                newEntry?.referencesProperty?.forEach(setStyle)
+                newEntry?.referencesProperty?.onChange<ObservableList<ReferencePosition>> {
                     (0 until area.paragraphs.size).forEach { paragraph -> area.clearStyle(paragraph) }
                     it?.forEach(setStyle)
                 }
             }
+
+            editorController.current.addListener { _, oldEntry, newEntry -> updateTextArea(oldEntry, newEntry) }
+            // Add in case journal loaded before listener attached
+            if (editorController.current.isNotNull.get()) updateTextArea(null, editorController.current.value)
 
             editorController.selectionBounds.bind(area.selectionProperty())
             area.hgrow = Priority.ALWAYS
