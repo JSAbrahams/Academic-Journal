@@ -1,6 +1,5 @@
 package main.kotlin
 
-import javafx.geometry.Orientation
 import javafx.geometry.Pos
 import javafx.scene.layout.CornerRadii
 import javafx.scene.paint.Color
@@ -21,7 +20,7 @@ class Styles : Stylesheet() {
 
         val tags by cssclass()
         val tag by cssclass()
-        val tagRadii = CornerRadii(5.0)
+        val tagRadii = CornerRadii(10.0)
 
         val entryItem by cssclass()
 
@@ -60,16 +59,13 @@ class Styles : Stylesheet() {
         }
 
         tags {
-            orientation = Orientation.HORIZONTAL
-            backgroundInsets = multi(box(0.em))
-
-            minHeight = 23.px
-            spacing = 3.px
+            hgap = 5.px
+            vgap = 5.px
         }
         tag {
-            minHeight = 20.px
             padding = box(3.px)
             alignment = Pos.CENTER
+            fontScale = 0.3
         }
 
         entryItem {
