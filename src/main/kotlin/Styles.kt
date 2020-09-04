@@ -17,6 +17,7 @@ val Color.web: String
 class Styles : Stylesheet() {
     companion object {
         val title by cssclass()
+        val textfield by cssclass()
 
         val tags by cssclass()
         val tag by cssclass()
@@ -32,12 +33,20 @@ class Styles : Stylesheet() {
         val hoverBackground = "black"
         val hoverTextColor = "white"
         val hoverPaddingPx = 5
+
+        val webviewFontSizePx = 13
+        val webViewFont = "Helvetica"
     }
 
     init {
         title {
             startMargin = (10.px)
             fontSize = 2.em
+        }
+        textfield {
+            textBoxBorder = Color.TRANSPARENT
+            focusColor = Color.TRANSPARENT
+            faintFocusColor = Color.TRANSPARENT
         }
 
         customContainer {

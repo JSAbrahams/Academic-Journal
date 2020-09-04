@@ -91,6 +91,8 @@ class JournalEntry(
         lastEditProperty.set(LocalDateTime.now())
     }
 
+    fun asSimpleMarkdown(): String = "# ${titleProperty.get()}\n" + textProperty.get()
+
     override fun equals(other: Any?): Boolean = other is JournalEntry
             && lastEditProperty.get().epochSeconds == other.lastEditProperty.get().epochSeconds
             && creationProperty.get().epochSeconds == other.creationProperty.get().epochSeconds
