@@ -2,8 +2,8 @@ package main.kotlin.view.fragment
 
 import javafx.scene.layout.Priority
 import main.kotlin.Styles
-import main.kotlin.model.JournalEntry
-import main.kotlin.model.JournalEntryModel
+import main.kotlin.model.journal.JournalEntry
+import main.kotlin.model.journal.JournalEntryModel
 import main.kotlin.view.tag.tagbar
 import tornadofx.*
 

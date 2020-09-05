@@ -10,8 +10,8 @@ import javafx.event.EventTarget
 import javafx.geometry.Insets
 import javafx.scene.layout.*
 import main.kotlin.Styles
-import main.kotlin.model.Tag
-import main.kotlin.model.TagModel
+import main.kotlin.model.journal.Tag
+import main.kotlin.model.journal.TagModel
 import tornadofx.*
 
 fun EventTarget.tagbar(values: ObservableValue<ObservableList<Tag>>, op: TagBar.() -> Unit = {}) =

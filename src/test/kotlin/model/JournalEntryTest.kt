@@ -5,7 +5,7 @@ import io.kotest.matchers.shouldBe
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import main.kotlin.model.JournalEntry
+import main.kotlin.model.journal.JournalEntry
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 

@@ -5,7 +5,7 @@ import io.kotest.matchers.shouldBe
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import main.kotlin.model.ReferencePosition
+import main.kotlin.model.journal.ReferencePosition
 
 class ReferencePositionTest : FreeSpec({
     "a reference position" - {

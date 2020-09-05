@@ -21,6 +21,9 @@ data class JournalMeta(val title: String = "") {
     val fileProperty = SimpleObjectProperty<File>()
 
     companion object {
+        /**
+         * Load only metadata of Journal JSON files, ignoring all other values of the Journal.
+         */
         fun load(file: File): JournalMeta {
             val format = Json { ignoreUnknownKeys = true }
             val journalMeta: JournalMeta = format.decodeFromString(file.readText())
@@ -28,6 +31,9 @@ data class JournalMeta(val title: String = "") {
             return journalMeta
         }
 
+        /**
+         * Create JournalMeta object with properties of journal and with the given file location.
+         */
         fun from(journal: Journal, file: File) = JournalMeta(journal.titleProperty.get()).also {
             it.fileProperty.set(file)
         }

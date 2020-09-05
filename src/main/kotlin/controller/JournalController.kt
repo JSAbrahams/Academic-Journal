@@ -3,8 +3,8 @@ package main.kotlin.controller
 import javafx.beans.property.SimpleObjectProperty
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import main.kotlin.model.JournalEntry
 import main.kotlin.model.journal.Journal
+import main.kotlin.model.journal.JournalEntry
 import tornadofx.Controller
 import java.io.File
 import java.time.LocalDateTime

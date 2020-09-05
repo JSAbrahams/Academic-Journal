@@ -2,10 +2,13 @@ package main.kotlin.controller
 
 import javafx.beans.property.SimpleMapProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.scene.paint.Color
+import main.kotlin.model.journal.ReferenceType
 import main.kotlin.model.reference.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import tornadofx.Controller
+import tornadofx.asObservable
 import tornadofx.onChange
 import tornadofx.toObservable
 import java.io.File
@@ -24,6 +27,14 @@ class ReferencesController : Controller() {
     val authorMapping = SimpleMapProperty<Int, Author>()
     val referenceMapping = SimpleMapProperty<Int, Reference>()
     val selectedReference = SimpleObjectProperty<Reference>()
+
+    val selectedType = SimpleObjectProperty(ReferenceType.HIGHLIGHT)
+    val typeColors = SimpleMapProperty(
+        mapOf(
+            ReferenceType.HIGHLIGHT to Color.YELLOW,
+            ReferenceType.SUMMARY to Color.web("99cccc")
+        ).asObservable()
+    )
 
     init {
         referenceMapping.onChange {

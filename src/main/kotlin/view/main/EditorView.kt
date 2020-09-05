@@ -9,8 +9,9 @@ import main.kotlin.JournalApp
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.controller.JournalController
-import main.kotlin.model.JournalEntry
-import main.kotlin.model.ReferencePosition
+import main.kotlin.controller.ReferencesController
+import main.kotlin.model.journal.JournalEntry
+import main.kotlin.model.journal.ReferencePosition
 import main.kotlin.view.JournalView
 import main.kotlin.view.tag.tagbar
 import org.commonmark.parser.Parser
@@ -24,6 +25,7 @@ import java.time.Duration
 class EditorView : JournalView() {
     private val editorController: EditorController by inject()
     private val journalController: JournalController by inject()
+    private val referencesController: ReferencesController by inject()
 
     private val hoverDurationMillis = 200L
 
@@ -148,7 +150,7 @@ class EditorView : JournalView() {
                     val setStyle: (ReferencePosition) -> Unit = { referencePosition ->
                         val selectionImpl = SelectionImpl("${referencePosition.hashCode()}", area) { path ->
                             path.strokeWidth = 0.0
-                            path.fill = Styles.highlightColor
+                            path.fill = referencesController.typeColors[referencePosition.typeProperty.value]
                         }
 
                         if (area.text.length >= referencePosition.endProperty.get()) {

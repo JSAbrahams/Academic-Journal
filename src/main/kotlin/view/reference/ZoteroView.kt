@@ -3,7 +3,8 @@ package main.kotlin.view.reference
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.controller.ReferencesController
-import main.kotlin.model.ReferencePosition
+import main.kotlin.model.journal.ReferencePosition
+import main.kotlin.model.journal.ReferenceType
 import main.kotlin.view.JournalView
 import tornadofx.*
 
@@ -61,22 +62,29 @@ class ZoteroView : JournalView() {
         }
 
         row {
-            button("+") {
-                disableWhen(
-                    editorController.isValidSelection.not()
-                        .or(editorController.isEditable.not())
-                        .or(referencesController.selectedReference.isNull)
-                )
-                action {
-                    editorController.current.get().referencesProperty.add(
-                        ReferencePosition(
-                            start = editorController.selectionBounds.get().start,
-                            end = editorController.selectionBounds.get().end,
-                            reference = referencesController.selectedReference.get()
-                        )
+            hbox {
+                addClass(Styles.buttons)
+
+                button("+") {
+                    disableWhen(
+                        editorController.isValidSelection.not()
+                            .or(editorController.isEditable.not())
+                            .or(referencesController.selectedReference.isNull)
                     )
-                    currentStage?.close()
+                    action {
+                        editorController.current.get().referencesProperty.add(
+                            ReferencePosition(
+                                start = editorController.selectionBounds.get().start,
+                                end = editorController.selectionBounds.get().end,
+                                reference = referencesController.selectedReference.get(),
+                                referenceType = referencesController.selectedType.get()
+                            )
+                        )
+                        currentStage?.close()
+                    }
                 }
+
+                combobox(referencesController.selectedType, ReferenceType.values().asList())
             }
         }
     }
