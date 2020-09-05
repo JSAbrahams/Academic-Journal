@@ -113,7 +113,7 @@ class EditorView : JournalView() {
                             ) {
                                 items += Pair(
                                     Pair(referencePosition.startProperty.get(), referencePosition.endProperty.get()),
-                                    referencePosition.referenceProperty.get().title
+                                    referencePosition.referenceProperty.get().titleProperty.get()
                                 )
                                 referencePos.add(referencePosition)
                             }

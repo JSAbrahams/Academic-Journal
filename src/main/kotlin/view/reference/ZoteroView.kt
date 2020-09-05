@@ -1,5 +1,8 @@
 package main.kotlin.view.reference
 
+import javafx.scene.layout.ColumnConstraints
+import javafx.scene.layout.Priority
+import javafx.scene.layout.RowConstraints
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.controller.ReferencesController
@@ -15,6 +18,11 @@ class ZoteroView : JournalView() {
     override val root = gridpane {
         addClass(Styles.customContainer)
 
+        columnConstraints.add(ColumnConstraints().also { it.hgrow = Priority.SOMETIMES })
+        columnConstraints.add(ColumnConstraints().also { it.hgrow = Priority.SOMETIMES })
+        columnConstraints.add(ColumnConstraints().also { it.hgrow = Priority.ALWAYS })
+
+        rowConstraints.add(RowConstraints().also { it.vgrow = Priority.NEVER })
         row {
             gridpane {
                 gridpaneConstraints { columnSpan = 2 }
@@ -34,21 +42,37 @@ class ZoteroView : JournalView() {
                     }
                 }
             }
-
         }
 
-
+        rowConstraints.add(RowConstraints().also { it.vgrow = Priority.ALWAYS })
         row {
             vbox {
+                hgrow = Priority.ALWAYS
+                vgrow = Priority.ALWAYS
                 text("Authors") { addClass(Styles.title) }
                 listview(observableListOf(referencesController.authorMapping.values)) {
+                    hgrow = Priority.ALWAYS
+                    vgrow = Priority.ALWAYS
                     cellFragment(AuthorFragment::class)
                 }
             }
 
             vbox {
+                hgrow = Priority.ALWAYS
+                vgrow = Priority.ALWAYS
+                text("Sub-Collections") { addClass(Styles.title) }
+                listview(observableListOf(referencesController.subcollectionMapping.values)) {
+                    vgrow = Priority.ALWAYS
+                }
+            }
+
+            vbox {
+                hgrow = Priority.ALWAYS
+                vgrow = Priority.ALWAYS
                 text("Items") { addClass(Styles.title) }
                 listview(observableListOf(referencesController.referenceMapping.values)) {
+                    hgrow = Priority.ALWAYS
+                    vgrow = Priority.ALWAYS
                     cellFragment(ReferenceFragment::class)
 
                     referencesController.selectedReference.onChange {
@@ -61,6 +85,7 @@ class ZoteroView : JournalView() {
             }
         }
 
+        rowConstraints.add(RowConstraints().also { it.vgrow = Priority.NEVER })
         row {
             hbox {
                 addClass(Styles.buttons)

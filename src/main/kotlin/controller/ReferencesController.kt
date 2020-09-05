@@ -25,6 +25,7 @@ class ReferencesController : Controller() {
 
     private val fieldTypes = mutableMapOf<String, Int>()
     val authorMapping = SimpleMapProperty<Int, Author>()
+    val subcollectionMapping = SimpleMapProperty<Int, String>()
     val referenceMapping = SimpleMapProperty<Int, Reference>()
     val selectedReference = SimpleObjectProperty<Reference>()
 
