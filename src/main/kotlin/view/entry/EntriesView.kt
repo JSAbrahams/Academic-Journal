@@ -6,7 +6,6 @@ import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.controller.JournalController
 import main.kotlin.view.JournalView
-import main.kotlin.view.fragment.EntryFragment
 import tornadofx.*
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit

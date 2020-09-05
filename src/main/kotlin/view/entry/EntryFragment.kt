@@ -1,4 +1,4 @@
-package main.kotlin.view.fragment
+package main.kotlin.view.entry
 
 import javafx.scene.layout.Priority
 import main.kotlin.Styles
