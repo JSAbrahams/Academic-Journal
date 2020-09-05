@@ -1,13 +1,11 @@
-package main.kotlin.view.main
+package main.kotlin.view.reference
 
 import javafx.collections.ObservableList
 import javafx.scene.layout.Priority
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
-import main.kotlin.model.ReferencePosition
+import main.kotlin.model.journal.ReferencePosition
 import main.kotlin.view.JournalView
-import main.kotlin.view.reference.ReferencePositionFragment
-import main.kotlin.view.reference.ZoteroView
 import tornadofx.*
 
 class ReferencesView : JournalView() {

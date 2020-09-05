@@ -4,7 +4,7 @@ import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.controller.JournalController
 import main.kotlin.controller.KeywordController
-import main.kotlin.model.Tag
+import main.kotlin.model.journal.Tag
 import main.kotlin.view.JournalView
 import tornadofx.*
 

@@ -1,8 +1,9 @@
-package main.kotlin.model
+package main.kotlin.model.journal
 
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.SimpleStringProperty
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -14,17 +15,28 @@ import tornadofx.ItemViewModel
 import tornadofx.select
 
 @Serializable(with = ReferencePositionSerializer::class)
-class ReferencePosition(val referenceId: Int, start: Int, end: Int) {
+class ReferencePosition(
+    val referenceId: Int,
+    start: Int,
+    end: Int,
+    referenceType: ReferenceType = ReferenceType.HIGHLIGHT
+) {
     val startProperty = SimpleIntegerProperty(start)
     val endProperty = SimpleIntegerProperty(end)
     val referenceProperty = SimpleObjectProperty<Reference>()
+    val typeProperty = SimpleObjectProperty(referenceType)
 
     /**
      * Set reference directly.
      *
      * Useful if all references have already been loaded.
      */
-    constructor(reference: Reference, start: Int, end: Int) : this(reference.id, start, end) {
+    constructor(
+        reference: Reference,
+        start: Int,
+        end: Int,
+        referenceType: ReferenceType = ReferenceType.HIGHLIGHT
+    ) : this(reference.id, start, end, referenceType) {
         referenceProperty.set(reference)
     }
 
@@ -49,35 +61,46 @@ object ReferencePositionSerializer : KSerializer<ReferencePosition> {
         element<Int>("start")
         element<Int>("end")
         element<Int>("reference")
+        element<Int>("type")
     }
 
     override fun serialize(encoder: Encoder, value: ReferencePosition) = encoder.encodeStructure(descriptor) {
         encodeIntElement(descriptor, 0, value.startProperty.get())
         encodeIntElement(descriptor, 1, value.endProperty.get())
         encodeIntElement(descriptor, 2, value.referenceId)
+        encodeIntElement(descriptor, 3, value.typeProperty.get().ordinal)
     }
 
     override fun deserialize(decoder: Decoder): ReferencePosition = decoder.decodeStructure(descriptor) {
         var (start, end) = Pair(0, 0)
         var referenceId = -1
+        var referenceType = ReferenceType.HIGHLIGHT
 
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
                 0 -> start = decodeIntElement(descriptor, 0)
                 1 -> end = decodeIntElement(descriptor, 1)
                 2 -> referenceId = decodeIntElement(descriptor, 2)
+                3 -> referenceType = ReferenceType.values()[decodeIntElement(descriptor, 3)]
                 CompositeDecoder.DECODE_DONE -> break
                 else -> error("Unexpected index: $index")
             }
         }
 
-        ReferencePosition(referenceId, start, end)
+        ReferencePosition(referenceId, start, end, referenceType)
     }
 }
 
-class NoteModel(property: ObjectProperty<ReferencePosition>) :
+enum class ReferenceType(val prettyName: String) {
+    HIGHLIGHT("Highlight"),
+    SUMMARY("Summary")
+}
+
+class ReferencePositionModel(property: ObjectProperty<ReferencePosition>) :
     ItemViewModel<ReferencePosition>(itemProperty = property) {
     val start = bind(autocommit = true) { property.select { it.startProperty.asString() } }
     val end = bind(autocommit = true) { property.select { it.endProperty.asString() } }
     val reference: ObjectProperty<Reference> = bind(autocommit = true) { property.select { it.referenceProperty } }
+    val type =
+        bind(autocommit = true) { property.select { it.typeProperty.select { SimpleStringProperty(it.prettyName) } } }
 }

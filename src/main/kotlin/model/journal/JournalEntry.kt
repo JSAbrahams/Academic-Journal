@@ -1,4 +1,4 @@
-package main.kotlin.model
+package main.kotlin.model.journal
 
 import javafx.beans.property.*
 import javafx.collections.ObservableList

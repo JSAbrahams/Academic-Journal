@@ -6,7 +6,7 @@ import javafx.scene.paint.Color
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import main.kotlin.model.Tag
+import main.kotlin.model.journal.Tag
 import java.util.*
 
 class TagTest : FreeSpec({

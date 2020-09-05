@@ -29,7 +29,6 @@ class Styles : Stylesheet() {
         val nestedContainer by cssclass()
         val buttons by cssclass()
 
-        val highlightColor = Color.YELLOW
         val hoverBackground = "black"
         val hoverTextColor = "white"
         val hoverPaddingPx = 5
@@ -78,7 +77,7 @@ class Styles : Stylesheet() {
         }
 
         entryItem {
-            padding = box(0.px, 3.px)
+            padding = box(0.px)
             spacing = 5.px
         }
     }

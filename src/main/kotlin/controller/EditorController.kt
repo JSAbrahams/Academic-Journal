@@ -5,9 +5,9 @@ import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.IndexRange
-import main.kotlin.model.JournalEntry
-import main.kotlin.model.ReferencePosition
-import main.kotlin.model.Tag
+import main.kotlin.model.journal.JournalEntry
+import main.kotlin.model.journal.ReferencePosition
+import main.kotlin.model.journal.Tag
 import tornadofx.Controller
 import tornadofx.asObservable
 import tornadofx.onChange
