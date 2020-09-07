@@ -50,7 +50,7 @@ class ZoteroView : JournalView() {
                 hgrow = Priority.ALWAYS
                 vgrow = Priority.ALWAYS
                 text("Authors") { addClass(Styles.title) }
-                listview(observableListOf(referencesController.authorMapping.values)) {
+                listview(observableListOf(referencesController.authorsProperty.values)) {
                     hgrow = Priority.ALWAYS
                     vgrow = Priority.ALWAYS
                     cellFragment(AuthorFragment::class)
@@ -61,7 +61,7 @@ class ZoteroView : JournalView() {
                 hgrow = Priority.ALWAYS
                 vgrow = Priority.ALWAYS
                 text("Sub-Collections") { addClass(Styles.title) }
-                listview(observableListOf(referencesController.subcollectionMapping.values)) {
+                listview(observableListOf(referencesController.subCollectionsProperty.values)) {
                     vgrow = Priority.ALWAYS
                 }
             }
@@ -70,18 +70,28 @@ class ZoteroView : JournalView() {
                 hgrow = Priority.ALWAYS
                 vgrow = Priority.ALWAYS
                 text("Items") { addClass(Styles.title) }
-                listview(observableListOf(referencesController.referenceMapping.values)) {
+                listview(observableListOf(referencesController.referencesProperty.values)) {
                     hgrow = Priority.ALWAYS
                     vgrow = Priority.ALWAYS
                     cellFragment(ReferenceFragment::class)
 
-                    referencesController.selectedReference.onChange {
+                    referencesController.selectedReferenceProperty.onChange {
                         selectionModel.select(it)
                         scrollTo(selectionModel.selectedIndex)
                         focusModel.focus(selectionModel.selectedIndex)
                         requestFocus()
                     }
                 }
+            }
+        }
+
+        rowConstraints.add(RowConstraints().also { it.vgrow = Priority.NEVER })
+        row {
+            button("Select all").action {
+                referencesController.authorsProperty.forEach { it.value.selectedProperty.set(true) }
+            }
+            button("Select all").action {
+                referencesController.subCollectionsProperty.forEach { it.value.selectedProperty.set(true) }
             }
         }
 
@@ -94,14 +104,14 @@ class ZoteroView : JournalView() {
                     disableWhen(
                         editorController.isValidSelection.not()
                             .or(editorController.isEditable.not())
-                            .or(referencesController.selectedReference.isNull)
+                            .or(referencesController.selectedReferenceProperty.isNull)
                     )
                     action {
                         editorController.current.get().referencesProperty.add(
                             ReferencePosition(
                                 start = editorController.selectionBounds.get().start,
                                 end = editorController.selectionBounds.get().end,
-                                reference = referencesController.selectedReference.get(),
+                                reference = referencesController.selectedReferenceProperty.get(),
                                 referenceType = referencesController.selectedType.get()
                             )
                         )

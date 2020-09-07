@@ -3,6 +3,7 @@ package main.kotlin.view.reference
 import main.kotlin.model.reference.Author
 import main.kotlin.model.reference.AuthorModel
 import tornadofx.ListCellFragment
+import tornadofx.checkbox
 import tornadofx.hbox
 import tornadofx.text
 
@@ -15,6 +16,10 @@ class AuthorFragment : ListCellFragment<Author>() {
     val entry = AuthorModel(itemProperty)
 
     override val root = hbox {
+        checkbox {
+            entry.isSelected.bindBidirectional(this.selectedProperty())
+        }
+
         text(entry.lastName)
         text(", ")
         text(entry.firstName)

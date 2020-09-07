@@ -45,6 +45,8 @@ class Reference(
     val journalAbbrProperty = SimpleStringProperty(journalAbbr)
 
     val languageProperty = SimpleStringProperty(language)
+
+    val subCollectionProperty = SimpleObjectProperty<SubCollection>()
 }
 
 class ReferenceModel(property: ObjectProperty<Reference>) : ItemViewModel<Reference>(itemProperty = property) {
@@ -67,5 +69,7 @@ class ReferenceModel(property: ObjectProperty<Reference>) : ItemViewModel<Refere
     val journalAbbr = bind(autocommit = true) { property.select { it.journalAbbrProperty } }
 
     val language = bind(autocommit = true) { property.select { it.languageProperty } }
+    val subCollection: ObjectProperty<SubCollection> =
+        bind(autocommit = false) { property.select { it.subCollectionProperty } }
 }
 

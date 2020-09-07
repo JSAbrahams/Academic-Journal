@@ -1,10 +1,11 @@
 package main.kotlin.view.reference
 
 import javafx.beans.binding.Bindings
+import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
-import javafx.scene.layout.Priority
+import main.kotlin.Styles
 import main.kotlin.controller.ReferencesController
 import main.kotlin.model.reference.Reference
 import main.kotlin.model.reference.ReferenceModel
@@ -17,40 +18,52 @@ class ReferenceFragment(item: Property<Reference>? = null) : ListCellFragment<Re
 
     val showAbstract = SimpleBooleanProperty(false)
 
-    // TODO move to stylesheet
-    private val WIDTH = 200.0
+    override val root = gridpane {
+        addClass(Styles.entryItem)
 
-    override val root = vbox {
-        hgrow = Priority.ALWAYS
-        maxWidth = WIDTH
+        disableWhen {
+            val anyAuthorSelected = entry.authors.fold(
+                SimpleBooleanProperty(false),
+                fun(acc, b): BooleanBinding { return Bindings.or(acc, b.selectedProperty.also { println(it) }) })
+
+            Bindings.`when`(entry.subCollection.isNotNull)
+                .then(anyAuthorSelected.and(
+                    // Final check, else NullPointer if null on view initialization (selectBoolean cannot handle null)
+                    if (entry.subCollection.isNotNull.get())
+                        entry.subCollection.selectBoolean { it.selectedProperty }
+                    else SimpleBooleanProperty(true)))
+                .otherwise(anyAuthorSelected)
+        }
 
         onLeftClick {
             showAbstract.set(entry.abstract.isNotBlank().get() && !showAbstract.get())
-            referenceController.selectedReference.set(entry.item)
+            referenceController.selectedReferenceProperty.set(entry.item)
         }
 
-        text(entry.title).managedWhen(entry.title.isNotBlank())
-        hbox {
+        row {
+            managedWhen(entry.title.isNotBlank())
+            text(entry.title) {
+                addClass(Styles.entryItemTitle)
+                gridpaneConstraints { columnSpan = 2 }
+            }
+        }
+
+        row {
             visibleWhen(entry.itemType.isNotBlank())
             managedWhen(entry.itemType.isNotBlank())
-            text("Type: ")
+
+            text("Type")
             text(entry.itemType)
         }
 
-        text("Authors")
-        listview(entry.authors) {
+        row {
             managedWhen(entry.authors.sizeProperty.greaterThan(0))
-            cellFragment(AuthorFragment::class)
-            prefHeightProperty().bind(Bindings.size(entry.authors).multiply(AuthorFragment.height))
-        }
+            visibleWhen(entry.authors.sizeProperty.greaterThan(0))
 
-        vbox {
-            visibleWhen(showAbstract)
-            managedWhen(showAbstract)
-
-            text("Abstract:")
-            text(entry.abstract) {
-                wrappingWidth = WIDTH
+            text("Authors")
+            listview(entry.authors) {
+                cellFragment(AuthorFragment::class)
+                prefHeightProperty().bind(Bindings.size(entry.authors).multiply(AuthorFragment.height))
             }
         }
     }

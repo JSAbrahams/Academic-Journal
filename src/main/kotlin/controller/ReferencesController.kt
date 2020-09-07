@@ -24,10 +24,10 @@ class ReferencesController : Controller() {
     val lastSync = SimpleObjectProperty(LocalDateTime.now())
 
     private val fieldTypes = mutableMapOf<String, Int>()
-    val authorMapping = SimpleMapProperty<Int, Author>()
-    val subcollectionMapping = SimpleMapProperty<Int, String>()
-    val referenceMapping = SimpleMapProperty<Int, Reference>()
-    val selectedReference = SimpleObjectProperty<Reference>()
+    val authorsProperty = SimpleMapProperty<Int, Author>()
+    val subCollectionsProperty = SimpleMapProperty<Int, SubCollection>()
+    val referencesProperty = SimpleMapProperty<Int, Reference>()
+    val selectedReferenceProperty = SimpleObjectProperty<Reference>()
 
     val selectedType = SimpleObjectProperty(ReferenceType.HIGHLIGHT)
     val typeColors = SimpleMapProperty(
@@ -38,9 +38,9 @@ class ReferencesController : Controller() {
     )
 
     init {
-        referenceMapping.onChange {
+        referencesProperty.onChange {
             if (journalController.journalProperty.isNotNull.get()) {
-                journalController.journalProperty.get().loadReference(referenceMapping.toMap())
+                journalController.journalProperty.get().loadReference(referencesProperty.toMap())
             }
         }
     }
@@ -81,41 +81,48 @@ class ReferencesController : Controller() {
         val referenceMapping = mutableMapOf<Int, Reference>()
 
         transaction {
-
             Items.selectAll().forEach { result ->
                 val itemType = ItemTypes
                     .select { ItemTypes.itemTypeId eq result[Items.itemTypeId] }
                     .firstOrNull()?.get(ItemTypes.typeName) ?: ""
 
-                val field = { fieldType: String ->
-                    val abstractValueId = ItemData
-                        .select { ItemData.itemId eq result[Items.itemId] and (ItemData.fieldId eq fieldTypes[fieldType]!!) }
-                        .firstOrNull()?.get(ItemData.valueId) ?: -1
-                    ItemDataValues
-                        .select { ItemDataValues.valueId eq abstractValueId }
-                        .firstOrNull()?.get(ItemDataValues.value) ?: ""
-                }
+                if (!IGNORED_TYPES.contains(itemType)) {
+                    val field = { fieldType: String ->
+                        val abstractValueId = ItemData
+                            .select { ItemData.itemId eq result[Items.itemId] and (ItemData.fieldId eq fieldTypes[fieldType]!!) }
+                            .firstOrNull()?.get(ItemData.valueId) ?: -1
+                        ItemDataValues
+                            .select { ItemDataValues.valueId eq abstractValueId }
+                            .firstOrNull()?.get(ItemDataValues.value) ?: ""
+                    }
 
-                if (!IGNORED_TYPES.contains(itemType)) referenceMapping[result[Items.itemId]] = Reference(
-                    id = result[Items.itemId],
-                    itemType = itemType,
-                    title = field(FIELD_TITLE),
-                    authors = ItemCreators.select { ItemCreators.itemId eq result[Items.itemId] }.flatMap {
+                    val authors = ItemCreators.select { ItemCreators.itemId eq result[Items.itemId] }.flatMap {
                         Creators.select { Creators.creatorId eq it[ItemCreators.creatorId] }.map { creator ->
-                            Author(creator[Creators.firstName], creator[Creators.lastName])
+                            Author(creator[Creators.creatorId], creator[Creators.firstName], creator[Creators.lastName])
                         }
-                    },
-                    abstract = field(ABSTRACT_NOTE)
-                )
+                    }
+
+                    referenceMapping[result[Items.itemId]] = Reference(
+                        id = result[Items.itemId],
+                        itemType = itemType,
+                        title = field(FIELD_TITLE),
+                        authors = authors,
+                        abstract = field(ABSTRACT_NOTE)
+                    )
+                    authors.forEach { authorMapping[it.id] = it }
+                }
             }
 
+            // Remaining authors
             Creators.selectAll().forEach {
-                authorMapping[it[Creators.creatorId]] = Author(it[Creators.firstName], it[Creators.lastName])
+                if (!authorMapping.containsKey(it[Creators.creatorId]))
+                    authorMapping[it[Creators.creatorId]] =
+                        Author(it[Creators.creatorId], it[Creators.firstName], it[Creators.lastName])
             }
         }
 
-        this.authorMapping.set(authorMapping.toObservable())
-        this.referenceMapping.set(referenceMapping.toObservable())
+        this.authorsProperty.set(authorMapping.toObservable())
+        this.referencesProperty.set(referenceMapping.toObservable())
         lastSync.set(LocalDateTime.now())
     }
 }

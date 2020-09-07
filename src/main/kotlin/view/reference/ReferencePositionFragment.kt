@@ -30,7 +30,7 @@ class ReferencePositionFragment : ListCellFragment<ReferencePosition>() {
 
         setOnMouseClicked {
             if (it.clickCount == 2 && entry.reference.isNotNull.get()) {
-                referencesController.selectedReference.set(entry.reference.value)
+                referencesController.selectedReferenceProperty.set(entry.reference.value)
                 referencesView.openWindow(owner = currentWindow, block = true)
             }
         }
