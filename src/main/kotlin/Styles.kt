@@ -26,6 +26,7 @@ class Styles : Stylesheet() {
 
         val entryItem by cssclass()
         val entryItemTitle by cssclass()
+        val textEntry by cssclass()
 
         val customContainer by cssclass()
         val nestedContainer by cssclass()
@@ -85,6 +86,13 @@ class Styles : Stylesheet() {
             padding = box(0.px)
             spacing = 5.px
             hgap = 5.px
+        }
+        textEntry {
+            text {
+                disabled {
+                    textFill = Color.GREEN
+                }
+            }
         }
     }
 }

@@ -1,9 +1,7 @@
 package main.kotlin.view.reference
 
 import javafx.beans.binding.Bindings
-import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.Property
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import main.kotlin.Styles
 import main.kotlin.controller.ReferencesController
@@ -16,32 +14,10 @@ class ReferenceFragment(item: Property<Reference>? = null) : ListCellFragment<Re
 
     val entry = ReferenceModel(item?.let { SimpleObjectProperty(it.value) } ?: itemProperty)
 
-    val showAbstract = SimpleBooleanProperty(false)
-
     override val root = gridpane {
         addClass(Styles.entryItem)
 
-        run {
-            val bindWhen = { ->
-                val anyAuthorSelected = entry.authors.fold(
-                    SimpleBooleanProperty(false),
-                    fun(acc, b): BooleanBinding { return Bindings.or(acc, b.selectedProperty) })
-
-                disableProperty().cleanBind(
-                    if (entry.collection.isNull.get()) {
-                        anyAuthorSelected
-                    } else {
-                        anyAuthorSelected.and(entry.collection.selectBoolean { it.selectedProperty })
-                    }.not()
-                )
-            }
-
-            bindWhen.invoke()
-            entry.authors.onChange { bindWhen.invoke() }
-        }
-
         onLeftClick {
-            showAbstract.set(entry.abstract.isNotBlank().get() && !showAbstract.get())
             referenceController.selectedReferenceProperty.set(entry.item)
         }
 

@@ -1,7 +1,9 @@
 package main.kotlin.controller
 
+import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleMapProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.collections.SetChangeListener
 import javafx.scene.paint.Color
 import main.kotlin.model.journal.ReferenceType
 import main.kotlin.model.reference.*
@@ -11,9 +13,9 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import tornadofx.Controller
 import tornadofx.asObservable
 import tornadofx.onChange
-import tornadofx.toObservable
 import java.io.File
 import java.time.LocalDateTime
+import kotlin.collections.set
 
 class ReferencesController : Controller() {
     val journalController: JournalController by inject()
@@ -28,6 +30,10 @@ class ReferencesController : Controller() {
     val authorsProperty = SimpleMapProperty<Int, Author>()
     val collectionsProperty = SimpleMapProperty<Int, Collection>()
     val referencesProperty = SimpleMapProperty<Int, Reference>()
+
+    private val filteredReferences = mutableSetOf<Reference>().asObservable()
+    val filteredReferencesProperty = SimpleListProperty(mutableListOf<Reference>().asObservable())
+
     val selectedReferenceProperty = SimpleObjectProperty<Reference>()
 
     val selectedType = SimpleObjectProperty(ReferenceType.HIGHLIGHT)
@@ -39,11 +45,42 @@ class ReferencesController : Controller() {
     )
 
     init {
+        this.filteredReferences.addListener { c: SetChangeListener.Change<out Reference> ->
+            if (c.wasAdded()) filteredReferencesProperty.add(c.elementAdded)
+            if (c.wasRemoved()) filteredReferencesProperty.remove(c.elementRemoved)
+        }
+
+        authorsProperty.onChange {
+            checkFilters()
+            it?.forEach { _, author -> author.selectedProperty.onChange { checkFilters() } }
+        }
+        collectionsProperty.onChange {
+            checkFilters()
+            it?.forEach { _, collection -> collection.selectedProperty.onChange { checkFilters() } }
+        }
+
         referencesProperty.onChange {
             if (journalController.journalProperty.isNotNull.get()) {
                 journalController.journalProperty.get().loadReference(referencesProperty.toMap())
             }
+
+            filteredReferences.addAll(it?.values?.toList() ?: emptyList())
+            // Re-apply filters, in case we make selected properties non volatile
+            checkFilters()
         }
+    }
+
+    private fun checkFilters() {
+        filteredReferences.removeIf { reference ->
+            val collectionUnselected = reference.collectionProperty.value?.selectedProperty?.not()?.get() ?: true
+            val allAuthorUnselected = reference.authorProperty.value?.all { it.selectedProperty.not().get() } ?: true
+            collectionUnselected || allAuthorUnselected
+        }
+        filteredReferences.addAll(referencesProperty.values.filter { reference ->
+            val collectionSelected = reference.collectionProperty.value?.selectedProperty?.get() ?: false
+            val anyAuthorSelected = reference.authorProperty.value?.any { it.selectedProperty.get() } ?: false
+            collectionSelected && anyAuthorSelected
+        })
     }
 
     fun connect() {
@@ -78,67 +115,51 @@ class ReferencesController : Controller() {
     fun refreshReferences() {
         if (!connected) return
 
-        val authorMapping = mutableMapOf<Int, Author>()
-        val referenceMapping = mutableMapOf<Int, Reference>()
-        val collectionMapping = mutableMapOf<Int, Collection>()
-
         transaction {
-            Items.selectAll().forEach { result ->
+            authorsProperty.set(Creators.selectAll().map { creator ->
+                creator[Creators.id] to Author(
+                    creator[Creators.id],
+                    creator[Creators.firstName],
+                    creator[Creators.lastName]
+                )
+            }.toMap().asObservable())
+
+            collectionsProperty.set(Collections.selectAll().map { collection ->
+                collection[Collections.id] to Collection(collection[Collections.id], collection[Collections.name])
+            }.toMap().asObservable())
+
+            referencesProperty.set(Items.selectAll().map { result ->
                 val itemType = ItemTypes
                     .select { ItemTypes.itemTypeId eq result[Items.itemTypeId] }
                     .firstOrNull()?.get(ItemTypes.typeName) ?: ""
 
-                if (!IGNORED_TYPES.contains(itemType)) {
-                    val field = { fieldType: String ->
-                        val abstractValueId = ItemData
-                            .select { ItemData.itemId eq result[Items.id] and (ItemData.fieldId eq fieldTypes[fieldType]!!) }
-                            .firstOrNull()?.get(ItemData.valueId) ?: -1
-                        ItemDataValues
-                            .select { ItemDataValues.valueId eq abstractValueId }
-                            .firstOrNull()?.get(ItemDataValues.value) ?: ""
-                    }
-
-                    val authors = ItemCreators.select { ItemCreators.itemId eq result[Items.id] }.flatMap {
-                        Creators.select { Creators.id eq it[ItemCreators.id] }.map { creator ->
-                            Author(creator[Creators.id], creator[Creators.firstName], creator[Creators.lastName])
-                        }
-                    }
-
-                    val collectionItem =
-                        CollectionItems.select { CollectionItems.itemId eq result[Items.id] }.firstOrNull()
-                    val collection: Collection? = if (collectionItem != null) {
-                        Collections.select { Collections.id eq collectionItem[CollectionItems.collectionId] }
-                            .firstOrNull()
-                            ?.let { Collection(it[Collections.id], it[Collections.name]) }
-                    } else null
-
-                    referenceMapping[result[Items.id]] = Reference(
-                        id = result[Items.id],
-                        itemType = itemType,
-                        title = field(FIELD_TITLE),
-                        authors = authors,
-                        abstract = field(ABSTRACT_NOTE),
-                        collection = collection
-                    )
-
-                    authors.forEach { authorMapping[it.id] = it }
-                    if (collection != null && !collectionMapping.containsKey(collection.id)) {
-                        collectionMapping[collection.id] = collection
-                    }
+                val field = { fieldType: String ->
+                    val abstractValueId = ItemData
+                        .select { ItemData.itemId eq result[Items.id] and (ItemData.fieldId eq fieldTypes[fieldType]!!) }
+                        .firstOrNull()?.get(ItemData.valueId) ?: -1
+                    ItemDataValues
+                        .select { ItemDataValues.valueId eq abstractValueId }
+                        .firstOrNull()?.get(ItemDataValues.value) ?: ""
                 }
-            }
 
-            // Remaining authors
-            Creators.selectAll().forEach {
-                if (!authorMapping.containsKey(it[Creators.id]))
-                    authorMapping[it[Creators.id]] =
-                        Author(it[Creators.id], it[Creators.firstName], it[Creators.lastName])
-            }
+                val creatorIds: List<Int> =
+                    ItemCreators.select { ItemCreators.itemId eq result[Items.id] }.map { it[ItemCreators.creatorId] }
+                val collectionId: Int = CollectionItems
+                    .select { CollectionItems.itemId eq result[Items.id] }
+                    .firstOrNull()
+                    ?.let { it[CollectionItems.collectionId] } ?: -1
+
+                result[Items.id] to Reference(
+                    id = result[Items.id],
+                    itemType = itemType,
+                    title = field(FIELD_TITLE),
+                    authors = authorsProperty.values.filter { author -> creatorIds.contains(author.id) },
+                    abstract = field(ABSTRACT_NOTE),
+                    collection = collectionsProperty[collectionId]
+                )
+            }.toMap().asObservable())
         }
 
-        this.authorsProperty.set(authorMapping.toObservable())
-        this.referencesProperty.set(referenceMapping.toObservable())
-        this.collectionsProperty.set(collectionMapping.toObservable())
         lastSync.set(LocalDateTime.now())
     }
 }

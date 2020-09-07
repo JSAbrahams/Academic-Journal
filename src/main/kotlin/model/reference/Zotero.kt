@@ -33,7 +33,7 @@ object Creators : Table() {
 // Mapping from Items to creators
 object ItemCreators : Table() {
     val itemId = integer("itemID")
-    val id = integer("creatorID")
+    val creatorId = integer("creatorID")
     val creatorTypeId = integer("creatorTypeID")
     override val primaryKey = PrimaryKey(itemId, name = "itemID")
 }

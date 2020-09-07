@@ -1,5 +1,6 @@
 package main.kotlin.view.reference
 
+import main.kotlin.Styles
 import main.kotlin.model.reference.Author
 import main.kotlin.model.reference.AuthorModel
 import tornadofx.*
@@ -32,6 +33,7 @@ class SimpleAuthorFragment : ListCellFragment<Author>() {
     val entry = AuthorModel(itemProperty)
 
     override val root = hbox {
+        addClass(Styles.textEntry)
         enableWhen(entry.isSelected)
 
         text(entry.lastName)
