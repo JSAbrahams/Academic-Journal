@@ -84,6 +84,7 @@ class Styles : Stylesheet() {
         entryItem {
             padding = box(0.px)
             spacing = 5.px
+            hgap = 5.px
         }
     }
 }

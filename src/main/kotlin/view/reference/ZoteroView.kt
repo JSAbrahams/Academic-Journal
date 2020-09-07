@@ -60,9 +60,10 @@ class ZoteroView : JournalView() {
             vbox {
                 hgrow = Priority.ALWAYS
                 vgrow = Priority.ALWAYS
-                text("Sub-Collections") { addClass(Styles.title) }
-                listview(observableListOf(referencesController.subCollectionsProperty.values)) {
+                text("Collections") { addClass(Styles.title) }
+                listview(observableListOf(referencesController.collectionsProperty.values)) {
                     vgrow = Priority.ALWAYS
+                    cellFragment(CollectionFragment::class)
                 }
             }
 
@@ -91,7 +92,7 @@ class ZoteroView : JournalView() {
                 referencesController.authorsProperty.forEach { it.value.selectedProperty.set(true) }
             }
             button("Select all").action {
-                referencesController.subCollectionsProperty.forEach { it.value.selectedProperty.set(true) }
+                referencesController.collectionsProperty.forEach { it.value.selectedProperty.set(true) }
             }
         }
 
@@ -101,10 +102,10 @@ class ZoteroView : JournalView() {
                 addClass(Styles.buttons)
 
                 button("+") {
-                    disableWhen(
-                        editorController.isValidSelection.not()
-                            .or(editorController.isEditable.not())
-                            .or(referencesController.selectedReferenceProperty.isNull)
+                    enableWhen(
+                        editorController.isValidSelection
+                            .and(editorController.isEditable)
+                            .and(referencesController.selectedReferenceProperty.isNotNull)
                     )
                     action {
                         editorController.current.get().referencesProperty.add(

@@ -2,15 +2,12 @@ package main.kotlin.view.reference
 
 import main.kotlin.model.reference.Author
 import main.kotlin.model.reference.AuthorModel
-import tornadofx.ListCellFragment
-import tornadofx.checkbox
-import tornadofx.hbox
-import tornadofx.text
+import tornadofx.*
 
 class AuthorFragment : ListCellFragment<Author>() {
     companion object {
         // According to Javafx documentation of cell height
-        val height = 24
+        const val height = 24
     }
 
     val entry = AuthorModel(itemProperty)
@@ -19,6 +16,23 @@ class AuthorFragment : ListCellFragment<Author>() {
         checkbox {
             entry.isSelected.bindBidirectional(this.selectedProperty())
         }
+
+        text(entry.lastName)
+        text(", ")
+        text(entry.firstName)
+    }
+}
+
+class SimpleAuthorFragment : ListCellFragment<Author>() {
+    companion object {
+        // According to Javafx documentation of cell height
+        const val height = 24
+    }
+
+    val entry = AuthorModel(itemProperty)
+
+    override val root = hbox {
+        enableWhen(entry.isSelected)
 
         text(entry.lastName)
         text(", ")

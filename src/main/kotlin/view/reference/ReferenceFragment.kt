@@ -25,17 +25,15 @@ class ReferenceFragment(item: Property<Reference>? = null) : ListCellFragment<Re
             val bindWhen = { ->
                 val anyAuthorSelected = entry.authors.fold(
                     SimpleBooleanProperty(false),
-                    fun(acc, b): BooleanBinding { return Bindings.or(acc, b.selectedProperty.also { println(it) }) })
+                    fun(acc, b): BooleanBinding { return Bindings.or(acc, b.selectedProperty) })
 
                 disableProperty().cleanBind(
-                    Bindings.`when`(entry.subCollection.isNotNull)
-                        .then(anyAuthorSelected.and(
-                            // Final check, else NullPointer if null on view initialization (selectBoolean cannot handle null)
-                            if (entry.subCollection.isNotNull.get())
-                                entry.subCollection.selectBoolean { it.selectedProperty }
-                            else SimpleBooleanProperty(true)))
-                        .otherwise(anyAuthorSelected)
-                        .not())
+                    if (entry.collection.isNull.get()) {
+                        anyAuthorSelected
+                    } else {
+                        anyAuthorSelected.and(entry.collection.selectBoolean { it.selectedProperty })
+                    }.not()
+                )
             }
 
             bindWhen.invoke()
@@ -56,6 +54,14 @@ class ReferenceFragment(item: Property<Reference>? = null) : ListCellFragment<Re
         }
 
         row {
+            visibleWhen(entry.collection.isNotNull)
+            managedWhen(entry.collection.isNotNull)
+
+            text("Collection")
+            text(entry.collection.select { it.nameProperty })
+        }
+
+        row {
             visibleWhen(entry.itemType.isNotBlank())
             managedWhen(entry.itemType.isNotBlank())
 
@@ -69,7 +75,7 @@ class ReferenceFragment(item: Property<Reference>? = null) : ListCellFragment<Re
 
             text("Authors")
             listview(entry.authors) {
-                cellFragment(AuthorFragment::class)
+                cellFragment(SimpleAuthorFragment::class)
                 prefHeightProperty().bind(Bindings.size(entry.authors).multiply(AuthorFragment.height))
             }
         }
