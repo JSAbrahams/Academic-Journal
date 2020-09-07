@@ -21,18 +21,25 @@ class ReferenceFragment(item: Property<Reference>? = null) : ListCellFragment<Re
     override val root = gridpane {
         addClass(Styles.entryItem)
 
-        disableWhen {
-            val anyAuthorSelected = entry.authors.fold(
-                SimpleBooleanProperty(false),
-                fun(acc, b): BooleanBinding { return Bindings.or(acc, b.selectedProperty.also { println(it) }) })
+        run {
+            val bindWhen = { ->
+                val anyAuthorSelected = entry.authors.fold(
+                    SimpleBooleanProperty(false),
+                    fun(acc, b): BooleanBinding { return Bindings.or(acc, b.selectedProperty.also { println(it) }) })
 
-            Bindings.`when`(entry.subCollection.isNotNull)
-                .then(anyAuthorSelected.and(
-                    // Final check, else NullPointer if null on view initialization (selectBoolean cannot handle null)
-                    if (entry.subCollection.isNotNull.get())
-                        entry.subCollection.selectBoolean { it.selectedProperty }
-                    else SimpleBooleanProperty(true)))
-                .otherwise(anyAuthorSelected)
+                disableProperty().cleanBind(
+                    Bindings.`when`(entry.subCollection.isNotNull)
+                        .then(anyAuthorSelected.and(
+                            // Final check, else NullPointer if null on view initialization (selectBoolean cannot handle null)
+                            if (entry.subCollection.isNotNull.get())
+                                entry.subCollection.selectBoolean { it.selectedProperty }
+                            else SimpleBooleanProperty(true)))
+                        .otherwise(anyAuthorSelected)
+                        .not())
+            }
+
+            bindWhen.invoke()
+            entry.authors.onChange { bindWhen.invoke() }
         }
 
         onLeftClick {
