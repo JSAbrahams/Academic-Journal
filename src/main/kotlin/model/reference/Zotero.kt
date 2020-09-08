@@ -7,8 +7,6 @@ val ZOTERO_VERSION = "5.0.89"
 val FIELD_TITLE = "title"
 val ABSTRACT_NOTE = "abstractNote"
 
-val IGNORED_TYPES = setOf("attachment", "note")
-
 // Collections
 object Collections : Table() {
     val id = integer("collectionId")

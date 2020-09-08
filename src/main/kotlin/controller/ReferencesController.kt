@@ -73,12 +73,16 @@ class ReferencesController : Controller() {
     private fun checkFilters() {
         filteredReferences.removeIf { reference ->
             val collectionUnselected = reference.collectionProperty.value?.selectedProperty?.not()?.get() ?: true
-            val allAuthorUnselected = reference.authorProperty.value?.all { it.selectedProperty.not().get() } ?: true
+            // If no authors, then false, not allowed to filter by author
+            val allAuthorUnselected = reference.authorProperty.isNotEmpty() &&
+                    reference.authorProperty.value?.all { it.selectedProperty.not().get() } ?: false
             collectionUnselected || allAuthorUnselected
         }
         filteredReferences.addAll(referencesProperty.values.filter { reference ->
             val collectionSelected = reference.collectionProperty.value?.selectedProperty?.get() ?: false
-            val anyAuthorSelected = reference.authorProperty.value?.any { it.selectedProperty.get() } ?: false
+            // If no authors, treat as though selected for now
+            val anyAuthorSelected =
+                reference.authorProperty.isEmpty() || reference.authorProperty.value?.any { it.selectedProperty.get() } ?: true
             collectionSelected && anyAuthorSelected
         })
     }
