@@ -71,7 +71,7 @@ class ZoteroView : JournalView() {
                 hgrow = Priority.ALWAYS
                 vgrow = Priority.ALWAYS
                 text("Items") { addClass(Styles.title) }
-                listview(observableListOf(referencesController.filteredReferencesProperty)) {
+                listview(referencesController.filteredReferencesProperty) {
                     hgrow = Priority.ALWAYS
                     vgrow = Priority.ALWAYS
                     cellFragment(ReferenceFragment::class)
