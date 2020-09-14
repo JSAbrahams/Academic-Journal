@@ -99,12 +99,13 @@ class JournalEntry(
     fun asSimpleMarkdown(): String {
         val text = StringBuilder(textProperty.get())
         // every time we insert a reference, we must increment the offset
-        var offset = 1
+        var offset = 0
 
-        val references = referencesProperty.map { it.referenceProperty.value }.distinct()
+        val references =
+            referencesProperty.sortedBy { it.startProperty.get() }.map { it.referenceProperty.value }.distinct()
         val referenceNumbers = references.mapIndexed { index, reference -> reference to index + 1 }.toMap()
 
-        referencesProperty.forEach {
+        referencesProperty.sortedBy { it.endProperty.get() }.forEach {
             text.insert(it.endProperty.get() + offset, " [${referenceNumbers[it.referenceProperty.value]}]")
             offset += 4
         }
