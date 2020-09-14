@@ -110,12 +110,26 @@ class JournalEntry(
             offset += 4
         }
 
-        text.append("\n\n\n")
+        text.append(
+            if (referencesProperty.isNotEmpty()) {
+                "\n ## References\n"
+            } else {
+                "\n\n\n"
+            }
+        )
+
         referenceNumbers.forEach { (reference, index) ->
-            text.append("$index. [${reference.titleProperty.get()}](${reference.urlProperty.get()})\n")
+            text.append("$index. ${reference.titleProperty.get()} | ")
+            text.append(
+                if (reference.doiProperty.get().isEmpty()) {
+                    "[${reference.urlProperty.get()}](${reference.urlProperty.get()})\n"
+                } else {
+                    "[${reference.doiProperty.get()}](${reference.urlProperty.get()})\n"
+                }
+            )
         }
 
-        return "# ${titleProperty.get()}\n" + text
+        return "# ${titleProperty.get()}\n\n" + text
     }
 
     override fun equals(other: Any?): Boolean = other is JournalEntry
