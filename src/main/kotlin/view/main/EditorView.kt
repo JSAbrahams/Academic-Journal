@@ -1,14 +1,9 @@
 package main.kotlin.view.main
 
 import javafx.collections.ObservableList
-import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.Label
-import javafx.scene.layout.Background
-import javafx.scene.layout.BackgroundFill
-import javafx.scene.layout.CornerRadii
 import javafx.scene.layout.Priority
-import javafx.scene.paint.Color
 import javafx.stage.Popup
 import main.kotlin.JournalApp
 import main.kotlin.Styles
@@ -70,8 +65,8 @@ class EditorView : JournalView() {
                 disableWhen(editorController.plainMarkdown or editorController.isEditable)
                 hiddenWhen(editorController.plainMarkdown or editorController.isEditable)
                 managedWhen(editorController.plainMarkdown.not() and editorController.isEditable.not())
-                fitToParentSize()
                 vgrow = Priority.ALWAYS
+                hgrow = Priority.ALWAYS
 
                 val parser = Parser.builder().build()
                 // Retrieved from https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js
@@ -93,22 +88,24 @@ class EditorView : JournalView() {
                 editorController.current.onChange { update() }
                 editorController.plainMarkdown.onChange { update() }
             }
-            text {
+            scrollpane {
                 disableWhen(editorController.plainMarkdown.not() or editorController.isEditable)
                 hiddenWhen(editorController.plainMarkdown.not() or editorController.isEditable)
                 managedWhen(editorController.plainMarkdown and editorController.isEditable.not())
-                fitToParentSize()
+                vgrow = Priority.ALWAYS
+                hgrow = Priority.ALWAYS
 
-                fun update() {
-                    if (editorController.isEditable.not().get() && editorController.current.isNotNull.get()) {
-                        text = editorController.current.value.asSimpleMarkdown()
+                text {
+                    fun update() {
+                        if (editorController.isEditable.not().get() && editorController.current.isNotNull.get()) {
+                            text = editorController.current.value.asSimpleMarkdown()
+                        }
                     }
-                }
 
-                background = Background(BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY))
-                editorController.isEditable.onChange { update() }
-                editorController.current.onChange { update() }
-                editorController.plainMarkdown.onChange { update() }
+                    editorController.isEditable.onChange { update() }
+                    editorController.current.onChange { update() }
+                    editorController.plainMarkdown.onChange { update() }
+                }
             }
 
             run {
