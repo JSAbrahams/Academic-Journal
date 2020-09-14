@@ -4,8 +4,10 @@ import org.jetbrains.exposed.sql.Table
 
 val ZOTERO_VERSION = "5.0.89"
 
-val FIELD_TITLE = "title"
-val ABSTRACT_NOTE = "abstractNote"
+const val FIELD_TITLE = "title"
+const val ABSTRACT_NOTE = "abstractNote"
+const val DOI = "DOI"
+const val URL = "url"
 
 // Collections
 object Collections : Table() {

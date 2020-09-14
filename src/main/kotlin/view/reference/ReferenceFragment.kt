@@ -46,6 +46,22 @@ class ReferenceFragment(item: Property<Reference>? = null) : ListCellFragment<Re
         }
 
         row {
+            visibleWhen(entry.doi.isNotBlank())
+            managedWhen(entry.doi.isNotBlank())
+
+            text("DOI")
+            text(entry.doi)
+        }
+
+        row {
+            visibleWhen(entry.url.isNotBlank())
+            managedWhen(entry.url.isNotBlank())
+
+            text("URL")
+            hyperlink(entry.url).action { hostServices.showDocument(entry.url.value) }
+        }
+
+        row {
             managedWhen(entry.authors.sizeProperty.greaterThan(0))
             visibleWhen(entry.authors.sizeProperty.greaterThan(0))
 

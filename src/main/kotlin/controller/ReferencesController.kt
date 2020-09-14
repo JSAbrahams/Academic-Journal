@@ -107,6 +107,12 @@ class ReferencesController : Controller() {
             fieldTypes[ABSTRACT_NOTE] = Fields
                 .select { Fields.fieldName eq ABSTRACT_NOTE }
                 .firstOrNull()?.get(Fields.fieldId) ?: -1
+            fieldTypes[DOI] = Fields
+                .select { Fields.fieldName eq DOI }
+                .firstOrNull()?.get(Fields.fieldId) ?: -1
+            fieldTypes[URL] = Fields
+                .select { Fields.fieldName eq URL }
+                .firstOrNull()?.get(Fields.fieldId) ?: -1
         }
 
         connected = true
@@ -159,7 +165,9 @@ class ReferencesController : Controller() {
                     title = field(FIELD_TITLE),
                     authors = authorsProperty.values.filter { author -> creatorIds.contains(author.id) },
                     abstract = field(ABSTRACT_NOTE),
-                    collection = collectionsProperty[collectionId]
+                    collection = collectionsProperty[collectionId],
+                    url = field(URL),
+                    doi = field(DOI)
                 )
             }.toMap().asObservable())
         }
