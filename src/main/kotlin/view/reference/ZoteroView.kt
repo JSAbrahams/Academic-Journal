@@ -1,5 +1,8 @@
 package main.kotlin.view.reference
 
+import javafx.scene.layout.ColumnConstraints
+import javafx.scene.layout.Priority
+import javafx.scene.layout.RowConstraints
 import main.kotlin.Styles
 import main.kotlin.controller.EditorController
 import main.kotlin.controller.ReferencesController
@@ -15,6 +18,11 @@ class ZoteroView : JournalView() {
     override val root = gridpane {
         addClass(Styles.customContainer)
 
+        columnConstraints.add(ColumnConstraints().also { it.hgrow = Priority.SOMETIMES })
+        columnConstraints.add(ColumnConstraints().also { it.hgrow = Priority.SOMETIMES })
+        columnConstraints.add(ColumnConstraints().also { it.hgrow = Priority.ALWAYS })
+
+        rowConstraints.add(RowConstraints().also { it.vgrow = Priority.NEVER })
         row {
             gridpane {
                 gridpaneConstraints { columnSpan = 2 }
@@ -34,24 +42,41 @@ class ZoteroView : JournalView() {
                     }
                 }
             }
-
         }
 
-
+        rowConstraints.add(RowConstraints().also { it.vgrow = Priority.ALWAYS })
         row {
             vbox {
+                hgrow = Priority.ALWAYS
+                vgrow = Priority.ALWAYS
                 text("Authors") { addClass(Styles.title) }
-                listview(observableListOf(referencesController.authorMapping.values)) {
+                listview(observableListOf(referencesController.authorsProperty.values)) {
+                    hgrow = Priority.ALWAYS
+                    vgrow = Priority.ALWAYS
                     cellFragment(AuthorFragment::class)
                 }
             }
 
             vbox {
+                hgrow = Priority.ALWAYS
+                vgrow = Priority.ALWAYS
+                text("Collections") { addClass(Styles.title) }
+                listview(observableListOf(referencesController.collectionsProperty.values)) {
+                    vgrow = Priority.ALWAYS
+                    cellFragment(CollectionFragment::class)
+                }
+            }
+
+            vbox {
+                hgrow = Priority.ALWAYS
+                vgrow = Priority.ALWAYS
                 text("Items") { addClass(Styles.title) }
-                listview(observableListOf(referencesController.referenceMapping.values)) {
+                listview(referencesController.filteredReferencesProperty) {
+                    hgrow = Priority.ALWAYS
+                    vgrow = Priority.ALWAYS
                     cellFragment(ReferenceFragment::class)
 
-                    referencesController.selectedReference.onChange {
+                    referencesController.selectedReferenceProperty.onChange {
                         selectionModel.select(it)
                         scrollTo(selectionModel.selectedIndex)
                         focusModel.focus(selectionModel.selectedIndex)
@@ -61,22 +86,33 @@ class ZoteroView : JournalView() {
             }
         }
 
+        rowConstraints.add(RowConstraints().also { it.vgrow = Priority.NEVER })
+        row {
+            button("Select all").action {
+                referencesController.authorsProperty.forEach { it.value.selectedProperty.set(true) }
+            }
+            button("Select all").action {
+                referencesController.collectionsProperty.forEach { it.value.selectedProperty.set(true) }
+            }
+        }
+
+        rowConstraints.add(RowConstraints().also { it.vgrow = Priority.NEVER })
         row {
             hbox {
                 addClass(Styles.buttons)
 
                 button("+") {
-                    disableWhen(
-                        editorController.isValidSelection.not()
-                            .or(editorController.isEditable.not())
-                            .or(referencesController.selectedReference.isNull)
+                    enableWhen(
+                        editorController.isValidSelection
+                            .and(editorController.isEditable)
+                            .and(referencesController.selectedReferenceProperty.isNotNull)
                     )
                     action {
                         editorController.current.get().referencesProperty.add(
                             ReferencePosition(
                                 start = editorController.selectionBounds.get().start,
                                 end = editorController.selectionBounds.get().end,
-                                reference = referencesController.selectedReference.get(),
+                                reference = referencesController.selectedReferenceProperty.get(),
                                 referenceType = referencesController.selectedType.get()
                             )
                         )

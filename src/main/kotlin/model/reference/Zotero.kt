@@ -4,17 +4,30 @@ import org.jetbrains.exposed.sql.Table
 
 val ZOTERO_VERSION = "5.0.89"
 
-val FIELD_TITLE = "title"
-val ABSTRACT_NOTE = "abstractNote"
+const val FIELD_TITLE = "title"
+const val ABSTRACT_NOTE = "abstractNote"
+const val DOI = "DOI"
+const val URL = "url"
 
-val IGNORED_TYPES = setOf("attachment", "note")
+// Collections
+object Collections : Table() {
+    val id = integer("collectionId")
+    val name = text("collectionName")
+    override val primaryKey = PrimaryKey(id, name = "collectionID")
+}
+
+// Collection mappings
+object CollectionItems : Table() {
+    val collectionId = integer("collectionID")
+    val itemId = integer("itemID")
+}
 
 // Authors
 object Creators : Table() {
-    val creatorId = integer("creatorID")
+    val id = integer("creatorID")
     val firstName = text("firstName")
     val lastName = text("lastName")
-    override val primaryKey = PrimaryKey(creatorId, name = "creatorID")
+    override val primaryKey = PrimaryKey(id, name = "creatorID")
 }
 
 // Mapping from Items to creators
@@ -27,10 +40,10 @@ object ItemCreators : Table() {
 
 // List of actual items in the Zotero application
 object Items : Table() {
-    val itemId = integer("itemID")
+    val id = integer("itemID")
     val itemTypeId = integer("itemTypeID")
     val library = integer("libraryID")
-    override val primaryKey = PrimaryKey(itemId, name = "itemID")
+    override val primaryKey = PrimaryKey(id, name = "itemID")
 }
 
 // Mapping from Item Type ID to Item type

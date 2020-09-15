@@ -19,6 +19,8 @@ class EditorController : Controller() {
     val isEditMode = SimpleBooleanProperty()
     val isEditable = current.isNotNull.and(isEditMode)
 
+    val plainMarkdown = SimpleBooleanProperty(false)
+
     val selectionBounds = SimpleObjectProperty<IndexRange>()
     val isValidSelection = current.isNotNull.and(selectionBounds.isNotNull)
 

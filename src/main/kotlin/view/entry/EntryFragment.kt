@@ -23,7 +23,9 @@ class EntryFragment : ListCellFragment<JournalEntry>() {
         }
 
         vbox {
-            text(entry.title)
+            text(entry.title) {
+                addClass(Styles.entryItemTitle)
+            }
             text().bind(entry.creation)
 
             tagbar(entry.tags) {

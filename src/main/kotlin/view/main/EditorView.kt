@@ -62,6 +62,12 @@ class EditorView : JournalView() {
             }
 
             webview {
+                disableWhen(editorController.plainMarkdown or editorController.isEditable)
+                hiddenWhen(editorController.plainMarkdown or editorController.isEditable)
+                managedWhen(editorController.plainMarkdown.not() and editorController.isEditable.not())
+                vgrow = Priority.ALWAYS
+                hgrow = Priority.ALWAYS
+
                 val parser = Parser.builder().build()
                 // Retrieved from https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js
                 val script = JournalApp::class.java.getResource("/javascript/mathjax.js").readText()
@@ -80,15 +86,27 @@ class EditorView : JournalView() {
 
                 editorController.isEditable.onChange { update() }
                 editorController.current.onChange { update() }
-
-                hgrow = Priority.ALWAYS
-                vgrow = Priority.ALWAYS
-
-                disableWhen(editorController.isEditable)
-                visibleWhen(editorController.isEditable.not())
-                managedWhen(editorController.isEditable.not())
+                editorController.plainMarkdown.onChange { update() }
             }
+            scrollpane {
+                disableWhen(editorController.plainMarkdown.not() or editorController.isEditable)
+                hiddenWhen(editorController.plainMarkdown.not() or editorController.isEditable)
+                managedWhen(editorController.plainMarkdown and editorController.isEditable.not())
+                vgrow = Priority.ALWAYS
+                hgrow = Priority.ALWAYS
 
+                text {
+                    fun update() {
+                        if (editorController.isEditable.not().get() && editorController.current.isNotNull.get()) {
+                            text = editorController.current.value.asSimpleMarkdown()
+                        }
+                    }
+
+                    editorController.isEditable.onChange { update() }
+                    editorController.current.onChange { update() }
+                    editorController.plainMarkdown.onChange { update() }
+                }
+            }
 
             run {
                 val area = InlineCssTextArea()
@@ -113,7 +131,7 @@ class EditorView : JournalView() {
                             ) {
                                 items += Pair(
                                     Pair(referencePosition.startProperty.get(), referencePosition.endProperty.get()),
-                                    referencePosition.referenceProperty.get().title
+                                    referencePosition.referenceProperty.get().titleProperty.get()
                                 )
                                 referencePos.add(referencePosition)
                             }
@@ -196,6 +214,12 @@ class EditorView : JournalView() {
 
         hbox {
             addClass(Styles.buttons)
+
+            togglebutton("Plain Markdown") {
+                disableWhen(editorController.isEditable)
+                editorController.plainMarkdown.bindBidirectional(this.selectedProperty())
+            }
+
             text("Last Edit")
             text(editorController.current.select { it.lastEditProperty.asString() })
 

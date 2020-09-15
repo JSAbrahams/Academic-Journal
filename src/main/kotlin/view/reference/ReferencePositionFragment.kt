@@ -1,18 +1,21 @@
 package main.kotlin.view.reference
 
 import javafx.geometry.Orientation
+import javafx.scene.input.MouseButton
 import main.kotlin.Styles
+import main.kotlin.controller.EditorController
 import main.kotlin.controller.ReferencesController
 import main.kotlin.model.journal.ReferencePosition
 import main.kotlin.model.journal.ReferencePositionModel
 import tornadofx.*
 
 class ReferencePositionFragment : ListCellFragment<ReferencePosition>() {
-    val entry = ReferencePositionModel(itemProperty)
+    private val entry = ReferencePositionModel(itemProperty)
 
-    val referencesController: ReferencesController by inject()
+    private val referencesController: ReferencesController by inject()
+    private val editorController: EditorController by inject()
 
-    val referencesView: ZoteroView by inject()
+    private val referencesView: ZoteroView by inject()
 
     override val root = vbox {
         hbox {
@@ -29,9 +32,13 @@ class ReferencePositionFragment : ListCellFragment<ReferencePosition>() {
         text(entry.reference.select { it.titleProperty })
 
         setOnMouseClicked {
-            if (it.clickCount == 2 && entry.reference.isNotNull.get()) {
-                referencesController.selectedReference.set(entry.reference.value)
+            if (entry.reference.isNull.get()) return@setOnMouseClicked
+
+            if (it.button == MouseButton.PRIMARY && it.clickCount == 2) {
+                referencesController.selectedReferenceProperty.set(entry.reference.value)
                 referencesView.openWindow(owner = currentWindow, block = true)
+            } else if (it.button == MouseButton.SECONDARY && it.clickCount == 2 && editorController.current.isNotNull.get()) {
+                editorController.current.value.referencesProperty.remove(itemProperty.value)
             }
         }
     }

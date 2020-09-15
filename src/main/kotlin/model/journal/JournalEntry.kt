@@ -91,7 +91,46 @@ class JournalEntry(
         lastEditProperty.set(LocalDateTime.now())
     }
 
-    fun asSimpleMarkdown(): String = "# ${titleProperty.get()}\n" + textProperty.get()
+    /**
+     * Render as markdown, with:
+     * - The title
+     * - References, including the URL's
+     */
+    fun asSimpleMarkdown(): String {
+        val text = StringBuilder(textProperty.get())
+        // every time we insert a reference, we must increment the offset
+        var offset = 0
+
+        val references =
+            referencesProperty.sortedBy { it.startProperty.get() }.map { it.referenceProperty.value }.distinct()
+        val referenceNumbers = references.mapIndexed { index, reference -> reference to index + 1 }.toMap()
+
+        referencesProperty.sortedBy { it.endProperty.get() }.forEach {
+            text.insert(it.endProperty.get() + offset, " [${referenceNumbers[it.referenceProperty.value]}]")
+            offset += 4
+        }
+
+        text.append(
+            if (referencesProperty.isNotEmpty()) {
+                "\n ## References\n"
+            } else {
+                "\n\n\n"
+            }
+        )
+
+        referenceNumbers.forEach { (reference, index) ->
+            text.append("$index. ${reference.titleProperty.get()} | ")
+            text.append(
+                if (reference.doiProperty.get().isEmpty()) {
+                    "[${reference.urlProperty.get()}](${reference.urlProperty.get()})\n"
+                } else {
+                    "[${reference.doiProperty.get()}](${reference.urlProperty.get()})\n"
+                }
+            )
+        }
+
+        return "# ${titleProperty.get()}\n\n" + text
+    }
 
     override fun equals(other: Any?): Boolean = other is JournalEntry
             && lastEditProperty.get().epochSeconds == other.lastEditProperty.get().epochSeconds
@@ -112,7 +151,6 @@ class JournalEntry(
         return result
     }
 }
-
 
 /**
  * Custom JournalEntrySerializer to handle the ObjectProperty's.

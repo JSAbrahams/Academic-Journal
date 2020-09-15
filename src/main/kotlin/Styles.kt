@@ -3,6 +3,7 @@ package main.kotlin
 import javafx.geometry.Pos
 import javafx.scene.layout.CornerRadii
 import javafx.scene.paint.Color
+import javafx.scene.text.FontWeight
 import tornadofx.*
 
 val Color.web: String
@@ -24,6 +25,8 @@ class Styles : Stylesheet() {
         val tagRadii = CornerRadii(10.0)
 
         val entryItem by cssclass()
+        val entryItemTitle by cssclass()
+        val textEntry by cssclass()
 
         val customContainer by cssclass()
         val nestedContainer by cssclass()
@@ -53,7 +56,7 @@ class Styles : Stylesheet() {
             textArea { backgroundRadius = multi(box(0.em)) }
             padding = box(5.px)
             spacing = 5.px
-            vgap = 10.px
+            vgap = 5.px
             hgap = 10.px
         }
         nestedContainer {
@@ -76,9 +79,20 @@ class Styles : Stylesheet() {
             fontScale = 0.3
         }
 
+        entryItemTitle {
+            fontWeight = FontWeight.BOLD
+        }
         entryItem {
             padding = box(0.px)
             spacing = 5.px
+            hgap = 5.px
+        }
+        textEntry {
+            text {
+                disabled {
+                    textFill = Color.GREEN
+                }
+            }
         }
     }
 }
