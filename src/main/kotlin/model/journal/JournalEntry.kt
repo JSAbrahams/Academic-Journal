@@ -216,6 +216,6 @@ class JournalEntryModel(property: ObjectProperty<JournalEntry>) :
     val title = bind(autocommit = true) { property.select { it.titleProperty } }
     val edited = bind(autocommit = true) { property.select { it.editedProperty } }
     val creation = bind(autocommit = true) { property.select { it.creationProperty } }
-    val text = bind(autocommit = true) { property.select { it.textProperty } }
+    val text = bind(autocommit = false) { property.select { it.textProperty } }
     val tags: ObservableList<Tag> = bind(autocommit = true) { property.select { it.tagList } }
 }
