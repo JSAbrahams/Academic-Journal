@@ -50,7 +50,7 @@ class JournalEntry(
      */
     fun loadReference(referenceMapping: Map<Int, Reference>) {
         val oldEdited = editedProperty.get()
-        referencesProperty.forEach { it.loadReference(referenceMapping) }
+        referencesProperty.forEach { it.loadReference(referenceMapping, this) }
         editedProperty.set(oldEdited)
     }
 
@@ -216,5 +216,6 @@ class JournalEntryModel(property: ObjectProperty<JournalEntry>) :
     val title = bind(autocommit = true) { property.select { it.titleProperty } }
     val edited = bind(autocommit = true) { property.select { it.editedProperty } }
     val creation = bind(autocommit = true) { property.select { it.creationProperty } }
+    val text = bind(autocommit = true) { property.select { it.textProperty } }
     val tags: ObservableList<Tag> = bind(autocommit = true) { property.select { it.tagList } }
 }

@@ -4,15 +4,20 @@ import javafx.beans.binding.Bindings
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleObjectProperty
 import main.kotlin.Styles
+import main.kotlin.controller.OverviewController
 import main.kotlin.controller.ReferencesController
 import main.kotlin.model.reference.Reference
 import main.kotlin.model.reference.ReferenceModel
+import main.kotlin.view.reference.overview.OverviewView
 import tornadofx.*
 
 class ReferenceFragment(item: Property<Reference>? = null) : ListCellFragment<Reference>() {
-    val referenceController: ReferencesController by inject()
-
     val entry = ReferenceModel(item?.let { SimpleObjectProperty(it.value) } ?: itemProperty)
+
+    private val referenceController: ReferencesController by inject()
+    private val overviewController: OverviewController by inject()
+
+    private val overviewView: OverviewView by inject()
 
     override val root = gridpane {
         addClass(Styles.entryItem)
@@ -22,7 +27,13 @@ class ReferenceFragment(item: Property<Reference>? = null) : ListCellFragment<Re
         }
 
         row {
-            managedWhen(entry.title.isNotBlank())
+            button("Overview") {
+                action {
+                    overviewController.currentReference.set(itemProperty.value)
+                    overviewView.openWindow(owner = currentStage, block = true)
+                }
+            }
+
             text(entry.title) {
                 addClass(Styles.entryItemTitle)
                 gridpaneConstraints { columnSpan = 2 }

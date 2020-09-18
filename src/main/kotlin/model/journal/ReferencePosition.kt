@@ -1,9 +1,6 @@
 package main.kotlin.model.journal
 
-import javafx.beans.property.ObjectProperty
-import javafx.beans.property.SimpleIntegerProperty
-import javafx.beans.property.SimpleObjectProperty
-import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -23,8 +20,11 @@ class ReferencePosition(
 ) {
     val startProperty = SimpleIntegerProperty(start)
     val endProperty = SimpleIntegerProperty(end)
+
     val referenceProperty = SimpleObjectProperty<Reference>()
     val typeProperty = SimpleObjectProperty(referenceType)
+
+    val journalEntryProperty = SimpleObjectProperty<JournalEntry>()
 
     /**
      * Set reference directly.
@@ -43,7 +43,10 @@ class ReferencePosition(
     /**
      * Load reference based on mapping from identifier to actual reference.
      */
-    fun loadReference(referenceMapping: Map<Int, Reference>) = referenceProperty.set(referenceMapping[referenceId])
+    fun loadReference(referenceMapping: Map<Int, Reference>, journalEntry: JournalEntry) {
+        referenceProperty.set(referenceMapping[referenceId])
+        journalEntryProperty.set(journalEntry)
+    }
 
     override fun equals(other: Any?): Boolean = other is ReferencePosition
             && startProperty.get() == other.startProperty.get()
@@ -103,4 +106,5 @@ class ReferencePositionModel(property: ObjectProperty<ReferencePosition>) :
     val reference: ObjectProperty<Reference> = bind(autocommit = true) { property.select { it.referenceProperty } }
     val type =
         bind(autocommit = true) { property.select { it.typeProperty.select { SimpleStringProperty(it.prettyName) } } }
+    val journalEntry: Property<JournalEntry> = bind(autocommit = true) { property.select { it.journalEntryProperty } }
 }
