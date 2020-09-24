@@ -63,10 +63,10 @@ class OverviewView : View() {
                 }
                 column("Summary", ReferencePosition::journalEntryProperty).cellFormat {
                     val model = JournalEntryModel(itemProperty())
-                    graphic = scrollpane {
-                        text(Bindings.createStringBinding({
-                            model.text.value.substring(rowItem.startProperty.get(), rowItem.endProperty.get())
-                        }))
+                    graphic = textarea(Bindings.createStringBinding({
+                        model.text.value.substring(rowItem.startProperty.get(), rowItem.endProperty.get())
+                    })) {
+                        isEditable = false
                     }
                 }
             }

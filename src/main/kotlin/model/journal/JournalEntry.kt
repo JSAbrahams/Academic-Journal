@@ -101,8 +101,10 @@ class JournalEntry(
         // every time we insert a reference, we must increment the offset
         var offset = 0
 
-        val references =
-            referencesProperty.sortedBy { it.startProperty.get() }.map { it.referenceProperty.value }.distinct()
+        val references = referencesProperty
+            .filter { it.referenceProperty.isNotNull.get() }
+            .sortedBy { it.startProperty.get() }
+            .map { it.referenceProperty.value }.distinct()
         val referenceNumbers = references.mapIndexed { index, reference -> reference to index + 1 }.toMap()
 
         referencesProperty.sortedBy { it.endProperty.get() }.forEach {
@@ -111,13 +113,12 @@ class JournalEntry(
         }
 
         text.append(
-            if (referencesProperty.isNotEmpty()) {
+            if (referenceNumbers.isNotEmpty()) {
                 "\n ## References\n"
             } else {
                 "\n\n\n"
             }
         )
-
         referenceNumbers.forEach { (reference, index) ->
             text.append("$index. ${reference.titleProperty.get()} | ")
             text.append(
@@ -129,7 +130,7 @@ class JournalEntry(
             )
         }
 
-        return "# ${titleProperty.get()}\n\n" + text
+        return (if (titleProperty.isNotEmpty.get()) "# ${titleProperty.get()}\n\n" else "") + text.toString()
     }
 
     override fun equals(other: Any?): Boolean = other is JournalEntry
