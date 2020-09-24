@@ -14,6 +14,7 @@ import main.kotlin.model.journal.JournalEntry
 import main.kotlin.model.journal.ReferencePosition
 import main.kotlin.view.JournalView
 import main.kotlin.view.tag.tagbar
+import org.commonmark.ext.gfm.tables.TablesExtension
 import org.commonmark.parser.Parser
 import org.commonmark.renderer.html.HtmlRenderer
 import org.fxmisc.richtext.InlineCssTextArea
@@ -21,6 +22,7 @@ import org.fxmisc.richtext.SelectionImpl
 import org.fxmisc.richtext.event.MouseOverTextEvent
 import tornadofx.*
 import java.time.Duration
+
 
 class EditorView : JournalView() {
     private val editorController: EditorController by inject()
@@ -68,7 +70,8 @@ class EditorView : JournalView() {
                 vgrow = Priority.ALWAYS
                 hgrow = Priority.ALWAYS
 
-                val parser = Parser.builder().build()
+                val extensions = listOf(TablesExtension.create())
+                val parser = Parser.builder().extensions(extensions).build()
                 // Retrieved from https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js
                 val script = JournalApp::class.java.getResource("/javascript/mathjax.js").readText()
                 val config = JournalApp::class.java.getResource("/javascript/config.js").readText()
@@ -79,7 +82,7 @@ class EditorView : JournalView() {
                         val document = parser.parse(text)
                         val html = "<script>$config</script>" +
                                 "<script type=\"text/javascript\" id=\"MathJax-script\" async>$script</script>" +
-                                HtmlRenderer.builder().build().render(document)
+                                HtmlRenderer.builder().extensions(extensions).build().render(document)
                         engine.loadContent(html)
                     }
                 }
