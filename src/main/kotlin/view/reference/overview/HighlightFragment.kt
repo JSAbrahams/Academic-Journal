@@ -21,10 +21,10 @@ class HighlightFragment : ListCellFragment<ReferencePosition>() {
         }
 
         text(Bindings.createStringBinding({
-            if (!entry.journalEntry.isBound) return@createStringBinding ""
-
-            val text = entry.journalEntry.value.textProperty.value
-            text.substring(itemProperty.value.startProperty.get(), itemProperty.value.endProperty.get())
+            entry.journalEntry.select { it.textProperty }.value?.substring(
+                itemProperty.value.startProperty.get(),
+                itemProperty.value.endProperty.get()
+            )
         }, entry.journalEntry.select { it.textProperty }))
     }
 }

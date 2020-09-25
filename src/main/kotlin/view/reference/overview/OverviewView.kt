@@ -36,8 +36,8 @@ class OverviewView : View() {
 
         rowConstraints.add(RowConstraints().also { it.vgrow = Priority.NEVER })
         row {
-            text("Highlights")
-            text("Summary")
+            text("Highlights") { addClass(Styles.title) }
+            text("Summary") { addClass(Styles.title) }
         }
 
         rowConstraints.add(RowConstraints().also { it.vgrow = Priority.ALWAYS })
@@ -63,10 +63,10 @@ class OverviewView : View() {
                 }
                 column("Summary", ReferencePosition::journalEntryProperty).cellFormat {
                     val model = JournalEntryModel(itemProperty())
-                    graphic = textarea(Bindings.createStringBinding({
+                    graphic = text(Bindings.createStringBinding({
                         model.text.value.substring(rowItem.startProperty.get(), rowItem.endProperty.get())
                     })) {
-                        isEditable = false
+                        isWrapText = true
                     }
                 }
             }
