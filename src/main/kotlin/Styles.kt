@@ -27,6 +27,7 @@ class Styles : Stylesheet() {
         val entryItem by cssclass()
         val entryItemTitle by cssclass()
         val textEntry by cssclass()
+        val greyed by cssclass()
 
         val customContainer by cssclass()
         val nestedContainer by cssclass()
@@ -93,6 +94,10 @@ class Styles : Stylesheet() {
                     textFill = Color.GREEN
                 }
             }
+        }
+
+        greyed {
+            fill = Color.GREY
         }
     }
 }
