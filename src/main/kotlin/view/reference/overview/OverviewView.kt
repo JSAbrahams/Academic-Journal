@@ -1,17 +1,22 @@
 package main.kotlin.view.reference.overview
 
 import javafx.beans.binding.Bindings
+import javafx.scene.control.TableRow
+import javafx.scene.input.MouseButton
 import javafx.scene.layout.ColumnConstraints
 import javafx.scene.layout.Priority
 import javafx.scene.layout.RowConstraints
 import main.kotlin.Styles
+import main.kotlin.controller.EditorController
 import main.kotlin.controller.OverviewController
 import main.kotlin.model.journal.JournalEntryModel
 import main.kotlin.model.journal.ReferencePosition
 import tornadofx.*
 
+
 class OverviewView : View() {
     private val overviewController: OverviewController by inject()
+    private val editorController: EditorController by inject()
 
     override val root = gridpane {
         addClass(Styles.customContainer)
@@ -68,6 +73,16 @@ class OverviewView : View() {
                     })) {
                         isWrapText = true
                     }
+                }
+
+                setRowFactory {
+                    val row = TableRow<ReferencePosition>()
+                    row.setOnMouseClicked {
+                        if (!row.isEmpty && it.button == MouseButton.PRIMARY && it.clickCount == 2) {
+                            editorController.current.set(row.item?.journalEntryProperty?.value)
+                        }
+                    }
+                    row
                 }
             }
         }

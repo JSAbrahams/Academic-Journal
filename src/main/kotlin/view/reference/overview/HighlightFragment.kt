@@ -55,7 +55,6 @@ class HighlightFragment : ListCellFragment<ReferencePosition>() {
             addClass(Styles.greyed)
         }
 
-
         setOnMouseClicked {
             if (it.button == MouseButton.PRIMARY && it.clickCount == 2) {
                 editorController.current.set(entry.journalEntry.value)
